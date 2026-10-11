@@ -1,0 +1,10 @@
+{
+  "Name": "StardewAI",
+  "Author": "ly",
+  "Version": "1.0.0",
+  "Description": "接入大模型的游戏内 AI：自由提问教程与攻略（F5），并可和任意 NPC 自由对话（F4）",
+  "UniqueID": "ly.StardewAI",
+  "EntryDll": "StardewAI.dll",
+  "MinimumApiVersion": "4.0.0",
+  "UpdateKeys": []
+}
