@@ -1,0 +1,10 @@
+{
+  "Name": "ModManager",
+  "Author": "ly",
+  "Version": "1.0.0",
+  "Description": "游戏内 Mod 管理器：自动检测已装 Mod 的新版本，并支持一键下载更新。",
+  "UniqueID": "ly.ModManager",
+  "EntryDll": "ModManager.dll",
+  "MinimumApiVersion": "4.0.0",
+  "UpdateKeys": []
+}

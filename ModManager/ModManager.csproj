@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AssemblyName>ModManager</AssemblyName>
+    <RootNamespace>ModManager</RootNamespace>
+    <Version>1.0.0</Version>
+    <EnableHarmony>false</EnableHarmony>
+    <GamePath>E:\Steam\steamapps\common\Stardew Valley</GamePath>
+    <IgnoreModFilePaths>^\.;^bin;^obj;^tools</IgnoreModFilePaths>
+    <NoWarn>NETSDK1138;CS1591;NU1701</NoWarn>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.4.0" />
+    <!-- 游戏根目录自带的剪贴板库，仅用于设置面板里的“粘贴”按钮，不随 Mod 复制 -->
+    <Reference Include="TextCopy">
+      <HintPath>$(GamePath)\TextCopy.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
