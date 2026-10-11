@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>星露谷物语 新手图文教程 · 完整版</title>
+<style>
+  :root{
+    --bg:#f6f3ea; --panel:#ffffff; --ink:#2f2b24; --ink2:#5c5548; --ink3:#8a8272;
+    --line:#e4ddcb; --green:#4f7d3f; --green2:#6ea254; --greenl:#e9f1e1;
+    --brown:#8a5a34; --gold:#c9962e; --goldl:#fbf2db; --red:#b5462f; --redl:#fbeae6;
+    --blue:#3f6e8a; --bluel:#e7eff4; --purple:#6b5a8e; --purplel:#efecf5;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB",system-ui,-apple-system,"Segoe UI",sans-serif;
+    line-height:1.8;font-size:15.5px;-webkit-font-smoothing:antialiased}
+  .hero{position:relative;overflow:hidden;color:#fff;padding:52px 24px 44px;
+    background:linear-gradient(135deg,#41702f 0%,#6ea254 52%,#9acb72 100%)}
+  .hero::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(circle at 88% 12%,rgba(255,255,255,.16),transparent 42%),
+               radial-gradient(circle at 6% 90%,rgba(255,255,255,.10),transparent 46%)}
+  .blob{position:absolute;border-radius:50%;background:rgba(255,255,255,.09);pointer-events:none;z-index:1}
+  .b1{width:250px;height:250px;top:-95px;right:-40px}
+  .b2{width:150px;height:150px;bottom:-72px;right:190px;background:rgba(255,255,255,.07)}
+  .b3{width:96px;height:96px;top:22px;right:360px;background:rgba(255,255,255,.06)}
+  .hero-inner{position:relative;z-index:2;max-width:1120px;margin:0 auto}
+  .hero h1{margin:0 0 10px;font-size:30px;letter-spacing:.5px;line-height:1.35}
+  .hero p{margin:0;font-size:15px;opacity:.94}
+  .tags{margin-top:20px;display:flex;flex-wrap:wrap;gap:8px}
+  .tag{background:rgba(255,255,255,.17);border:1px solid rgba(255,255,255,.38);
+    padding:4px 13px;border-radius:999px;font-size:12.5px;letter-spacing:.3px}
+  .wrap{max-width:1120px;margin:0 auto;padding:32px 24px 40px;
+    display:grid;grid-template-columns:236px minmax(0,1fr);gap:30px;align-items:start}
+  .toc{position:sticky;top:22px;background:var(--panel);border:1px solid var(--line);
+    border-radius:14px;padding:16px 13px;box-shadow:0 1px 3px rgba(70,58,36,.05)}
+  .toc h4{margin:0 0 10px;font-size:12.5px;color:var(--ink3);letter-spacing:2px;font-weight:700}
+  .toc a{display:block;padding:7px 11px;border-radius:8px;color:var(--ink2);
+    text-decoration:none;font-size:13.5px;transition:background .15s,color .15s}
+  .toc a:hover{background:var(--greenl);color:var(--green)}
+  main{min-width:0;display:flex;flex-direction:column;gap:22px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:26px 28px 30px;box-shadow:0 1px 3px rgba(70,58,36,.05)}
+  .card>h2{margin:0 0 6px;font-size:20px;display:flex;align-items:center;gap:11px;line-height:1.4}
+  .num{display:inline-flex;width:30px;height:30px;border-radius:9px;background:var(--green);
+    color:#fff;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex:none}
+  .sub{color:var(--ink2);font-size:13.5px;margin:0 0 18px;padding-left:41px}
+  h3{font-size:16px;margin:26px 0 10px;padding-left:11px;border-left:4px solid var(--gold)}
+  h3:first-of-type{margin-top:6px}
+  h4{font-size:14.5px;margin:16px 0 6px}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0;padding-left:22px}
+  li{margin:5px 0}
+  b,strong{color:var(--ink)}
+  code{background:#f0ece0;border:1px solid var(--line);border-radius:5px;
+    padding:1px 6px;font-size:13px;font-family:Consolas,"Courier New",monospace;color:#7a4a22}
+  .note{border-left:4px solid var(--gold);background:var(--goldl);
+    padding:12px 16px;border-radius:0 10px 10px 0;font-size:14px;margin:16px 0}
+  .note.tip{border-left-color:var(--green);background:var(--greenl)}
+  .note.warn{border-left-color:var(--red);background:var(--redl)}
+  .note.info{border-left-color:var(--blue);background:var(--bluel)}
+  .note .t{font-weight:700;margin-right:6px}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+    background:#faf8f2;border:1px dashed var(--line);border-radius:12px;padding:16px;margin:10px 0 6px}
+  .node{background:var(--green);color:#fff;padding:7px 14px;border-radius:10px;
+    font-size:13.5px;white-space:nowrap;box-shadow:0 1px 2px rgba(79,125,63,.25)}
+  .node.alt{background:var(--brown)} .node.gold{background:var(--gold)}
+  .arrow{color:var(--gold);font-weight:700;font-size:15px}
+  .cap{font-size:12.5px;color:var(--ink3);margin:2px 0 0}
+  .steps{list-style:none;padding:0;margin:10px 0 4px;counter-reset:s}
+  .steps li{position:relative;padding:0 0 18px 44px;counter-increment:s}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:27px;height:27px;
+    border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;
+    justify-content:center;font-size:13px;font-weight:700}
+  .steps li::after{content:"";position:absolute;left:13px;top:31px;bottom:3px;width:2px;background:var(--line)}
+  .steps li:last-child{padding-bottom:0} .steps li:last-child::after{display:none}
+  table{width:100%;border-collapse:collapse;font-size:13.6px;margin:10px 0 6px}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:#f2efe4;color:var(--ink2);font-weight:700;white-space:nowrap}
+  tbody tr:nth-child(even){background:#faf8f2}
+  td.c{text-align:center;white-space:nowrap}
+  .wheel-box{display:flex;gap:26px;align-items:center;flex-wrap:wrap;margin:6px 0 4px}
+  .wheel-box svg{width:280px;height:280px;flex:none}
+  .meter{margin:10px 0}
+  .meter-label{display:flex;justify-content:space-between;font-size:13.5px;color:var(--ink2);margin-bottom:6px}
+  .meter-bar{height:18px;background:#efe9dc;border-radius:9px;overflow:hidden;border:1px solid var(--line)}
+  .meter-fill{height:100%;width:100%;background:linear-gradient(90deg,#6ea254,#b9d894)}
+  .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:12px 0 4px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:12px 0 4px}
+  .mini{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#faf8f2}
+  .mini h4{margin:0 0 5px;font-size:15px;color:var(--green)}
+  .mini .kv{font-size:13px;color:var(--ink2);margin:3px 0}
+  .mini .kv b{color:var(--ink)}
+  .way{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:#faf8f2}
+  .way .wt{font-size:15.5px;font-weight:700;color:var(--green);display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .way .wn{display:inline-flex;width:21px;height:21px;border-radius:6px;background:var(--green);
+    color:#fff;font-size:12px;align-items:center;justify-content:center;flex:none}
+  .way p{font-size:13.2px;color:var(--ink2);margin:4px 0}
+  .way .kw{color:var(--gold);font-weight:700}
+  .chip{display:inline-block;font-size:11.5px;padding:1px 8px;border-radius:999px;
+    border:1px solid var(--line);background:#fff;color:var(--ink3);margin:0 5px 3px 0}
+  .school{border:1px solid var(--line);border-radius:12px;padding:15px 16px;background:#fff}
+  .school h4{margin:0 0 8px;font-size:15px;color:var(--brown)}
+  .school .pro,.school .con{font-size:13px;margin:4px 0;color:var(--ink2)}
+  .school .pro b{color:var(--green)} .school .con b{color:var(--red)}
+  .tl{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:12px 0 4px}
+  .tl-item{border:1px solid var(--line);border-radius:12px;padding:14px 15px;background:#fff;position:relative;overflow:hidden}
+  .tl-item::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--green)}
+  .tl-item.t2::before{background:var(--gold)} .tl-item.t3::before{background:var(--blue)}
+  .tl-item .d{font-size:13px;color:var(--ink3);font-weight:700;letter-spacing:.5px}
+  .tl-item .h{font-size:15px;font-weight:700;margin:2px 0 6px;color:var(--green)}
+  .tl-item.t2 .h{color:var(--brown)} .tl-item.t3 .h{color:var(--blue)}
+  .tl-item p{font-size:13.2px;margin:4px 0;color:var(--ink2)}
+  .mine{display:grid;grid-template-columns:repeat(12,1fr);gap:5px;margin:10px 0 6px}
+  .mc{height:26px;border-radius:6px;background:#e9e3d5;color:var(--ink3);
+    font-size:10.5px;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .mc.g{background:var(--greenl);color:var(--green);border:1px solid #cfe0bf}
+  .mc.deep{background:#dbe9d0;color:#3f6b31;border:1px solid #c2d8ad}
+  .mc.deepest{background:#c9ddb8;color:#33591f;border:1px solid #b3ce97}
+  .mine-legend{font-size:12.5px;color:var(--ink3);display:flex;gap:16px;flex-wrap:wrap}
+  .hearts{font-size:22px;letter-spacing:3px;color:#c9536a;line-height:1}
+  .hearts .off{color:#ddd5c4}
+  .room{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:16px 0}
+  .room-head{background:linear-gradient(135deg,#4f7d3f,#6ea254);color:#fff;
+    padding:10px 16px;font-size:15px;font-weight:700;display:flex;justify-content:space-between;
+    align-items:center;gap:10px;flex-wrap:wrap}
+  .room-head .meta{font-size:12px;font-weight:400;opacity:.92}
+  .room-body{padding:14px 16px 6px;background:#fff}
+  .bundle{margin:0 0 14px}
+  .bundle:last-child{margin-bottom:8px}
+  .bundle .bt{font-size:14px;font-weight:700;color:var(--ink);display:flex;
+    justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:2px}
+  .bundle .btr{font-size:12px;color:var(--gold);font-weight:700}
+  .room table{margin:5px 0 0;font-size:13.1px}
+  .room th{background:#f6f4ec}
+  /* ID 速查表 */
+  .ids table{font-size:12.8px}
+  .ids td{padding:5px 8px}
+  .ids td.n{width:38%}
+  .ids td.i{width:12%;white-space:nowrap}
+  .ids td.i code{background:#eef3e8;border-color:#d5e3c8;color:#3f6b31;font-weight:700}
+  .idh{font-size:14.5px;font-weight:700;color:var(--green);margin:20px 0 2px;
+    padding-left:10px;border-left:4px solid var(--green)}
+  .idh:first-of-type{margin-top:8px}
+  /* 查询工具 */
+  .idtool{display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+    background:#faf8f2;border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;margin:14px 0 6px}
+  .idtool input{flex:1;min-width:200px;padding:9px 13px;font-size:14.5px;
+    border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);
+    outline:none;font-family:inherit}
+  .idtool input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(79,125,63,.12)}
+  .idcnt{font-size:12.5px;color:var(--ink3);white-space:nowrap}
+  .idclr{font-size:12.5px;padding:8px 14px;border-radius:9px;border:1px solid var(--line);
+    background:#fff;color:var(--ink2);cursor:pointer;font-family:inherit}
+  .idclr:hover{background:var(--greenl);color:var(--green);border-color:#cfe0bf}
+  .idhint{font-size:12.5px;color:var(--ink3);margin:6px 0 0}
+  .ids td.i code{cursor:pointer;transition:background .12s}
+  .ids td.i code:hover{background:#dcead0}
+  .ids td.i code.copied{background:#c9dfb5;color:#2f551f;border-color:#b3ce97}
+  .empty{text-align:center;color:var(--ink3);font-size:13.5px;padding:26px 0;margin:0;display:none}
+  /* 内嵌查询工具 */
+  .tbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#faf8f2;
+    border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin:6px 0 10px}
+  .tbar input{flex:1;min-width:190px;padding:10px 13px;font-size:15px;border:1px solid var(--line);
+    border-radius:9px;outline:none;font-family:inherit;background:#fff;color:var(--ink)}
+  .tbar input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(79,125,63,.12)}
+  .estat{font-size:12.5px;color:var(--ink3);white-space:nowrap}
+  .ebtn{font-size:12.5px;padding:9px 13px;border-radius:9px;border:1px solid var(--line);
+    background:#fff;color:var(--ink2);cursor:pointer;font-family:inherit;white-space:nowrap}
+  .ebtn:hover{background:var(--greenl);color:var(--green);border-color:#cfe0bf}
+  .ebtn.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:700}
+  .etypes{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 8px}
+  .etp{font-size:12.5px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);
+    background:#fff;color:var(--ink2);cursor:pointer;font-family:inherit}
+  .etp:hover{border-color:#cfe0bf;color:var(--green)}
+  .etp.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:700}
+  .etp .n{opacity:.65;font-size:11px}
+  .ehint{font-size:12.5px;color:var(--ink3);margin:6px 0 10px}
+  .egrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(216px,1fr));gap:9px;
+    max-height:560px;overflow-y:auto;padding:2px}
+  .eit{background:#faf8f2;border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+    display:flex;justify-content:space-between;align-items:center;gap:9px}
+  .eit:hover{border-color:#bcd4a8;background:#fff}
+  .eim{min-width:0;flex:1}
+  .ezh{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .een{font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .etg{display:inline-block;font-size:10px;border-radius:5px;padding:0 6px;margin-top:3px}
+  .etg.g{color:#3f6b31;background:var(--greenl)}
+  .etg.q{color:#7a4a22;background:var(--goldl)}
+  .ecd{font-family:Consolas,"Courier New",monospace;font-weight:700;border-radius:8px;
+    padding:5px 10px;cursor:pointer;user-select:none;white-space:nowrap;font-size:14.5px;
+    color:#3f6b31;background:#eef3e8;border:1px solid #d5e3c8}
+  .ecd.q{font-size:11.5px;color:#8a6234;background:var(--goldl);border-color:#eadcb0}
+  .ecd.ok{background:#c9dfb5;border-color:#b3ce97;color:#2f551f}
+  .enone{text-align:center;color:var(--ink3);font-size:13.5px;padding:34px 0}
+  .foot{max-width:1120px;margin:0 auto;padding:8px 24px 60px;font-size:12.5px;color:var(--ink3);line-height:1.9}
+  .foot b{color:var(--ink2)}
+  @media (max-width:900px){
+    .wrap{grid-template-columns:1fr;gap:20px;padding:22px 16px 30px}
+    .toc{position:static;display:flex;flex-wrap:wrap;gap:6px}
+    .toc h4{width:100%} .toc a{padding:6px 10px;background:#faf8f2}
+    .grid2,.grid3,.tl{grid-template-columns:1fr}
+    .hero h1{font-size:24px} .card{padding:22px 18px 26px} .sub{padding-left:0}
+    .mine{grid-template-columns:repeat(6,1fr)}
+    .ids td.n{width:auto}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+  <div class="hero-inner">
+    <h1>星露谷物语 新手图文教程 · 完整版</h1>
+    <p>从第一天到第一年 · 赚钱方式全解 · 玩法流派 · 献祭清单 · 小鸡代码流与物品代码</p>
+    <div class="tags">
+      <span class="tag">图文速查</span>
+      <span class="tag">12 种赚钱方式</span>
+      <span class="tag">10 大玩法流派</span>
+      <span class="tag">社区中心全阶段献祭</span>
+      <span class="tag">小鸡代码流 + 物品代码表</span>
+      <span class="tag">基于 1.6 版本</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="toc">
+    <h4>目录</h4>
+    <a href="#c1">1　先懂循环</a>
+    <a href="#c2">2　第一天开局</a>
+    <a href="#c3">3　三大核心系统</a>
+    <a href="#c4">4　赚钱方式全解（12 种）</a>
+    <a href="#c5">5　玩法流派（10 种）</a>
+    <a href="#c6">6　春季开局时间轴</a>
+    <a href="#c7">7　下矿须知</a>
+    <a href="#c8">8　社交与社区中心</a>
+    <a href="#c9">9　献祭全清单（分阶段）</a>
+    <a href="#c10">10　小鸡代码流</a>
+    <a href="#c11">11　物品代码查询工具</a>
+    <a href="#c12">12　新手常见误区</a>
+    <a href="#c13">13　第一年四季规划</a>
+    <a href="#c14">14　常用查询入口</a>
+  </nav>
+
+  <main>
+
+    <!-- 1 -->
+    <section class="card" id="c1">
+      <h2><span class="num">1</span>先懂循环：这个游戏在玩什么</h2>
+      <p class="sub">核心不是"通关"，而是一套可持续放大的日常循环</p>
+      <div class="flow">
+        <span class="node">种田</span><span class="arrow">→</span>
+        <span class="node">收获</span><span class="arrow">→</span>
+        <span class="node gold">卖钱 / 加工增值</span><span class="arrow">→</span>
+        <span class="node">买种子 · 盖建筑 · 升级工具</span><span class="arrow">→</span>
+        <span class="node alt">下矿 · 钓鱼 · 社交</span><span class="arrow">→</span>
+        <span class="node">解锁新内容</span>
+      </div>
+      <p class="cap">最后一步回到"种田"，形成正反馈循环——农场规模与收入会随之滚雪球。</p>
+      <div class="note info"><span class="t">关键认知：</span>游戏内主线任务没有时间限制。不必追赶进度，按自己的节奏玩即可——慢慢探索恰恰是最好的体验方式。</div>
+    </section>
+
+    <!-- 2 -->
+    <section class="card" id="c2">
+      <h2><span class="num">2</span>第一天：跟着引导走完开局</h2>
+      <p class="sub">游戏没有独立教程关，但第一天本身就是教程</p>
+      <ol class="steps">
+        <li><b>选择农场地图</b> —— 开局先选农场类型（详见第 5 章），新手建议选<b>标准农场</b>，布局开阔、容错高。</li>
+        <li><b>抵达小镇</b> —— 开场动画后，木匠 Robin 会在镇口接你，并带你走到农场小屋。</li>
+        <li><b>进屋安顿</b> —— 小屋里有床、电视和储物箱。床是每天存档与恢复体力的地方。</li>
+        <li><b>收到首封信</b> —— 镇长 Lewis 交给你一封信，附赠 <b>15 个防风草种子</b>，并解锁"开始游戏"任务。</li>
+        <li><b>开垦与播种</b> —— 用锄头翻地 → 撒种 → 用浇水壶浇水。这三步是往后每天的日常动作。</li>
+        <li><b>认识镇上的人</b> —— 天黑前到镇上走一圈，和遇到的村民打招呼，会累积初始好感度。</li>
+        <li><b>回屋睡觉</b> —— 上床睡觉即保存进度；体力用完后必须睡觉，否则会在野外晕倒并被扣钱。</li>
+      </ol>
+      <div class="note tip"><span class="t">小贴士：</span>防风草 <b>4 天成熟</b>，基础售价 35 金。第一季这 15 株就是你启动资金的第一桶金。前期务必保证<b>田里一直有作物在长</b>。</div>
+    </section>
+
+    <!-- 3 -->
+    <section class="card" id="c3">
+      <h2><span class="num">3</span>三大核心系统：时间 · 能量 · 电视</h2>
+      <p class="sub">理解这三样，就理解了大半的游戏节奏</p>
+
+      <h3>3.1　时间与季节</h3>
+      <div class="wheel-box">
+        <svg viewBox="0 0 320 320" role="img" aria-label="四季轮盘">
+          <g transform="rotate(-90 160 160)">
+            <circle cx="160" cy="160" r="118" fill="none" stroke="#7fb069" stroke-width="44" stroke-dasharray="185.35 556.1"/>
+            <circle cx="160" cy="160" r="118" fill="none" stroke="#e0b04a" stroke-width="44" stroke-dasharray="185.35 556.1" stroke-dashoffset="-185.35"/>
+            <circle cx="160" cy="160" r="118" fill="none" stroke="#c9803f" stroke-width="44" stroke-dasharray="185.35 556.1" stroke-dashoffset="-370.7"/>
+            <circle cx="160" cy="160" r="118" fill="none" stroke="#85a9c9" stroke-width="44" stroke-dasharray="185.35 556.1" stroke-dashoffset="-556.05"/>
+          </g>
+          <text x="160" y="150" text-anchor="middle" font-size="18" font-weight="700" fill="#2f2b24" font-family="Microsoft YaHei,sans-serif">1 年</text>
+          <text x="160" y="176" text-anchor="middle" font-size="12.5" fill="#5c5548" font-family="Microsoft YaHei,sans-serif">4 季 × 28 天</text>
+          <text x="160" y="196" text-anchor="middle" font-size="12.5" fill="#5c5548" font-family="Microsoft YaHei,sans-serif">共 112 天</text>
+          <text x="244" y="86" text-anchor="middle" font-size="14" font-weight="700" fill="#3f6b31" font-family="Microsoft YaHei,sans-serif">春</text>
+          <text x="244" y="240" text-anchor="middle" font-size="14" font-weight="700" fill="#8a6a15" font-family="Microsoft YaHei,sans-serif">夏</text>
+          <text x="76" y="240" text-anchor="middle" font-size="14" font-weight="700" fill="#8a4f1d" font-family="Microsoft YaHei,sans-serif">秋</text>
+          <text x="76" y="86" text-anchor="middle" font-size="14" font-weight="700" fill="#2f5570" font-family="Microsoft YaHei,sans-serif">冬</text>
+        </svg>
+        <div>
+          <ul>
+            <li>一天从早上 6:00 开始；凌晨 2:00 未睡觉会强制晕倒。</li>
+            <li>一个季度固定 <b>28 天</b>，顺序为 春 → 夏 → 秋 → 冬。</li>
+            <li>季节切换时，<b>田里未收获的作物全部枯萎</b>，务必算好成熟天数。</li>
+            <li>冬天土地无法种植（温室除外），是采集、下矿、钓鱼与升级建筑的季节。</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>3.2　能量（体力）</h3>
+      <div class="meter">
+        <div class="meter-label"><span>初始体力上限</span><span>270 / 270</span></div>
+        <div class="meter-bar"><div class="meter-fill"></div></div>
+      </div>
+      <ul>
+        <li>锄地、浇水、砍树、挖矿、钓鱼都消耗体力；上限可通过收集"星露果"提升。</li>
+        <li>吃东西可恢复体力（防风草、生鱼片、各类料理均有效），前期常靠采集与钓鱼补充。</li>
+        <li><b style="color:#b5462f">体力耗尽会晕倒</b>：扣部分金币，并可能丢失随身物品。出门前务必带吃的。</li>
+      </ul>
+
+      <h3>3.3　电视（每天必看）</h3>
+      <table>
+        <thead><tr><th>节目</th><th>内容</th><th>对你的价值</th></tr></thead>
+        <tbody>
+          <tr><td>靠土地生活</td><td>季节性种田 / 钓鱼 / 采集技巧</td><td>内置"官方教程"，每周固定播出</td></tr>
+          <tr><td>酱汁女王</td><td>每天教一道菜谱，周日重播</td><td>解锁料理，料理能回体力也能送礼</td></tr>
+          <tr><td>天气预报</td><td>次日天气</td><td>雨天不用浇水，可省下大量体力</td></tr>
+          <tr><td>今日运势</td><td>当日幸运值</td><td><b>幸运值高时下矿</b>，掉落与下探概率更好</td></tr>
+        </tbody>
+      </table>
+      <div class="note tip"><span class="t">建议：</span>每天早上先开电视看一遍（约 1 分钟游戏时间），长期收益非常可观。</div>
+    </section>
+
+    <!-- 4 -->
+    <section class="card" id="c4">
+      <h2><span class="num">4</span>赚钱方式全解（12 种）</h2>
+      <p class="sub">每种方式都标注了产出、启动成本、适用阶段与操作要点</p>
+
+      <h3>4.1　快速对比</h3>
+      <table>
+        <thead><tr><th>方式</th><th class="c">启动成本</th><th class="c">收益上限</th><th class="c">省力程度</th><th>最佳阶段</th></tr></thead>
+        <tbody>
+          <tr><td>种植</td><td class="c">低</td><td class="c">高</td><td class="c">中</td><td>全程</td></tr>
+          <tr><td>钓鱼</td><td class="c">极低</td><td class="c">中</td><td class="c">低</td><td>前期</td></tr>
+          <tr><td>下矿</td><td class="c">低</td><td class="c">中</td><td class="c">低</td><td>前期—中期</td></tr>
+          <tr><td>采集</td><td class="c">零</td><td class="c">低</td><td class="c">中</td><td>前期</td></tr>
+          <tr><td>畜牧</td><td class="c">高</td><td class="c">中高</td><td class="c">中</td><td>中期</td></tr>
+          <tr><td>工匠品加工</td><td class="c">中高</td><td class="c">极高</td><td class="c">中</td><td>中期—后期</td></tr>
+          <tr><td>林业</td><td class="c">中</td><td class="c">中</td><td class="c">高</td><td>中期</td></tr>
+          <tr><td>鱼塘</td><td class="c">中</td><td class="c">中</td><td class="c">高</td><td>中期—后期</td></tr>
+          <tr><td>蟹笼</td><td class="c">中</td><td class="c">低中</td><td class="c">极高</td><td>中期</td></tr>
+          <tr><td>温室 · 上古果实</td><td class="c">高</td><td class="c">极高</td><td class="c">高</td><td>后期</td></tr>
+          <tr><td>蘑菇洞 / 果蝠洞</td><td class="c">中</td><td class="c">低中</td><td class="c">极高</td><td>中期</td></tr>
+          <tr><td>宝石复制机等被动</td><td class="c">高</td><td class="c">中</td><td class="c">极高</td><td>后期</td></tr>
+        </tbody>
+      </table>
+
+      <h3>4.2　逐项详解</h3>
+      <div class="grid2">
+
+        <div class="way"><div class="wt"><span class="wn">1</span>种植（农作物）</div>
+          <p><span class="kw">产出：</span>防风草、土豆、蓝莓、南瓜、蔓越莓等季节性作物。</p>
+          <p><span class="kw">要点：</span>作物只在所属季节生长，换季会枯萎——务必按"剩余天数 ≥ 成熟天数"决定种什么。</p>
+          <p><span class="kw">技巧：</span>优先种<b>可反复收获</b>的作物（蓝莓、蔓越莓、草莓、啤酒花），一次播种多次收成。</p>
+          <p><span class="kw">时机：</span>全程可用，是收入的底盘。</p>
+        </div>
+
+        <div class="way"><div class="wt"><span class="wn">2</span>钓鱼</div>
+          <p><span class="kw">产出：</span>各类鱼；普通鱼单价数十金，稀有鱼可达数百至数千金。</p>
+          <p><span class="kw">要点：</span>鱼的种类由<b>水域（河/湖/海）+ 季节 + 时间段 + 天气</b>共同决定，雨天常能钓到特殊鱼。</p>
+          <p><span class="kw">技巧：</span>钓竿点按要短促，不要长按；钓鱼等级越高，绿色进度条越长、越容易。</p>
+          <p><span class="kw">时机：</span><b>前期最佳</b>——零成本、不受土地限制、雨天也有收益。</p>
+        </div>
+
+        <div class="way"><div class="wt"><span class="wn">3</span>下矿（采矿）</div>
+          <p><span class="kw">产出：</span>铜/铁/金/铱矿石、煤、各色宝石与晶球。</p>
+          <p><span class="kw">要点：</span>矿石用于<b>升级工具</b>与建造设施，宝石（钻石、绿宝石等）可直接卖钱。</p>
+          <p><span class="kw">技巧：</span>看当日<b>幸运值</b>决定是否深挖；层数越深，矿物越贵重。</p>
+          <p><span class="kw">时机：</span>雨天（不用浇水）优先下矿；春季第 5 日矿洞开放后即可开始。</p>
+        </div>
+
+        <div class="way"><div class="wt"><span class="wn">4</span>采集（觅食）</div>
+          <p><span class="kw">产出：</span>季节性野物（野山葵、野梅、榛子等）、沙滩贝类、野生蘑菇。</p>
+          <p><span class="kw">要点：</span>零成本，且是<b>社区中心献祭包</b>的刚需材料。</p>
+          <p><span class="kw">技巧：</span>记住每个季节物品的刷新区域；配合"采集者"「伐木工」等职业加成收益翻倍。</p>
+          <p><span class="kw">时机：</span>前期顺手做，边走路边捡。</p>
+        </div>
+
+        <div class="way"><div class="wt"><span class="wn">5</span>畜牧（动物产品）</div>
+          <p><span class="kw">产出：</span>鸡蛋、牛奶、羊毛、鸭蛋、松露、兔子的脚。</p>
+          <p><span class="kw">要点：</span>动物<b>好感度越高，产出品质越高</b>（金星/铱星溢价明显）。每天抚摸、保证有草料。</p>
+          <p><span class="kw">技巧：</span>建<b>筒仓</b>自动储草；鸡舍畜棚可升级，解锁自动喂料。</p>
+          <p><span class="kw">时机：</span>中期建立，配合压酪机/蛋黄酱机变现。</p>
+        </div>
+
+        <div class="way"><div class="wt"><span class="wn">6</span>工匠品加工（收益最高）</div>
+          <p><span class="kw">产出：</span>果酒、果酱、腌菜、奶酪、蛋黄酱、蜂蜜、松露油、布料。</p>
+          <p><span class="kw">要点：</span>水果进<b>小桶</b>变果酒（约原价 3 倍）；水果蔬菜进<b>罐头瓶</b>变果酱/腌菜（约 2 倍 + 50）。</p>
+          <p><span class="kw">技巧：</span>设施越多越好，原料可以来自种植、畜牧、采集任何一个环节。</p>
+          <p><span class="kw">时机：</span>中期铺开，后期是主要收入来源。</p>
+        </div>
+
+        <div class="way"><div class="wt"><span class="wn">7</span>林业（树液采集）</div>
+          <p><span class="kw">产出：</span>枫糖浆、橡树树脂、松焦油；砍树另得木材。</p>
+          <p><span class="kw">要点：</span>给成树装<b>树液采集器</b>，之后完全自动产出，周期以天计。</p>
+          <p><span class="kw">技巧：</span>三种产物都是制作与献祭材料，可自用也可出售；林场规模化后产量可观。</p>
+          <p><span class="kw">时机：</span>中期布置，摆好就不用管。</p>
+        </div>
+
+        <div class="way"><div class="wt"><span class="wn">8</span>鱼塘（养鱼）</div>
+          <p><span class="kw">产出：</span>鱼籽（Roe）；鲟鱼的鱼籽加工后是<b>鱼籽酱</b>（高价）。</p>
+          <p><span class="kw">要点：</span>鱼塘可扩容养更多鱼，鱼越多产出越频繁；鱼籽放进罐头瓶继续加工。</p>
+          <p><span class="kw">技巧：</span>鱼塘还能稳定产出献祭/料理所需鱼类，一举两得。</p>
+          <p><span class="kw">时机：</span>中期建造，后期收益稳定。</p>
+        </div>
+
+        <div class="way"><div class="wt"><span class="wn">9</span>蟹笼（自动捕鱼）</div>
+          <p><span class="kw">产出：</span>龙虾、螃蟹、鸟蛤、蚌、虾、蜗牛等贝类水产。</p>
+          <p><span class="kw">要点：</span>放入水中并塞入<b>鱼饵</b>，隔天来收即可；触发"陷阱"技能后无需鱼饵。</p>
+          <p><span class="kw">技巧：</span>是凑齐鱼缸献祭"蟹笼包"的最省力方式。</p>
+          <p><span class="kw">时机：</span>中期批量布置，几乎零维护。</p>
+        </div>
+
+        <div class="way"><div class="wt"><span class="wn">10</span>温室 · 上古果实</div>
+          <p><span class="kw">产出：</span>温室全年可种任何作物；<b>上古果实</b>成熟后持续结果。</p>
+          <p><span class="kw">要点：</span>上古果实 + 小桶 = 上古果酒，是公认的后期最强被动收入。</p>
+          <p><span class="kw">技巧：</span>先用<b>种子生产器</b>把上古果实变回种子，快速扩种整片温室。</p>
+          <p><span class="kw">时机：</span>解锁温室（茶水间献祭）并获得上古种子之后。</p>
+        </div>
+
+        <div class="way"><div class="wt"><span class="wn">11</span>蘑菇洞 / 果蝠洞</div>
+          <p><span class="kw">产出：</span>蘑菇洞稳定产红/紫/普通蘑菇；果蝠洞产各类水果。</p>
+          <p><span class="kw">要点：</span>农场洞穴建成后二选一，选择不可逆（后期可付费更改）。</p>
+          <p><span class="kw">技巧：</span>蘑菇是献祭与料理材料，选蘑菇洞更实用；缺水果的人可选果蝠洞。</p>
+          <p><span class="kw">时机：</span>洞穴建成后长期被动产出。</p>
+        </div>
+
+        <div class="way"><div class="wt"><span class="wn">12</span>宝石复制机等被动设施</div>
+          <p><span class="kw">产出：</span>宝石复制机可批量复制宝石，<b>复制钻石</b>收益最高。</p>
+          <p><span class="kw">要点：</span>来源是金库献祭的奖励；此外蜂房产蜜、避雷针产电池都是被动收益。</p>
+          <p><span class="kw">技巧：</span>复制的宝石既能卖钱，也能用于送礼与献祭。</p>
+          <p><span class="kw">时机：</span>后期，完全被动。</p>
+        </div>
+      </div>
+
+      <h3>4.3　加工链与增值关系</h3>
+      <table>
+        <thead><tr><th>设施</th><th>原料</th><th>产出</th><th>增值逻辑</th></tr></thead>
+        <tbody>
+          <tr><td>小桶</td><td>水果 / 蜂蜜 / 小麦 / 啤酒花</td><td>果酒 / 蜂蜜酒 / 啤酒 / 淡啤酒</td><td>果酒约为水果原价的 <b>3 倍</b>，核心增益</td></tr>
+          <tr><td>罐头瓶</td><td>水果 / 蔬菜 / 鱼籽</td><td>果酱 / 腌菜 / 鱼籽酱</td><td>约为原价 <b>2 倍 + 50</b></td></tr>
+          <tr><td>压酪机</td><td>牛奶 / 羊奶</td><td>奶酪 / 山羊奶酪</td><td>大幅增值，品质越高越贵</td></tr>
+          <tr><td>蛋黄酱机</td><td>鸡蛋 / 鸭蛋 / 恐龙蛋</td><td>蛋黄酱 / 鸭蛋黄酱 / 恐龙蛋黄酱</td><td>稳定增益</td></tr>
+          <tr><td>产油机</td><td>松露 / 玉米 / 向日葵</td><td>松露油 / 玉米油 / 向日葵油</td><td>松露油单价高</td></tr>
+          <tr><td>织布机</td><td>羊毛</td><td>布料</td><td>布料是献祭与制作材料</td></tr>
+          <tr><td>蜂房</td><td>附近的花</td><td>蜂蜜</td><td>无需照料，完全被动</td></tr>
+        </tbody>
+      </table>
+      <div class="note tip"><span class="t">核心思路：</span>前期靠<b>钓鱼 + 种植</b>攒启动资金；中期铺开<b>工匠品加工</b>（小桶/罐头瓶）；后期上<b>温室 + 上古果实 + 小桶</b>，收入会呈指数级增长。</div>
+    </section>
+
+    <!-- 5 -->
+    <section class="card" id="c5">
+      <h2><span class="num">5</span>玩法流派（10 种）</h2>
+      <p class="sub">不同玩家走出完全不同的路线，找到适合你的那一种</p>
+      <div class="grid2">
+        <div class="school"><h4>1　种植流</h4>
+          <p class="pro"><b>核心：</b>大面积种植高价值作物，靠产量取胜。</p>
+          <p class="pro"><b>优点：</b>稳定、易理解，规模可无限扩张。</p>
+          <p class="con"><b>缺点：</b>前期浇水极耗体力，早期需大量手工劳作。</p></div>
+        <div class="school"><h4>2　工匠流 / 酿造流</h4>
+          <p class="pro"><b>核心：</b>作物与畜牧产出全部投入小桶、罐头瓶加工。</p>
+          <p class="pro"><b>优点：</b><b>后期收益最高</b>，是公认的"版本答案"。</p>
+          <p class="con"><b>缺点：</b>需要大量木材、石头与空间建造设施，成型较慢。</p></div>
+        <div class="school"><h4>3　畜牧流</h4>
+          <p class="pro"><b>核心：</b>鸡舍 + 畜棚，靠蛋、奶、毛、松露获利。</p>
+          <p class="pro"><b>优点：</b>产出被动、稳定，配合压酪机收益可观。</p>
+          <p class="con"><b>缺点：</b>需持续供给饲料并每天抚摸动物。</p></div>
+        <div class="school"><h4>4　钓鱼流</h4>
+          <p class="pro"><b>核心：</b>以钓鱼为主要收入，辅以鱼塘与蟹笼。</p>
+          <p class="pro"><b>优点：</b><b>前期来钱最快</b>、零成本、不占地。</p>
+          <p class="con"><b>缺点：</b>需要操作技巧，收入受天气与季节影响。</p></div>
+        <div class="school"><h4>5　矿工流</h4>
+          <p class="pro"><b>核心：</b>深耕矿洞与骷髅洞穴，产出矿石与宝石。</p>
+          <p class="pro"><b>优点：</b>顺带获得武器、装备与工具升级材料。</p>
+          <p class="con"><b>缺点：</b>耗体力、有风险，收入波动较大。</p></div>
+        <div class="school"><h4>6　采集流（觅食）</h4>
+          <p class="pro"><b>核心：</b>拾取季节性物品、蘑菇洞产出、沙滩贝类。</p>
+          <p class="pro"><b>优点：</b>零成本，前期与献祭包的好帮手。</p>
+          <p class="con"><b>缺点：</b>收入上限低，很难作为唯一主线。</p></div>
+        <div class="school"><h4>7　林业流</h4>
+          <p class="pro"><b>核心：</b>规模化种树，装采集器产糖浆/树脂/焦油。</p>
+          <p class="pro"><b>优点：</b>几乎全自动，副产品木材自给自足。</p>
+          <p class="con"><b>缺点：</b>前期回报慢，占地较大。</p></div>
+        <div class="school"><h4>8　温室 · 上古果实流</h4>
+          <p class="pro"><b>核心：</b>温室全种上古果实，配小桶酿酒。</p>
+          <p class="pro"><b>优点：</b><b>后期最强</b>、全年不停、收益极稳。</p>
+          <p class="con"><b>缺点：</b>需先解锁温室并获得上古种子，成型最晚。</p></div>
+        <div class="school"><h4>9　茶苗 / 咖啡流（小清新副业）</h4>
+          <p class="pro"><b>核心：</b>卡罗琳 2 心解锁茶苗配方，规模化种茶苗；或种咖啡豆产咖啡。</p>
+          <p class="pro"><b>优点：</b>前期成本低、见效快。</p>
+          <p class="con"><b>缺点：</b>天花板有限，适合作为过渡副业。</p></div>
+        <div class="school"><h4>10　主线路线流：社区中心 vs Joja</h4>
+          <p class="pro"><b>社区中心：</b>靠收集献祭包修复社区中心，过程长但奖励丰富、剧情完整。</p>
+          <p class="con"><b>Joja：</b>花钱买会员，用金币代替献祭，前期快但需要大量现金，且失去社区中心剧情。</p>
+          <p style="color:var(--ink3);font-size:12.5px">二者只能选其一，会显著影响后期走向。</p></div>
+      </div>
+
+      <h3>农场地图怎么选（与流派强相关）</h3>
+      <table>
+        <thead><tr><th>农场类型</th><th>特点</th><th>适配流派</th></tr></thead>
+        <tbody>
+          <tr><td>标准农场</td><td>地形开阔、耕地最多，最通用</td><td>全能，新手首选</td></tr>
+          <tr><td>河畔农场</td><td>水域多，便于钓鱼</td><td>钓鱼流</td></tr>
+          <tr><td>森林农场</td><td>额外采集物与树桩</td><td>采集流 / 林业流</td></tr>
+          <tr><td>山顶农场</td><td>含矿脉地形</td><td>矿工流</td></tr>
+          <tr><td>荒野农场</td><td>夜间会在农场刷怪</td><td>战斗向玩法</td></tr>
+          <tr><td>四角农场</td><td>四片分区，多人友好</td><td>联机 / 综合</td></tr>
+          <tr><td>海滩农场</td><td>靠海可拾贝，但基本不能用洒水器</td><td>钓鱼流 / 采集流</td></tr>
+          <tr><td>草原农场（1.6 新增）</td><td>自带草地与鸡，畜牧更省心</td><td>畜牧流</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 6 -->
+    <section class="card" id="c6">
+      <h2><span class="num">6</span>春季开局时间轴</h2>
+      <p class="sub">第一季度（春 1 ~ 28 日）该怎么安排</p>
+      <div class="tl">
+        <div class="tl-item"><div class="d">第 1 — 12 天</div><div class="h">站稳脚跟</div>
+          <p>种防风草与土豆，每天浇水；坚持看电视学技巧。随手砍树攒木材、捡采集物。</p></div>
+        <div class="tl-item t2"><div class="d">第 13 天</div><div class="h">蛋蛋节 · 买草莓</div>
+          <p>参加蛋蛋节，尽可能多买<b>草莓种子</b>（100 金/个），散场回家立刻种下。</p></div>
+        <div class="tl-item t3"><div class="d">第 14 — 28 天</div><div class="h">收获与升级</div>
+          <p>草莓成熟后反复收获；攒材料做洒水器；趁农闲去铁匠处升级工具。</p></div>
+      </div>
+      <h3>春季作物速查</h3>
+      <table>
+        <thead><tr><th>作物</th><th class="c">种子价</th><th class="c">成熟天数</th><th class="c">基础售价</th><th>备注</th></tr></thead>
+        <tbody>
+          <tr><td>防风草</td><td class="c">20</td><td class="c">4</td><td class="c">35</td><td>开局种子，周转最快</td></tr>
+          <tr><td>大蒜</td><td class="c">40</td><td class="c">4</td><td class="c">60</td><td>生长快，性价比不错</td></tr>
+          <tr><td>土豆</td><td class="c">50</td><td class="c">6</td><td class="c">80</td><td>有几率额外多产 1 个</td></tr>
+          <tr><td>羽衣甘蓝</td><td class="c">70</td><td class="c">6</td><td class="c">110</td><td>单位收益较高</td></tr>
+          <tr><td>绿豆</td><td class="c">60</td><td class="c">10</td><td class="c">40</td><td>可反复多次收获</td></tr>
+          <tr><td>花椰菜</td><td class="c">80</td><td class="c">12</td><td class="c">175</td><td>单株价高，可长成巨型作物</td></tr>
+          <tr><td>草莓</td><td class="c">100</td><td class="c">8</td><td class="c">120</td><td>蛋蛋节限定，可反复多次收获</td></tr>
+          <tr><td>大黄</td><td class="c">100</td><td class="c">13</td><td class="c">220</td><td>需沙漠商人（解锁沙漠后）</td></tr>
+        </tbody>
+      </table>
+      <div class="note warn"><span class="t">注意：</span>草莓在春季 13 日种下后约 21 日首收，此后每 4 天可再收，直到夏季来临前，通常能收 <b>2 ~ 3 次</b>。换季前务必收完。</div>
+    </section>
+
+    <!-- 7 -->
+    <section class="card" id="c7">
+      <h2><span class="num">7</span>下矿须知</h2>
+      <p class="sub">普通矿洞位于山上，春季第 5 日开放</p>
+      <div class="mine">
+        <div class="mc g">5</div><div class="mc g">10</div><div class="mc g">15</div><div class="mc g">20</div>
+        <div class="mc g">25</div><div class="mc g">30</div><div class="mc g">35</div><div class="mc g">40</div>
+        <div class="mc deep">45</div><div class="mc deep">50</div><div class="mc deep">55</div><div class="mc deep">60</div>
+        <div class="mc deep">65</div><div class="mc deep">70</div><div class="mc deep">75</div><div class="mc deep">80</div>
+        <div class="mc deepest">85</div><div class="mc deepest">90</div><div class="mc deepest">95</div><div class="mc deepest">100</div>
+        <div class="mc deepest">105</div><div class="mc deepest">110</div><div class="mc deepest">115</div><div class="mc deepest">120</div>
+      </div>
+      <div class="mine-legend">
+        <span>■ 浅色：较浅层，相对安全</span>
+        <span>■ 深色：怪物更强，产出更好</span>
+        <span>每格 = 5 层，均为"电梯检查点"</span>
+      </div>
+      <ul>
+        <li>矿洞共 <b>120 层</b>，每 5 层解锁一个电梯记录点，之后可乘电梯直达。</li>
+        <li>每层需找到向下的梯子（或挖开石头）继续下探；石头里也可能藏矿物。</li>
+        <li>建议在电视播报<b>幸运值较高</b>的日子下矿，掉落与开出梯子的概率更好。</li>
+        <li>矿石 → 到铁匠 Clint 处<b>升级工具</b>（铜 → 钢 → 金 → 铱）。</li>
+        <li>各层矿物分布不同：地晶多见于 1-39 层，泪晶多见于 40-79 层，火水晶多见于 80-120 层。</li>
+      </ul>
+      <div class="note warn"><span class="t">升级代价：</span>每次升级耗时 <b>3 天</b>，这 3 天内被升级的工具无法使用。升级浇水壶或锄头前请确认田地状况——通常选在月末无法种植时再升级。</div>
+    </section>
+
+    <!-- 8 -->
+    <section class="card" id="c8">
+      <h2><span class="num">8</span>社交与社区中心</h2>
+      <p class="sub">好感度决定剧情、赠品与后续内容解锁</p>
+      <h3>与村民建立好感</h3>
+      <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:8px 0">
+        <span class="hearts">♥♥♥♥♥<span class="off">♥♥♥♥♥</span></span>
+        <span style="font-size:13px;color:var(--ink2)">每天可送一份礼物 &nbsp;·&nbsp; 满 10 颗心可约会 / 结婚</span>
+      </div>
+      <ul>
+        <li>每位村民有各自喜好：送<b>喜欢</b>的礼物加好感多，送<b>讨厌</b>的反而会扣。</li>
+        <li>生日当天送出的礼物，好感加成显著提高（可达平时的数倍）。</li>
+        <li>好感度到达不同等级会触发专属剧情，并可能获赠物品或配方。</li>
+      </ul>
+      <h3>社区中心 · 献祭包是什么</h3>
+      <p>社区中心内有一系列"献祭包（Bundles）"，按类别提交指定物品即可完成。每个包都有实际奖励，全部完成会修复整个社区中心。这是贯穿前中期的长线目标，具体清单见下一章。若你选择 Joja 路线，则可用金币在 Joja 超市直接购买等价项目，但会失去这部分剧情与奖励。</p>
+      <div class="note tip"><span class="t">小贴士：</span>把卡罗琳好感升到 2 颗心，她会教你"茶苗"配方，种出的<b>茶苗</b>（代码 251）是前期一条不错的稳定收入。</div>
+    </section>
+
+    <!-- 9 -->
+    <section class="card" id="c9">
+      <h2><span class="num">9</span>社区中心献祭全清单（分阶段）</h2>
+      <p class="sub">按房间顺序逐步解锁 —— 每个房间的完成条件与全部所需物品</p>
+
+      <div class="note info">
+        <span class="t">解锁顺序：</span>
+        工艺室（<b>首个开放</b>）→ 茶水间 / 鱼缸（各完成 1 个收集包后）→ 锅炉房（完成 2 个后）→ 公告板（完成 3 个后）→ 金库（完成 4 个后）。
+        所有收集包完成即修复社区中心，并触发后续"失踪的收集包"。
+      </div>
+
+      <div class="room">
+        <div class="room-head"><span>一、工艺室 Crafts Room</span><span class="meta">首个开放 · 奖励：修桥通往采石场 + 金色镰刀</span></div>
+        <div class="room-body">
+          <div class="bundle"><div class="bt"><span>春季采集收集包</span><span class="btr">奖励：春季种子 ×30</span></div>
+            <table><tbody><tr><td>野山葵、黄水仙、韭葱、蒲公英（各 1）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>夏季采集收集包</span><span class="btr">奖励：夏季种子 ×30</span></div>
+            <table><tbody><tr><td>葡萄、香味浆果、甜豌豆（各 1）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>秋季采集收集包</span><span class="btr">奖励：秋季种子 ×30</span></div>
+            <table><tbody><tr><td>普通蘑菇、野梅、榛子、黑莓（各 1）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>冬季采集收集包</span><span class="btr">奖励：冬季种子 ×30</span></div>
+            <table><tbody><tr><td>冬根、水晶果、雪山药、番红花（各 1）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>建筑收集包</span><span class="btr">奖励：煤炭窑 ×1</span></div>
+            <table><tbody><tr><td>木材 ×99、木材 ×99、石头 ×99、硬木 ×10</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>异国情调采集收集包</span><span class="btr">奖励：秋日恩赐 ×5</span></div>
+            <table><tbody><tr><td>椰子、仙人掌果子、山洞萝卜、红蘑菇、紫蘑菇、枫糖浆、橡树树脂、松焦油、羊肚菌（各 1）</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <div class="room">
+        <div class="room-head"><span>二、茶水间 Pantry</span><span class="meta">完成 1 包后开放 · 奖励：修复温室</span></div>
+        <div class="room-body">
+          <div class="bundle"><div class="bt"><span>春季作物收集包</span><span class="btr">奖励：生长激素 ×20</span></div>
+            <table><tbody><tr><td>防风草、青豆、花椰菜、土豆（各 1）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>夏季作物收集包</span><span class="btr">奖励：优质洒水器 ×1</span></div>
+            <table><tbody><tr><td>西红柿、辣椒、蓝莓、甜瓜（各 1）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>秋季作物收集包</span><span class="btr">奖励：蜂房 ×1</span></div>
+            <table><tbody><tr><td>玉米、茄子、南瓜、山药（各 1）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>高品质作物收集包</span><span class="btr">奖励：罐头瓶 ×1</span></div>
+            <table><tbody><tr><td>防风草 ×5（金星）、甜瓜 ×5（金星）、南瓜 ×5（金星）、玉米 ×5（金星）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>动物收集包</span><span class="btr">奖励：压酪机 ×1</span></div>
+            <table><tbody><tr><td>大壶牛奶、棕色大鸡蛋、大鸡蛋、大瓶羊奶、动物毛、鸭蛋（各 1）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>工匠收集包</span><span class="btr">奖励：小桶 ×1</span></div>
+            <table><tbody><tr><td>松露油、布料、山羊奶酪、奶酪、蜂蜜、果酱、苹果、杏子、橙子、桃子、石榴、樱桃（各 1，共 12 项）</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <div class="room">
+        <div class="room-head"><span>三、鱼缸 Fish Tank</span><span class="meta">完成 1 包后开放 · 奖励：移除巨石 + 淘盘</span></div>
+        <div class="room-body">
+          <div class="bundle"><div class="bt"><span>河鱼收集包</span><span class="btr">奖励：高级鱼饵 ×30</span></div>
+            <table><tbody><tr><td>太阳鱼（河·春/夏 6:00-19:00）、鲶鱼（河·春/秋，雨天）、西鲱（河·春/夏/秋，雨天）、虎纹鳟鱼（河·秋/冬 6:00-19:00）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>湖鱼收集包</span><span class="btr">奖励：精装旋式鱼饵 ×1</span></div>
+            <table><tbody><tr><td>大嘴鲈鱼（湖·全季 6:00-19:00）、鲤鱼（湖·春/夏/秋）、大头鱼（湖·全季）、鲟鱼（湖·夏/冬 6:00-19:00）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>海鱼收集包</span><span class="btr">奖励：传送图腾：海滩 ×5</span></div>
+            <table><tbody><tr><td>沙丁鱼（海·春/秋/冬）、金枪鱼（海·夏/冬）、红鲷鱼（海·夏/秋，雨天）、罗非鱼（海·夏/秋 6:00-14:00）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>夜间垂钓收集包</span><span class="btr">奖励：光辉戒指 ×1</span></div>
+            <table><tbody><tr><td>大眼鱼（河·秋，雨天 12:00-次日 2:00）、鲷鱼（河·全季 18:00-次日 2:00）、鳗鱼（海·春/秋，雨天 16:00-次日 2:00）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>蟹笼收集包</span><span class="btr">奖励：蟹笼 ×3</span></div>
+            <table><tbody><tr><td>龙虾、小龙虾、螃蟹、鸟蛤、蚌、虾、蜗牛、玉黍螺、牡蛎、蛤（各 1，共 10 项）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>特色鱼类收集包</span><span class="btr">奖励：海之菜肴 ×5</span></div>
+            <table><tbody><tr><td>河豚（海·夏 12:00-16:00）、鬼鱼（矿井池塘）、沙鱼（沙漠池塘）、木跃鱼（秘密森林）</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <div class="room">
+        <div class="room-head"><span>四、锅炉房 Boiler Room</span><span class="meta">完成 2 包后开放 · 奖励：修复矿车（快速移动）</span></div>
+        <div class="room-body">
+          <div class="bundle"><div class="bt"><span>铁匠的收集包</span><span class="btr">奖励：熔炉 ×1</span></div>
+            <table><tbody><tr><td>铜锭、铁锭、金锭（各 1，于熔炉中熔炼矿石得到）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>地理学家的收集包</span><span class="btr">奖励：万象晶球 ×5</span></div>
+            <table><tbody><tr><td>石英（矿井任意层）、地晶（1-39 层）、泪晶（40-79 层）、火水晶（80-120 层）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>冒险家的收集包</span><span class="btr">奖励：小型磁铁戒指 ×1</span></div>
+            <table><tbody><tr><td>史莱姆泥 ×99、蝙蝠翅膀 ×10、太阳精华 ×1、虚空精华 ×1</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <div class="room">
+        <div class="room-head"><span>五、公告板 Bulletin Board</span><span class="meta">完成 3 包后开放 · 奖励：不可结婚村民各 +2 心</span></div>
+        <div class="room-body">
+          <div class="bundle"><div class="bt"><span>厨师收集包</span><span class="btr">奖励：粉红蛋糕 ×3</span></div>
+            <table><tbody><tr><td>枫糖浆、蕨菜、松露、虞美人花、生鱼寿司、煎鸡蛋（各 1）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>染料收集包</span><span class="btr">奖励：种子生产器 ×1</span></div>
+            <table><tbody><tr><td>红蘑菇、海胆、向日葵、鸭毛、海蓝宝石、红叶卷心菜（各 1）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>土地研究收集包</span><span class="btr">奖励：回收机 ×1</span></div>
+            <table><tbody><tr><td>紫蘑菇、鹦鹉螺、鲢鱼、冰封晶球（各 1）</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>饲料收集包</span><span class="btr">奖励：加热器 ×1</span></div>
+            <table><tbody><tr><td>小麦 ×10、干草 ×10、苹果 ×3</td></tr></tbody></table></div>
+          <div class="bundle"><div class="bt"><span>魔法师收集包</span><span class="btr">奖励：金锭 ×5</span></div>
+            <table><tbody><tr><td>橡树树脂、果酒、兔子的脚、石榴（各 1）</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <div class="room">
+        <div class="room-head"><span>六、金库 Vault</span><span class="meta">完成 4 包后开放 · 奖励：修理巴士（可前往沙漠）</span></div>
+        <div class="room-body">
+          <div class="bundle"><div class="bt"><span>需累计支付金币（点击"购买"即完成）</span><span class="btr">总计 42,500 金</span></div>
+            <table>
+              <thead><tr><th>阶段</th><th class="c">金额</th><th>奖励</th></tr></thead>
+              <tbody>
+                <tr><td>第 1 阶段</td><td class="c">2,500</td><td>巧克力蛋糕 ×3</td></tr>
+                <tr><td>第 2 阶段</td><td class="c">5,000</td><td>高级肥料 ×30</td></tr>
+                <tr><td>第 3 阶段</td><td class="c">10,000</td><td>避雷针 ×1</td></tr>
+                <tr><td>第 4 阶段</td><td class="c">25,000</td><td>宝石复制机 ×1</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="room">
+        <div class="room-head" style="background:linear-gradient(135deg,#6b5a8e,#8b78b0)">
+          <span>七、失踪的收集包（完成社区中心后触发）</span><span class="meta">奖励：废弃 Joja 超市改建为电影院</span></div>
+        <div class="room-body">
+          <p style="font-size:13.3px;color:var(--ink2);margin:4px 0 8px">完成修复社区中心后，第一个雨天或暴风雨的前一晚睡觉时触发剧情：一道闪电击中废弃 Joja 超市并打开入口，里面藏着"失踪的收集包"。</p>
+          <table>
+            <thead><tr><th>需要物品</th><th class="c">代码</th><th>说明</th></tr></thead>
+            <tbody>
+              <tr><td>银星品质果酒（任意水果）</td><td class="c">348</td><td>由小桶酿造</td></tr>
+              <tr><td>恐龙蛋黄酱</td><td class="c">807</td><td>蛋黄酱机加工恐龙蛋</td></tr>
+              <tr><td>五彩碎片</td><td class="c">74</td><td>采矿 / 稀有掉落</td></tr>
+              <tr><td>金星品质上古水果 ×5</td><td class="c">454</td><td>种植上古果实获得</td></tr>
+              <tr><td>金星品质虚空鲑鱼</td><td class="c">795</td><td>巫婆沼泽钓鱼</td></tr>
+              <tr><td>鱼籽酱</td><td class="c">445</td><td>罐头瓶加工鲟鱼鱼籽</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="note tip"><span class="t">补充：</span>新建存档时可勾选"<b>重新混合的收集包</b>"，系统会随机替换部分内容，让每次开局都不同；新手首次游玩建议不勾选。</div>
+    </section>
+
+    <!-- 10 -->
+    <section class="card" id="c10">
+      <h2><span class="num">10</span>小鸡代码流：用命名白嫖物品</h2>
+      <p class="sub">利用游戏内置的命名彩蛋，把任意物品直接"叫"进背包</p>
+
+      <div class="note warn">
+        <span class="t">性质说明：</span>这是游戏内长期存在的一个机制漏洞（彩蛋），并非官方设计功能。使用它可以大幅降低游戏难度，纯看个人取舍——想保留探索乐趣就别用，想出图/测试/省时间则很实用。
+      </div>
+
+      <h3>10.1　为什么叫"小鸡代码流"</h3>
+      <p>游戏有一个隐藏规则：<b>给动物或角色命名时，只要名字里包含用方括号括起来的物品代码，例如 <code>[74]</code>，游戏就会把对应物品放进你的背包。</b></p>
+      <p>而所有动物里，<b>鸡是最便宜的</b>（约 800 金），且可以反复购买。于是玩家普遍采用"买一只鸡 → 起个带代码的名字 → 立刻收货"的循环来刷物品——这就是"小鸡代码流"这个名字的由来。</p>
+
+      <h3>10.2　方法一：动物命名（推荐，可无限重复）</h3>
+      <ol class="steps">
+        <li><b>前往玛妮牧场</b>（Marnie's Ranch），与她对话选择"购买动物"。</li>
+        <li><b>选一只鸡</b>——最划算的载体。</li>
+        <li><b>命名时填入代码</b>，格式为方括号包住纯数字，最多同时写 <b>3 个</b>，例如 <code>[74][72][434]</code>（五彩碎片 + 钻石 + 星之果实）。</li>
+        <li><b>点击确认</b> —— 物品立刻进入背包，无需等待对话。</li>
+        <li><b>需要更多</b>就再买一只鸡，重复上述步骤。</li>
+      </ol>
+
+      <h3>10.3　方法二：角色命名（免费，但只能用一次）</h3>
+      <ol class="steps">
+        <li><b>创建新角色时</b>，在名字里写入最多 3 个代码，如 <code>[74][645][446]</code>。</li>
+        <li>进入游戏后，<b>与"会念出你名字"的村民对话</b>——酒吧的 Gus 最稳定。</li>
+        <li>每次对话都会重新发放物品，可反复领取。</li>
+        <li>名字后期可在巫师的"幻觉神龛"花费 500 金更改，但需先与其建立好感。</li>
+      </ol>
+
+      <h3>10.4　必知的坑</h3>
+      <table>
+        <thead><tr><th>项目</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>名字长度</td><td>名字至少 <b>5 个字符</b>，否则会提示"Invalid Name"。代码太短时可在括号外加字母凑数，如 <code>abc[74]</code></td></tr>
+          <tr><td>一次数量</td><td>最多同时填 <b>3 个</b>代码</td></tr>
+          <tr><td>1.6 版本变化</td><td>游戏内部改用带类型前缀的写法（如 <code>(O)74</code>），但<b>普通物品用纯数字依然有效</b></td></tr>
+          <tr><td>能刷哪些物品</td><td>命名彩蛋<b>只认纯数字的"物体"类（O 类）</b>——作物、鱼、矿物、料理、材料等。武器、家具、帽子、衣服等带前缀的类别，写进名字里<b>完全无效</b>（不报错，也不会给物品）</td></tr>
+          <tr><td>平台差异</td><td>PC / iOS / Android 有效；<b>Switch 无效</b>；PS / Xbox 结果不稳定</td></tr>
+          <tr><td>输入法</td><td>手机端部分输入法会把方括号转成中文标点，务必切成<b>半角英文</b>再输入</td></tr>
+        </tbody>
+      </table>
+
+      <h3>10.5　物品类型前缀全表（1.6 限定代码）</h3>
+      <p>1.6 版本给每件物品加上了"类型前缀"，组成全局唯一的<b>限定代码（QualifiedItemId）</b>。之所以需要它，是因为纯数字在不同类型之间会撞车——例如 <code>128</code> 既是<b>河豚</b>（物体），又是<b>蘑菇箱</b>（大型可制作物），只有写成 <code>(O)128</code> 与 <code>(BC)128</code> 才能区分。</p>
+      <table>
+        <thead><tr><th class="c">前缀</th><th>类别</th><th>包含什么</th><th class="c">命名彩蛋</th><th>示例</th></tr></thead>
+        <tbody>
+          <tr><td class="c"><code>(O)</code> 或无</td><td>物体 Objects</td><td>作物、鱼、矿物、料理、材料——背包里的绝大多数</td><td class="c" style="color:#4f7d3f;font-weight:700">可用</td><td><code>[74]</code></td></tr>
+          <tr><td class="c"><code>(BC)</code></td><td>大型可制作物</td><td>可放置的设施与机器（蘑菇箱、洒水器等）</td><td class="c" style="color:#b5462f;font-weight:700">无效</td><td><code>(BC)0</code></td></tr>
+          <tr><td class="c"><code>(T)</code></td><td>工具 Tools</td><td>斧头、锄头、钓竿等</td><td class="c" style="color:#b5462f;font-weight:700">无效</td><td><code>(T)Axe</code></td></tr>
+          <tr><td class="c"><code>(W)</code></td><td>武器 Weapons</td><td>剑、匕首、锤、弹弓</td><td class="c" style="color:#b5462f;font-weight:700">无效</td><td><code>(W)0</code></td></tr>
+          <tr><td class="c"><code>(F)</code></td><td>家具 Furniture</td><td>椅子、桌子、装饰摆件</td><td class="c" style="color:#b5462f;font-weight:700">无效</td><td><code>(F)0</code></td></tr>
+          <tr><td class="c"><code>(B)</code></td><td>鞋子 Boots</td><td>可装备的鞋类</td><td class="c" style="color:#b5462f;font-weight:700">无效</td><td><code>(B)504</code></td></tr>
+          <tr><td class="c"><code>(P)</code></td><td>裤子 Pants</td><td>可装备的下装</td><td class="c" style="color:#b5462f;font-weight:700">无效</td><td><code>(P)0</code></td></tr>
+          <tr><td class="c"><code>(S)</code></td><td>上衣 Shirts</td><td>可装备的上装</td><td class="c" style="color:#b5462f;font-weight:700">无效</td><td><code>(S)1000</code></td></tr>
+          <tr><td class="c"><code>(H)</code></td><td>帽子 Hats</td><td>各类帽子</td><td class="c" style="color:#b5462f;font-weight:700">无效</td><td><code>(H)0</code></td></tr>
+          <tr><td class="c"><code>(TR)</code></td><td>饰品 Trinkets</td><td>1.6 新增的可装备小饰品</td><td class="c" style="color:#b5462f;font-weight:700">无效</td><td><code>(TR)MagicHairDye</code></td></tr>
+          <tr><td class="c"><code>(M)</code></td><td>人偶 Mannequins</td><td>1.6 新增的模特人偶</td><td class="c" style="color:#b5462f;font-weight:700">无效</td><td><code>(M)Mannequin</code></td></tr>
+          <tr><td class="c"><code>(WP)</code></td><td>壁纸 Wallpaper</td><td>墙面装饰</td><td class="c" style="color:#b5462f;font-weight:700">无效</td><td><code>(WP)0</code></td></tr>
+          <tr><td class="c"><code>(FL)</code></td><td>农舍地板</td><td>Farmhouse 地板</td><td class="c" style="color:#b5462f;font-weight:700">无效</td><td><code>(FL)0</code></td></tr>
+        </tbody>
+      </table>
+      <div class="note info">
+        <span class="t">两条关键结论：</span>
+        <b>1）</b>命名彩蛋只能刷 <b>(O) 物体类</b>，也就是纯数字那些；其余 11 类写进名字里都不会生效，也不会报错。<br>
+        <b>2）</b>当你只写纯数字时，游戏的解析顺序为：物体 → 大型可制作物 → 家具 → 武器 → 鞋子 → 帽子 → 人偶 → 裤子 → 上衣 → 工具 → 饰品 → 壁纸 → 地板。<b>物体类排在最前</b>，所以纯数字几乎都落在物体上。
+      </div>
+      <div class="note warn">
+        <span class="t">想刷武器 / 家具 / 衣服怎么办：</span>这些类别必须借助 <b>SMAPI 控制台命令</b>（PC 端安装 SMAPI 后可用），输入带前缀的完整 ID，例如 <code>player_add (W)0</code>。原版游戏与主机平台没有对应手段，属于正常设定。
+      </div>
+
+      <div class="note tip"><span class="t">叠加玩法：</span>动物命名法可与正常游戏并行——先用代码刷出<b>上古种子（499）</b>与<b>五彩碎片（74）</b>，再正常经营温室与酿酒，是"速成流"的常见开局思路。</div>
+    </section>
+
+    <!-- 11 -->
+    <section class="card" id="c11">
+      <h2><span class="num">11</span>物品代码查询工具</h2>
+      <p class="sub">内置完整查询器 · 覆盖 1.6 版本全部 12 类物品 · 支持中文名 / 英文名 / 代码搜索</p>
+
+      <div class="tbar">
+        <input id="eq" type="search" autocomplete="off" placeholder="搜索：斧头 / axe / (T)Axe / 74 / 钻石 …">
+        <span id="estat" class="estat"></span>
+        <button id="eonlyO" class="ebtn" type="button" title="只看可用命名彩蛋获取的物体类">仅可命名获取</button>
+        <button id="eclr" class="ebtn" type="button">清空</button>
+      </div>
+      <div class="etypes" id="etypes"></div>
+      <p class="ehint">绿色代码＝物体类，点击复制 <code>[74]</code> 形式，可直接用于动物命名彩蛋；金色代码＝其余 11 类，需 PC 端 SMAPI 控制台 <code>player_add</code>。</p>
+      <div id="egrid" class="egrid"></div>
+      <div id="enone" class="enone" style="display:none">没有找到匹配的物品，换个关键词或直接输入代码试试。</div>
+
+      <h3>完整清单到哪里查</h3>
+      <table>
+        <thead><tr><th>来源</th><th>地址</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>本工具（离线）</td><td>本页第 11 章</td><td>已收录全部 12 类物品，可搜索、可复制代码</td></tr>
+          <tr><td>中文 Wiki（推荐）</td><td><code>https://zh.stardewvalleywiki.com</code></td><td>搜索物品名 → 进入条目 → 信息栏中即可看到"编号"</td></tr>
+          <tr><td>英文 Wiki</td><td><code>https://stardewvalleywiki.com</code></td><td>同上，数据最全、更新最快</td></tr>
+          <tr><td>物品 ID 数据库</td><td><code>https://stardewvalleyids.com</code></td><td>第三方站，按 12 种类型分组列出全部条目，含限定代码</td></tr>
+        </tbody>
+      </table>
+      <div class="note warn"><span class="t">注意：</span>官方 Wiki <b>没有</b>一张"全部物品 ID 总表"——物品 ID 分散显示在每个物品条目页的信息栏中。要浏览密集型总表，用本工具或上表第三方站点更方便。</div>
+    </section>
+
+    <!-- 12 -->
+    <section class="card" id="c12">
+      <h2><span class="num">12</span>新手常见误区</h2>
+      <p class="sub">对照检查，少走弯路</p>
+      <table>
+        <thead><tr><th style="width:42%">常见误区</th><th>正确做法</th></tr></thead>
+        <tbody>
+          <tr><td>把全部体力花在浇水</td><td>前期体力有限，优先保证田地有水，剩余体力用于下矿或钓鱼</td></tr>
+          <tr><td>换季前还种着长周期作物</td><td>提前算好成熟天数，换季未收获的作物会枯萎</td></tr>
+          <tr><td>从不看电视</td><td>每天花 1 分钟看：技巧、菜谱、天气与幸运值都实用</td></tr>
+          <tr><td>开局就大量制作初级洒水器</td><td>初级洒水器仅覆盖 4 格，性价比低，建议先攒钱上更高级</td></tr>
+          <tr><td>长期不升级工具</td><td>工具升级是永久收益，尽早升到铜、钢级别能显著提效</td></tr>
+          <tr><td>囤货不舍得卖</td><td>前期现金周转比囤积更重要，该卖就卖</td></tr>
+          <tr><td>只知道卖原产品</td><td>水果蔬菜尽量走加工（果酒/果酱），价值可翻数倍</td></tr>
+          <tr><td>忘记睡觉存盘</td><td>只有上床睡觉才会保存并恢复体力，注意留体力回家</td></tr>
+          <tr><td>忽视献祭包</td><td>献祭包奖励实用且能解锁温室等关键设施，越早规划越省事</td></tr>
+          <tr><td>忽视动物好感</td><td>每天抚摸动物、保证有草料，产出品质会明显提升</td></tr>
+          <tr><td>把铱制洒水器等贵重物品卖早了</td><td>这类设施类物品留着自用价值远高于售价</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 13 -->
+    <section class="card" id="c13">
+      <h2><span class="num">13</span>第一年四季规划</h2>
+      <p class="sub">一张表安排一整年</p>
+      <table>
+        <thead><tr><th class="c">季节</th><th>主线作物</th><th>重点事项</th></tr></thead>
+        <tbody>
+          <tr><td class="c"><b>春</b></td><td>防风草、土豆、草莓</td><td>建立基本农田；蛋蛋节囤草莓种子；升级初始工具；持续下矿积累矿石</td></tr>
+          <tr><td class="c"><b>夏</b></td><td>蓝莓、甜瓜、啤酒花</td><td>收入大幅提升；铺设洒水器解放体力；开始建工匠品设施（小桶/罐头瓶）</td></tr>
+          <tr><td class="c"><b>秋</b></td><td>南瓜、蔓越莓、葡萄</td><td>全年种植收益高峰期；大量囤积原料用于酿酒；继续推进社区中心献祭</td></tr>
+          <tr><td class="c"><b>冬</b></td><td>无（或温室）</td><td>靠矿洞、钓鱼、采集维持；集中升级建筑与工具；完成献祭包中依赖采集/钓鱼的部分</td></tr>
+        </tbody>
+      </table>
+      <div class="note info"><span class="t">思路总结：</span>春打基础、夏扩规模、秋攒资金、冬做沉淀。一年下来，你基本就能从"新手"过渡为"熟练农场主"。</div>
+    </section>
+
+    <!-- 14 -->
+    <section class="card" id="c14">
+      <h2><span class="num">14</span>常用查询入口</h2>
+      <p class="sub">遇到具体数据时，直接查权威百科效率最高</p>
+      <table>
+        <thead><tr><th>用途</th><th>地址</th></tr></thead>
+        <tbody>
+          <tr><td>中文 Wiki（推荐）</td><td><code>https://zh.stardewvalleywiki.com</code></td></tr>
+          <tr><td>英文 Wiki（数据最全）</td><td><code>https://stardewvalleywiki.com</code></td></tr>
+          <tr><td>玩家问答 / 心得</td><td>百度贴吧"星露谷物语吧"、NGA、Reddit r/StardewValley</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:13.5px;color:var(--ink2)">可在 Wiki 中查询：农作物价格与生长周期、NPC 送礼喜好、收集包清单、鱼类与钓鱼时机、节日日程、完整物品代码等。</p>
+    </section>
+
+  </main>
+</div>
+
+<footer class="foot">
+  <b>说明：</b>本教程为新手向图文整理。收集包清单参考《星露谷物语》官方 Wiki（zh.stardewvalleywiki.com）；物品代码取自公开物品 ID 数据集并抽样核对（防风草 24、钻石 72、五彩碎片 74、上古种子 114、铱制洒水器 645 等均与游戏内一致）。游戏版本更新可能带来数值调整，实际以游戏内为准。<br>
+  <b>关于命名彩蛋：</b>该机制属于游戏内置漏洞，非官方功能，使用时请自行权衡对游戏体验的影响。
+</footer>
+
+<script>
+var EDATA=[["O", "杂草", "Weeds", "0"],["O", "Diamond Stone", "Diamond Stone", "2"],["O", "Ruby Stone", "Ruby Stone", "4"],["O", "Jade Stone", "Jade Stone", "6"],["O", "Amethyst Stone", "Amethyst Stone", "8"],["O", "Topaz Stone", "Topaz Stone", "10"],["O", "Emerald Stone", "Emerald Stone", "12"],["O", "Aquamarine Stone", "Aquamarine Stone", "14"],["O", "野山葵", "Wild Horseradish", "16"],["O", "黄水仙", "Daffodil", "18"],["O", "韭葱", "Leek", "20"],["O", "蒲公英", "Dandelion", "22"],["O", "防风草", "Parsnip", "24"],["O", "Mussel Stone", "Mussel Stone", "25"],["O", "木材", "Lumber", "30"],["O", "石头", "Stone", "32"],["O", "石头", "Stone", "34"],["O", "石头", "Stone", "36"],["O", "石头", "Stone", "38"],["O", "石头", "Stone", "40"],["O", "石头", "Stone", "42"],["O", "Gem Stone", "Gem Stone", "44"],["O", "Mystic Stone", "Mystic Stone", "46"],["O", "Snowy Stone", "Snowy Stone", "48"],["O", "Snowy Stone", "Snowy Stone", "50"],["O", "Snowy Stone", "Snowy Stone", "52"],["O", "Snowy Stone", "Snowy Stone", "54"],["O", "Snowy Stone", "Snowy Stone", "56"],["O", "Snowy Stone", "Snowy Stone", "58"],["O", "绿宝石", "Emerald", "60"],["O", "海蓝宝石", "Aquamarine", "62"],["O", "红宝石", "Ruby", "64"],["O", "紫水晶", "Amethyst", "66"],["O", "黄水晶", "Topaz", "68"],["O", "香蕉树苗", "Banana Sapling", "69"],["O", "翡翠", "Jade", "70"],["O", "镶边幸运紫色短裤", "Trimmed Lucky Purple Shorts", "71"],["O", "钻石", "Diamond", "72"],["O", "金色核桃", "Golden Walnut", "73"],["O", "五彩碎片", "Prismatic Shard", "74"],["O", "Geode Stone", "Geode Stone", "75"],["O", "Frozen Geode Stone", "Frozen Geode Stone", "76"],["O", "Magma Geode Stone", "Magma Geode Stone", "77"],["O", "山洞萝卜", "Cave Carrot", "78"],["O", "秘密纸条", "Secret Note", "79"],["O", "石英", "Quartz", "80"],["O", "火水晶", "Fire Quartz", "82"],["O", "泪晶", "Frozen Tear", "84"],["O", "地晶", "Earth Crystal", "86"],["O", "椰子", "Coconut", "88"],["O", "仙人掌果子", "Cactus Fruit", "90"],["O", "香蕉", "Banana", "91"],["O", "树液", "Sap", "92"],["O", "火把", "Torch", "93"],["O", "精灵火把", "Spirit Torch", "94"],["O", "Radioactive Stone", "Radioactive Stone", "95"],["O", "矮人卷轴 I", "Dwarf Scroll I", "96"],["O", "矮人卷轴 II", "Dwarf Scroll II", "97"],["O", "矮人卷轴 III", "Dwarf Scroll III", "98"],["O", "矮人卷轴 IV", "Dwarf Scroll IV", "99"],["O", "有缺口的土罐", "Chipped Amphora", "100"],["O", "箭头", "Arrowhead", "101"],["O", "遗失之书", "Lost Book", "102"],["O", "古代玩偶", "Ancient Doll", "103"],["O", "精灵珠宝", "Elvish Jewelry", "104"],["O", "咀嚼洁齿棒", "Chewing Stick", "105"],["O", "装饰用扇子", "Ornamental Fan", "106"],["O", "恐龙蛋", "Dinosaur Egg", "107"],["O", "稀有圆盘", "Rare Disc", "108"],["O", "古剑", "Ancient Sword", "109"],["O", "生锈的汤匙", "Rusty Spoon", "110"],["O", "生锈的靴刺", "Rusty Spur", "111"],["O", "生锈的齿轮", "Rusty Cog", "112"],["O", "鸡雕像", "Chicken Statue", "113"],["O", "古代种子", "Ancient Seed", "114"],["O", "史前工具", "Prehistoric Tool", "115"],["O", "干海星", "Dried Starfish", "116"],["O", "锚", "Anchor", "117"],["O", "玻璃碎片", "Glass Shards", "118"],["O", "骨笛", "Bone Flute", "119"],["O", "史前手斧", "Prehistoric Handaxe", "120"],["O", "矮人头盔", "Dwarvish Helm", "121"],["O", "矮人小工具", "Dwarf Gadget", "122"],["O", "古代鼓", "Ancient Drum", "123"],["O", "黄金面具", "Golden Mask", "124"],["O", "黄金遗物", "Golden Relic", "125"],["O", "诡异玩偶", "Strange Doll", "126"],["O", "诡异玩偶", "Strange Doll", "127"],["O", "河豚", "Pufferfish", "128"],["O", "鳀鱼", "Anchovy", "129"],["O", "金枪鱼", "Tuna", "130"],["O", "沙丁鱼", "Sardine", "131"],["O", "鲷鱼", "Bream", "132"],["O", "大嘴鲈鱼", "Largemouth Bass", "136"],["O", "小嘴鲈鱼", "Smallmouth Bass", "137"],["O", "虹鳟鱼", "Rainbow Trout", "138"],["O", "鲑鱼", "Salmon", "139"],["O", "大眼鱼", "Walleye", "140"],["O", "河鲈", "Perch", "141"],["O", "鲤鱼", "Carp", "142"],["O", "鲶鱼", "Catfish", "143"],["O", "狗鱼", "Pike", "144"],["O", "太阳鱼", "Sunfish", "145"],["O", "红鲻鱼", "Red Mullet", "146"],["O", "鲱鱼", "Herring", "147"],["O", "鳗鱼", "Eel", "148"],["O", "章鱼", "Octopus", "149"],["O", "红鲷鱼", "Red Snapper", "150"],["O", "鱿鱼", "Squid", "151"],["O", "海草", "Seaweed", "152"],["O", "绿藻", "Green Algae", "153"],["O", "海参", "Sea Cucumber", "154"],["O", "大海参", "Super Cucumber", "155"],["O", "鬼鱼", "Ghostfish", "156"],["O", "白藻", "White Algae", "157"],["O", "石鱼", "Stonefish", "158"],["O", "绯红鱼", "Crimsonfish", "159"],["O", "鮟鱇鱼", "Angler", "160"],["O", "冰柱鱼", "Ice Pip", "161"],["O", "岩浆鳗鱼", "Lava Eel", "162"],["O", "传说之鱼", "Legend", "163"],["O", "沙鱼", "Sandfish", "164"],["O", "蝎鲤鱼", "Scorpion Carp", "165"],["O", "财宝箱", "Treasure Chest", "166"],["O", "Joja 可乐", "Joja Cola", "167"],["O", "垃圾", "Trash", "168"],["O", "浮木", "Driftwood", "169"],["O", "破损的眼镜", "Broken Glasses", "170"],["O", "破损的 CD", "Broken CD", "171"],["O", "湿透的报纸", "Soggy Newspaper", "172"],["O", "大鸡蛋", "Large Egg", "174"],["O", "蛋", "Egg", "176"],["O", "干草", "Hay", "178"],["O", "蛋", "Egg", "180"],["O", "大鸡蛋", "Large Egg", "182"],["O", "牛奶", "Milk", "184"],["O", "大壶牛奶", "Large Milk", "186"],["O", "青豆", "Green Bean", "188"],["O", "花椰菜", "Cauliflower", "190"],["O", "华丽的项链", "Ornate Necklace", "191"],["O", "土豆", "Potato", "192"],["O", "煎鸡蛋", "Fried Egg", "194"],["O", "煎蛋卷", "Omelet", "195"],["O", "沙拉", "Salad", "196"],["O", "乳酪花椰菜", "Cheese Cauliflower", "197"],["O", "烤鱼", "Baked Fish", "198"],["O", "防风草汤", "Parsnip Soup", "199"],["O", "蔬菜杂烩", "Vegetable Medley", "200"],["O", "完美早餐", "Complete Breakfast", "201"],["O", "炸鱿鱼", "Fried Calamari", "202"],["O", "奇怪的小面包", "Strange Bun", "203"],["O", "幸运午餐", "Lucky Lunch", "204"],["O", "炒蘑菇", "Fried Mushroom", "205"],["O", "披萨", "Pizza", "206"],["O", "豆类火锅", "Bean Hotpot", "207"],["O", "琉璃山药", "Glazed Yams", "208"],["O", "惊喜鲤鱼", "Carp Surprise", "209"],["O", "薯饼", "Hashbrowns", "210"],["O", "薄煎饼", "Pancakes", "211"],["O", "鲑鱼晚餐", "Salmon Dinner", "212"],["O", "鱼肉卷", "Fish Taco", "213"],["O", "香酥鲈鱼", "Crispy Bass", "214"],["O", "爆炒青椒", "Pepper Poppers", "215"],["O", "面包", "Bread", "216"],["O", "椰汁汤", "Tom Kha Soup", "218"],["O", "鳟鱼汤", "Trout Soup", "219"],["O", "巧克力蛋糕", "Chocolate Cake", "220"],["O", "粉红蛋糕", "Pink Cake", "221"],["O", "大黄派", "Rhubarb Pie", "222"],["O", "饼干", "Cookies", "223"],["O", "意大利面", "Spaghetti", "224"],["O", "炒鳗鱼", "Fried Eel", "225"],["O", "香辣鳗鱼", "Spicy Eel", "226"],["O", "生鱼片", "Sashimi", "227"],["O", "生鱼寿司", "Maki Roll", "228"],["O", "墨西哥薄饼", "Tortilla", "229"],["O", "红之盛宴", "Red Plate", "230"],["O", "帕尔玛奶酪茄子", "Eggplant Parmesan", "231"],["O", "大米布丁", "Rice Pudding", "232"],["O", "冰淇淋", "Ice Cream", "233"],["O", "蓝莓千层酥", "Blueberry Tart", "234"],["O", "秋日恩赐", "Autumn's Bounty", "235"],["O", "南瓜汤", "Pumpkin Soup", "236"],["O", "巨无霸餐", "Super Meal", "237"],["O", "红莓酱", "Cranberry Sauce", "238"],["O", "塞料面包", "Stuffing", "239"],["O", "农夫午餐", "Farmer's Lunch", "240"],["O", "救生汉堡", "Survival Burger", "241"],["O", "海之菜肴", "Dish O' The Sea", "242"],["O", "矿工特供", "Miner's Treat", "243"],["O", "块茎拼盘", "Roots Platter", "244"],["O", "糖", "Sugar", "245"],["O", "大麦粉", "Wheat Flour", "246"],["O", "油", "Oil", "247"],["O", "蒜", "Garlic", "248"],["O", "甘蓝菜", "Kale", "250"],["O", "茶苗", "Tea Sapling", "251"],["O", "大黄", "Rhubarb", "252"],["O", "三倍浓缩咖啡", "Triple Shot Espresso", "253"],["O", "甜瓜", "Melon", "254"],["O", "西红柿", "Tomato", "256"],["O", "羊肚菌", "Morel", "257"],["O", "蓝莓", "Blueberry", "258"],["O", "蕨菜", "Fiddlehead Fern", "259"],["O", "辣椒", "Hot Pepper", "260"],["O", "传送图腾：沙漠", "Warp Totem: Desert", "261"],["O", "小麦", "Wheat", "262"],["O", "萝卜", "Radish", "264"],["O", "海泡布丁", "Seafoam Pudding", "265"],["O", "红叶卷心菜", "Red Cabbage", "266"],["O", "比目鱼", "Flounder", "267"],["O", "杨桃", "Starfruit", "268"],["O", "午夜鲤鱼", "Midnight Carp", "269"],["O", "玉米", "Corn", "270"],["O", "未碾米", "Unmilled Rice", "271"],["O", "茄子", "Eggplant", "272"],["O", "稻苗", "Rice Shoot", "273"],["O", "洋蓟", "Artichoke", "274"],["O", "古物宝藏", "Artifact Trove", "275"],["O", "南瓜", "Pumpkin", "276"],["O", "枯萎的花束", "Wilted Bouquet", "277"],["O", "小白菜", "Bok Choy", "278"],["O", "魔法糖冰棍", "Magic Rock Candy", "279"],["O", "山药", "Yam", "280"],["O", "鸡油菌", "Chanterelle", "281"],["O", "蔓越莓", "Cranberries", "282"],["O", "冬青树", "Holly", "283"],["O", "甜菜", "Beet", "284"],["O", "樱桃炸弹", "Cherry Bomb", "286"],["O", "炸弹", "Bomb", "287"],["O", "超级炸弹", "Mega Bomb", "288"],["O", "鸵鸟蛋", "Ostrich Egg", "289"],["O", "Iron Stone", "Iron Stone", "290"],["O", "桃花心木种子", "Mahogany Seed", "292"],["O", "红砖地板", "Brick Floor", "293"],["O", "嫩枝", "Twig", "294"],["O", "嫩枝", "Twig", "295"],["O", "美洲大树莓", "Salmonberry", "296"],["O", "草籽", "Grass Starter", "297"],["O", "硬木围栏", "Hardwood Fence", "298"],["O", "苋菜种子", "Amaranth Seeds", "299"],["O", "苋菜", "Amaranth", "300"],["O", "葡萄种子", "Grape Starter", "301"],["O", "啤酒花种子", "Hops Starter", "302"],["O", "淡啤酒", "Pale Ale", "303"],["O", "啤酒花", "Hops", "304"],["O", "虚空蛋", "Void Egg", "305"],["O", "蛋黄酱", "Mayonnaise", "306"],["O", "鸭蛋黄酱", "Duck Mayonnaise", "307"],["O", "虚空蛋黄酱", "Void Mayonnaise", "308"],["O", "橡子", "Acorn", "309"],["O", "枫树种子", "Maple Seed", "310"],["O", "松果", "Pine Cone", "311"],["O", "杂草", "Weeds", "313"],["O", "杂草", "Weeds", "314"],["O", "杂草", "Weeds", "315"],["O", "杂草", "Weeds", "316"],["O", "杂草", "Weeds", "317"],["O", "杂草", "Weeds", "318"],["O", "Ice Crystal", "Ice Crystal", "319"],["O", "Ice Crystal", "Ice Crystal", "320"],["O", "Ice Crystal", "Ice Crystal", "321"],["O", "木围栏", "Wood Fence", "322"],["O", "石围栏", "Stone Fence", "323"],["O", "铁围栏", "Iron Fence", "324"],["O", "大门", "Gate", "325"],["O", "矮人语教程", "Dwarvish Translation Guide", "326"],["O", "木地板", "Wood Floor", "328"],["O", "石头地板", "Stone Floor", "329"],["O", "粘土", "Clay", "330"],["O", "风化地板", "Weathered Floor", "331"],["O", "水晶地板", "Crystal Floor", "333"],["O", "铜锭", "Copper Bar", "334"],["O", "铁锭", "Iron Bar", "335"],["O", "金锭", "Gold Bar", "336"],["O", "铱锭", "Iridium Bar", "337"],["O", "精炼石英", "Refined Quartz", "338"],["O", "蜂蜜", "Honey", "340"],["O", "茶具", "Tea Set", "341"],["O", "腌菜", "Pickles", "342"],["O", "石头", "Stone", "343"],["O", "果酱", "Jelly", "344"],["O", "啤酒", "Beer", "346"],["O", "稀有种子", "Rare Seed", "347"],["O", "果酒", "Wine", "348"],["O", "能量滋补水", "Energy Tonic", "349"],["O", "果汁", "Juice", "350"],["O", "肌肉回复药", "Muscle Remedy", "351"],["O", "初级肥料", "Basic Fertilizer", "368"],["O", "高级肥料", "Quality Fertilizer", "369"],["O", "初级保湿土壤", "Basic Retaining Soil", "370"],["O", "高级保湿土壤", "Quality Retaining Soil", "371"],["O", "蛤", "Clam", "372"],["O", "黄金南瓜", "Golden Pumpkin", "373"],["O", "虞美人花", "Poppy", "376"],["O", "铜矿石", "Copper Ore", "378"],["O", "铁矿石", "Iron Ore", "380"],["O", "煤炭", "Coal", "382"],["O", "黄金矿石", "Gold Ore", "384"],["O", "铱矿石", "Iridium Ore", "386"],["O", "木材", "Wood", "388"],["O", "石头", "Stone", "390"],["O", "鹦鹉螺", "Nautilus Shell", "392"],["O", "珊瑚", "Coral", "393"],["O", "彩虹贝壳", "Rainbow Shell", "394"],["O", "咖啡", "Coffee", "395"],["O", "香味浆果", "Spice Berry", "396"],["O", "海胆", "Sea Urchin", "397"],["O", "葡萄", "Grape", "398"],["O", "大葱", "Spring Onion", "399"],["O", "草莓", "Strawberry", "400"],["O", "稻草地板", "Straw Floor", "401"],["O", "甜豌豆", "Sweet Pea", "402"],["O", "工作小食", "Field Snack", "403"],["O", "普通蘑菇", "Common Mushroom", "404"],["O", "木头小径", "Wood Path", "405"],["O", "野梅", "Wild Plum", "406"],["O", "砾石小径", "Gravel Path", "407"],["O", "榛子", "Hazelnut", "408"],["O", "水晶小径", "Crystal Path", "409"],["O", "黑莓", "Blackberry", "410"],["O", "鹅卵石小径", "Cobblestone Path", "411"],["O", "冬根", "Winter Root", "412"],["O", "蓝色史莱姆蛋", "Blue Slime Egg", "413"],["O", "水晶果", "Crystal Fruit", "414"],["O", "垫脚石小径", "Stepping Stone Path", "415"],["O", "雪山药", "Snow Yam", "416"],["O", "宝石甜莓", "Sweet Gem Berry", "417"],["O", "番红花", "Crocus", "418"],["O", "醋", "Vinegar", "419"],["O", "红蘑菇", "Red Mushroom", "420"],["O", "向日葵", "Sunflower", "421"],["O", "紫蘑菇", "Purple Mushroom", "422"],["O", "大米", "Rice", "423"],["O", "奶酪", "Cheese", "424"],["O", "玫瑰仙子种子", "Fairy Seeds", "425"],["O", "山羊奶酪", "Goat Cheese", "426"],["O", "郁金香球茎", "Tulip Bulb", "427"],["O", "布料", "Cloth", "428"],["O", "蓝爵士种子", "Jazz Seeds", "429"],["O", "松露", "Truffle", "430"],["O", "向日葵种子", "Sunflower Seeds", "431"],["O", "松露油", "Truffle Oil", "432"],["O", "咖啡豆", "Coffee Bean", "433"],["O", "星之果实", "Stardrop", "434"],["O", "羊奶", "Goat Milk", "436"],["O", "红色史莱姆蛋", "Red Slime Egg", "437"],["O", "大瓶羊奶", "L. Goat Milk", "438"],["O", "紫色史莱姆蛋", "Purple Slime Egg", "439"],["O", "动物毛", "Wool", "440"],["O", "爆炸弹丸", "Explosive Ammo", "441"],["O", "鸭蛋", "Duck Egg", "442"],["O", "鸭毛", "Duck Feather", "444"],["O", "鱼籽酱", "Caviar", "445"],["O", "兔子的脚", "Rabbit's Foot", "446"],["O", "腌鱼籽", "Aged Roe", "447"],["O", "石基", "Stone Base", "449"],["O", "石头", "Stone", "450"],["O", "杂草", "Weeds", "452"],["O", "虞美人种子", "Poppy Seeds", "453"],["O", "上古水果", "Ancient Fruit", "454"],["O", "夏季亮片种子", "Spangle Seeds", "455"],["O", "海藻汤", "Algae Soup", "456"],["O", "清汤", "Pale Broth", "457"],["O", "花束", "Bouquet", "458"],["O", "蜜蜂酒", "Mead", "459"],["O", "美人鱼吊坠", "Mermaid's Pendant", "460"],["O", "装饰壶", "Decorative Pot", "461"],["O", "鼓块", "Drum Block", "463"],["O", "长笛块", "Flute Block", "464"],["O", "生长激素", "Speed-Gro", "465"],["O", "高级生长激素", "Deluxe Speed-Gro", "466"],["O", "防风草种子", "Parsnip Seeds", "472"],["O", "青豆种子", "Bean Starter", "473"],["O", "花椰菜种子", "Cauliflower Seeds", "474"],["O", "土豆种子", "Potato Seeds", "475"],["O", "大蒜种子", "Garlic Seeds", "476"],["O", "甘蓝种子", "Kale Seeds", "477"],["O", "大黄种子", "Rhubarb Seeds", "478"],["O", "甜瓜种子", "Melon Seeds", "479"],["O", "西红柿种子", "Tomato Seeds", "480"],["O", "蓝莓种子", "Blueberry Seeds", "481"],["O", "辣椒种子", "Pepper Seeds", "482"],["O", "小麦种子", "Wheat Seeds", "483"],["O", "萝卜种子", "Radish Seeds", "484"],["O", "红叶卷心菜种子", "Red Cabbage Seeds", "485"],["O", "杨桃种子", "Starfruit Seeds", "486"],["O", "玉米种子", "Corn Seeds", "487"],["O", "茄子种子", "Eggplant Seeds", "488"],["O", "洋蓟种子", "Artichoke Seeds", "489"],["O", "南瓜种子", "Pumpkin Seeds", "490"],["O", "小白菜种子", "Bok Choy Seeds", "491"],["O", "山药种子", "Yam Seeds", "492"],["O", "蔓越莓种子", "Cranberry Seeds", "493"],["O", "甜菜种子", "Beet Seeds", "494"],["O", "春季种子", "Spring Seeds", "495"],["O", "夏季种子", "Summer Seeds", "496"],["O", "秋季种子", "Fall Seeds", "497"],["O", "冬季种子", "Winter Seeds", "498"],["O", "上古种子", "Ancient Seeds", "499"],["O", "小型光辉戒指", "Small Glow Ring", "516"],["O", "光辉戒指", "Glow Ring", "517"],["O", "小型磁铁戒指", "Small Magnet Ring", "518"],["O", "磁铁戒指", "Magnet Ring", "519"],["O", "史莱姆克星戒指", "Slime Charmer Ring", "520"],["O", "战士戒指", "Warrior Ring", "521"],["O", "吸血戒指", "Vampire Ring", "522"],["O", "野蛮人戒指", "Savage Ring", "523"],["O", "由巴的戒指", "Ring of Yoba", "524"],["O", "结实戒指", "Sturdy Ring", "525"],["O", "窃贼戒指", "Burglar's Ring", "526"],["O", "铱环", "Iridium Band", "527"],["O", "点唱机戒指", "Jukebox Ring", "528"],["O", "紫水晶戒指", "Amethyst Ring", "529"],["O", "黄水晶戒指", "Topaz Ring", "530"],["O", "海蓝宝石戒指", "Aquamarine Ring", "531"],["O", "翡翠戒指", "Jade Ring", "532"],["O", "绿宝石戒指", "Emerald Ring", "533"],["O", "红宝石戒指", "Ruby Ring", "534"],["O", "晶球", "Geode", "535"],["O", "冰封晶球", "Frozen Geode", "536"],["O", "岩浆晶球", "Magma Geode", "537"],["O", "透闪石", "Alamite", "538"],["O", "黑方石", "Bixite", "539"],["O", "重晶石", "Baryte", "540"],["O", "青泥石", "Aerinite", "541"],["O", "方解石", "Calcite", "542"],["O", "白云石", "Dolomite", "543"],["O", "硅钙石", "Esperite", "544"],["O", "氟磷灰石", "Fluorapatite", "545"],["O", "杰明石", "Geminite", "546"],["O", "日光榴石", "Helvite", "547"],["O", "绿水镍矿", "Jamborite", "548"],["O", "铁铅矿", "Jagoite", "549"],["O", "蓝晶石", "Kyanite", "550"],["O", "酸性月岩", "Lunarite", "551"],["O", "孔雀石", "Malachite", "552"],["O", "柱星叶石", "Neptunite", "553"],["O", "柠檬石", "Lemon Stone", "554"],["O", "新硅钙石", "Nekoite", "555"],["O", "雌黄", "Orpiment", "556"],["O", "石化史莱姆", "Petrified Slime", "557"],["O", "雷公蛋", "Thunder Egg", "558"],["O", "黄铁矿", "Pyrite", "559"],["O", "海洋石", "Ocean Stone", "560"],["O", "幽灵水晶", "Ghost Crystal", "561"],["O", "虎眼石", "Tigerseye", "562"],["O", "碧玉", "Jasper", "563"],["O", "猫眼石", "Opal", "564"],["O", "赤红猫眼石", "Fire Opal", "565"],["O", "天青石", "Celestine", "566"],["O", "大理石", "Marble", "567"],["O", "沙岩", "Sandstone", "568"],["O", "花岗岩", "Granite", "569"],["O", "玄武岩", "Basalt", "570"],["O", "石灰石", "Limestone", "571"],["O", "皂石", "Soapstone", "572"],["O", "赤铁矿", "Hematite", "573"],["O", "泥石", "Mudstone", "574"],["O", "黑曜石", "Obsidian", "575"],["O", "板岩", "Slate", "576"],["O", "精灵石", "Fairy Stone", "577"],["O", "陶瓷碎片", "Star Shards", "578"],["O", "史前肩胛骨", "Prehistoric Scapula", "579"],["O", "史前胫骨", "Prehistoric Tibia", "580"],["O", "史前头骨", "Prehistoric Skull", "581"],["O", "手部骨骼", "Skeletal Hand", "582"],["O", "史前肋骨", "Prehistoric Rib", "583"],["O", "史前脊骨", "Prehistoric Vertebra", "584"],["O", "尾部骨骼", "Skeletal Tail", "585"],["O", "鹦鹉螺化石", "Nautilus Fossil", "586"],["O", "两栖动物化石", "Amphibian Fossil", "587"],["O", "棕榈化石", "Palm Fossil", "588"],["O", "三叶虫", "Trilobite", "589"],["O", "远古斑点", "Artifact Spot", "590"],["O", "郁金香", "Tulip", "591"],["O", "夏季亮片", "Summer Spangle", "593"],["O", "玫瑰仙子", "Fairy Rose", "595"],["O", "蓝爵", "Blue Jazz", "597"],["O", "洒水器", "Sprinkler", "599"],["O", "葡萄干布丁", "Plum Pudding", "604"],["O", "水煮洋蓟", "Artichoke Dip", "605"],["O", "蔬菜什锦盖饭", "Stir Fry", "606"],["O", "烤榛子", "Roasted Hazelnuts", "607"],["O", "南瓜派", "Pumpkin Pie", "608"],["O", "萝卜沙拉", "Radish Salad", "609"],["O", "水果沙拉", "Fruit Salad", "610"],["O", "黑莓脆皮饼", "Blackberry Cobbler", "611"],["O", "蔓越莓糖果", "Cranberry Candy", "612"],["O", "苹果", "Apple", "613"],["O", "绿茶", "Green Tea", "614"],["O", "意式烤面包", "Bruschetta", "618"],["O", "优质洒水器", "Quality Sprinkler", "621"],["O", "樱桃树苗", "Cherry Sapling", "628"],["O", "杏子树苗", "Apricot Sapling", "629"],["O", "橙子树苗", "Orange Sapling", "630"],["O", "桃子树苗", "Peach Sapling", "631"],["O", "石榴树苗", "Pomegranate Sapling", "632"],["O", "苹果树苗", "Apple Sapling", "633"],["O", "杏子", "Apricot", "634"],["O", "橙子", "Orange", "635"],["O", "桃子", "Peach", "636"],["O", "石榴", "Pomegranate", "637"],["O", "樱桃", "Cherry", "638"],["O", "铱制洒水器", "Iridium Sprinkler", "645"],["O", "卷心菜沙拉", "Coleslaw", "648"],["O", "意式蕨菜炖饭", "Fiddlehead Risotto", "649"],["O", "虞美人籽松糕", "Poppyseed Muffin", "651"],["O", "石头", "Stone", "668"],["O", "石头", "Stone", "670"],["O", "杂草", "Weeds", "674"],["O", "杂草", "Weeds", "675"],["O", "杂草", "Weeds", "676"],["O", "杂草", "Weeds", "677"],["O", "杂草", "Weeds", "678"],["O", "杂草", "Weeds", "679"],["O", "绿色史莱姆蛋", "Green Slime Egg", "680"],["O", "雨水图腾", "Rain Totem", "681"],["O", "变种鲤鱼", "Mutant Carp", "682"],["O", "虫肉", "Bug Meat", "684"],["O", "鱼饵", "Bait", "685"],["O", "旋式鱼饵", "Spinner", "686"],["O", "精装旋式鱼饵", "Dressed Spinner", "687"],["O", "传送图腾：农场", "Warp Totem: Farm", "688"],["O", "传送图腾：山岭", "Warp Totem: Mountains", "689"],["O", "传送图腾：海滩", "Warp Totem: Beach", "690"],["O", "倒刺钩", "Barbed Hook", "691"],["O", "铅制浮标", "Lead Bobber", "692"],["O", "寻宝者", "Treasure Hunter", "693"],["O", "陷阱浮标", "Trap Bobber", "694"],["O", "软木塞浮标", "Cork Bobber", "695"],["O", "鲟鱼", "Sturgeon", "698"],["O", "虎纹鳟鱼", "Tiger Trout", "699"],["O", "大头鱼", "Bullhead", "700"],["O", "罗非鱼", "Tilapia", "701"],["O", "鲢鱼", "Chub", "702"],["O", "磁铁", "Magnet", "703"],["O", "麻哈脂鲤", "Dorado", "704"],["O", "青花鱼", "Albacore", "705"],["O", "西鲱", "Shad", "706"],["O", "蛇齿单线鱼", "Lingcod", "707"],["O", "大比目鱼", "Halibut", "708"],["O", "硬木", "Hardwood", "709"],["O", "蟹笼", "Crab Pot", "710"],["O", "龙虾", "Lobster", "715"],["O", "小龙虾", "Crayfish", "716"],["O", "螃蟹", "Crab", "717"],["O", "鸟蛤", "Cockle", "718"],["O", "蚌", "Mussel", "719"],["O", "虾", "Shrimp", "720"],["O", "蜗牛", "Snail", "721"],["O", "玉黍螺", "Periwinkle", "722"],["O", "牡蛎", "Oyster", "723"],["O", "枫糖浆", "Maple Syrup", "724"],["O", "橡树树脂", "Oak Resin", "725"],["O", "松焦油", "Pine Tar", "726"],["O", "海鲜杂烩汤", "Chowder", "727"],["O", "烩鱼汤", "Fish Stew", "728"],["O", "法式田螺", "Escargot", "729"],["O", "龙虾浓汤", "Lobster Bisque", "730"],["O", "枫糖棒", "Maple Bar", "731"],["O", "蟹黄糕", "Crab Cakes", "732"],["O", "虾鸡尾酒", "Shrimp Cocktail", "733"],["O", "木跃鱼", "Woodskip", "734"],["O", "Haley's Lost Bracelet", "Haley's Lost Bracelet", "742"],["O", "草莓种子", "Strawberry Seeds", "745"],["O", "南瓜灯", "Jack-O-Lantern", "746"],["O", "腐烂的植物", "Rotten Plant", "747"],["O", "腐烂的植物", "Rotten Plant", "748"],["O", "万象晶球", "Omni Geode", "749"],["O", "杂草", "Weeds", "750"],["O", "Copper Stone", "Copper Stone", "751"],["O", "石头", "Stone", "760"],["O", "石头", "Stone", "762"],["O", "Gold Stone", "Gold Stone", "764"],["O", "Iridium Stone", "Iridium Stone", "765"],["O", "史莱姆泥", "Slime", "766"],["O", "蝙蝠翅膀", "Bat Wing", "767"],["O", "太阳精华", "Solar Essence", "768"],["O", "虚空精华", "Void Essence", "769"],["O", "混合种子", "Mixed Seeds", "770"],["O", "纤维", "Fiber", "771"],["O", "蒜油", "Oil of Garlic", "772"],["O", "生命药水", "Life Elixir", "773"],["O", "万能鱼饵", "Wild Bait", "774"],["O", "冰川鱼", "Glacierfish", "775"],["O", "杂草", "Weeds", "784"],["O", "杂草", "Weeds", "785"],["O", "杂草", "Weeds", "786"],["O", "电池组", "Battery Pack", "787"],["O", "丢失的斧子", "Lost Axe", "788"],["O", "幸运紫色短裤", "Lucky Purple Shorts", "789"],["O", "浆果篮", "Berry Basket", "790"],["O", "金色椰子", "Golden Coconut", "791"],["O", "杂草", "Weeds", "792"],["O", "杂草", "Weeds", "793"],["O", "杂草", "Weeds", "794"],["O", "虚空鲑鱼", "Void Salmon", "795"],["O", "史莱姆鱼", "Slimejack", "796"],["O", "珍珠", "Pearl", "797"],["O", "午夜鱿鱼", "Midnight Squid", "798"],["O", "幽灵鱼", "Spook Fish", "799"],["O", "水滴鱼", "Blobfish", "800"],["O", "结婚戒指", "Wedding Ring", "801"],["O", "仙人掌种子", "Cactus Seeds", "802"],["O", "铱奶", "Iridium Milk", "803"],["O", "树肥", "Tree Fertilizer", "805"],["O", "恐龙蛋黄酱", "Dinosaur Mayonnaise", "807"],["O", "虚空幽灵吊坠", "Void Ghost Pendant", "808"],["O", "电影票", "Movie Ticket", "809"],["O", "蟹壳戒指", "Crabshell Ring", "810"],["O", "燃烧弹戒指", "Napalm Ring", "811"],["O", "鱼籽", "Roe", "812"],["O", "鱿鱼墨汁", "Squid Ink", "814"],["O", "茶叶", "Tea Leaves", "815"],["O", "Fossil Stone", "Fossil Stone", "816"],["O", "Fossil Stone", "Fossil Stone", "817"],["O", "Clay Stone", "Clay Stone", "818"],["O", "Omni Geode Stone", "Omni Geode Stone", "819"],["O", "颅骨化石", "Fossilized Skull", "820"],["O", "脊柱化石", "Fossilized Spine", "821"],["O", "尾巴化石", "Fossilized Tail", "822"],["O", "腿骨化石", "Fossilized Leg", "823"],["O", "肋骨化石", "Fossilized Ribs", "824"],["O", "蛇头骨", "Snake Skull", "825"],["O", "蛇脊椎骨", "Snake Vertebrae", "826"],["O", "蝙蝠木乃伊", "Mummified Bat", "827"],["O", "青蛙木乃伊", "Mummified Frog", "828"],["O", "姜", "Ginger", "829"],["O", "芋头", "Taro Root", "830"],["O", "芋头块茎", "Taro Tuber", "831"],["O", "菠萝", "Pineapple", "832"],["O", "菠萝种子", "Pineapple Seeds", "833"],["O", "芒果", "Mango", "834"],["O", "芒果幼苗", "Mango Sapling", "835"],["O", "黄貂鱼", "Stingray", "836"],["O", "狮子鱼", "Lionfish", "837"],["O", "蓝铁饼鱼", "Blue Discus", "838"],["O", "荆棘戒指", "Thorns Ring", "839"],["O", "乡村木地板", "Rustic Plank Floor", "840"],["O", "石制走道地板", "Stone Walkway Floor", "841"],["O", "日记残页", "Journal Scrap", "842"],["O", "Cinder Shard Stone", "Cinder Shard Stone", "843"],["O", "Cinder Shard Stone", "Cinder Shard Stone", "844"],["O", "石头", "Stone", "845"],["O", "石头", "Stone", "846"],["O", "石头", "Stone", "847"],["O", "火山晶石", "Cinder Shard", "848"],["O", "Copper Stone", "Copper Stone", "849"],["O", "Iron Stone", "Iron Stone", "850"],["O", "熔岩菇", "Magma Cap", "851"],["O", "龙牙", "Dragon Tooth", "852"],["O", "珍稀诱钩", "Curiosity Lure", "856"],["O", "老虎史莱姆蛋", "Tiger Slime Egg", "857"],["O", "齐钻", "Qi Gem", "858"],["O", "幸运戒指", "Lucky Ring", "859"],["O", "热咖啡戒指", "Hot Java Ring", "860"],["O", "保护戒指", "Protection Ring", "861"],["O", "吸魂戒指", "Soul Sapper Ring", "862"],["O", "凤凰戒指", "Phoenix Ring", "863"],["O", "战争纪念物", "War Memento", "864"],["O", "美食家番茄盐", "Gourmet Tomato Salt", "865"],["O", "星露谷玫瑰", "Stardew Valley Rose", "866"],["O", "高级电视遥控器", "Advanced TV Remote", "867"],["O", "极寒碎片", "Arctic Shard", "868"],["O", "蠕动蚯蚓", "Wriggling Worm", "869"],["O", "海盗项链", "Pirate's Locket", "870"],["O", "仙尘", "Fairy Dust", "872"],["O", "椰林飘香", "Piña Colada", "873"],["O", "虫肉块", "Bug Steak", "874"],["O", "灵外质", "Ectoplasm", "875"],["O", "五彩胶冻", "Prismatic Jelly", "876"],["O", "优质浮标", "Quality Bobber", "877"],["O", "怪兽香水", "Monster Musk", "879"],["O", "组合戒指", "Combined Ring", "880"],["O", "骨头碎片", "Bone Fragment", "881"],["O", "杂草", "Weeds", "882"],["O", "杂草", "Weeds", "883"],["O", "杂草", "Weeds", "884"],["O", "纤维种子", "Fiber Seeds", "885"],["O", "传送图腾：姜岛", "Warp Totem: Island", "886"],["O", "免疫指环", "Immunity Band", "887"],["O", "辉石戒指", "Glowstone Ring", "888"],["O", "齐瓜", "Qi Fruit", "889"],["O", "齐豆", "Qi Bean", "890"],["O", "蘑菇树种子", "Mushroom Tree Seed", "891"],["O", "传送图腾：齐先生的场地", "Warp Totem: Qi's Arena", "892"],["O", "烟花（红色）", "Fireworks (Red)", "893"],["O", "烟花（紫色）", "Fireworks (Purple)", "894"],["O", "烟花（绿色）", "Fireworks (Green)", "895"],["O", "银河之魂", "Galaxy Soul", "896"],["O", "皮埃尔丢失的存货单", "Pierre's Missing Stocklist", "897"],["O", "绯红鱼之子", "Son of Crimsonfish", "898"],["O", "雌鮟鱇鱼", "Ms. Angler", "899"],["O", "传说之鱼二代", "Legend II", "900"],["O", "放射性鲤鱼", "Radioactive Carp", "901"],["O", "小冰川鱼", "Glacierfish Jr.", "902"],["O", "姜汁汽水", "Ginger Ale", "903"],["O", "香蕉布丁", "Banana Pudding", "904"],["O", "芒果糯米饭", "Mango Sticky Rice", "905"],["O", "夏威夷芋泥", "Poi", "906"],["O", "热带咖喱", "Tropical Curry", "907"],["O", "魔法鱼饵", "Magic Bait", "908"],["O", "放射性矿石", "Radioactive Ore", "909"],["O", "放射性矿锭", "Radioactive Bar", "910"],["O", "马笛", "Horse Flute", "911"],["O", "施肥器", "Enricher", "913"],["O", "加压喷头", "Pressure Nozzle", "915"],["O", "齐氏调味料", "Qi Seasoning", "917"],["O", "顶级生长激素", "Hyper Speed-Gro", "918"],["O", "顶级肥料", "Deluxe Fertilizer", "919"],["O", "顶级保湿土壤", "Deluxe Retaining Soil", "920"],["O", "墨汁意大利饺", "Squid Ink Ravioli", "921"],["O", "补给箱", "SupplyCrate", "922"],["O", "补给箱", "SupplyCrate", "923"],["O", "补给箱", "SupplyCrate", "924"],["O", "史莱姆箱", "Slime Crate", "925"],["O", "野炊工具", "Cookout Kit", "926"],["O", "野营灶", "Camping Stove", "927"],["O", "金蛋", "Golden Egg", "928"],["O", "树篱", "Hedge", "929"],["O", "???", "???", "930"],["O", "异界晶石", "Far Away Stone", "FarAwayStone"],["O", "卡利科三花蛋", "Calico Egg", "CalicoEgg"],["O", "混合花卉种子", "Mixed Flower Seeds", "MixedFlowerSeeds"],["O", "黄金浮漂", "Golden Bobber", "GoldenBobber"],["O", "卡利科三花石头", "Calico Egg Stone", "CalicoEggStone_0"],["O", "卡利科三花石头", "Calico Egg Stone", "CalicoEggStone_1"],["O", "卡利科三花石头", "Calico Egg Stone", "CalicoEggStone_2"],["O", "谜之盒", "Mystery Box", "MysteryBox"],["O", "黄金标签", "Golden Tag", "TroutDerbyTag"],["O", "高级鱼饵", "Deluxe Bait", "DeluxeBait"],["O", "苔藓", "Moss", "Moss"],["O", "长满苔藓的种子", "Mossy Seed", "MossySeed"],["O", "绿雨杂草", "Green Rain Weeds", "GreenRainWeeds0"],["O", "绿雨杂草", "Green Rain Weeds", "GreenRainWeeds1"],["O", "绿雨杂草", "Green Rain Weeds", "GreenRainWeeds2"],["O", "绿雨杂草", "Green Rain Weeds", "GreenRainWeeds3"],["O", "绿雨杂草", "Green Rain Weeds", "GreenRainWeeds4"],["O", "绿雨杂草", "Green Rain Weeds", "GreenRainWeeds5"],["O", "绿雨杂草", "Green Rain Weeds", "GreenRainWeeds6"],["O", "绿雨杂草", "Green Rain Weeds", "GreenRainWeeds7"],["O", "声纳浮漂", "Sonar Bobber", "SonarBobber"],["O", "鱼饵", "Bait", "SpecificBait"],["O", "便携帐篷", "Tent Kit", "TentKit"],["O", "金矿原石", "Gold Stone", "VolcanoGoldNode"],["O", "神秘树种", "Mystic Tree Seed", "MysticTreeSeed"],["O", "神秘糖浆", "Mystic Syrup", "MysticSyrup"],["O", "葡萄干", "Raisins", "Raisins"],["O", "Dried", "Dried", "DriedFruit"],["O", "Dried", "Dried", "DriedMushrooms"],["O", "星之果茶", "Stardrop Tea", "StardropTea"],["O", "兑奖券", "Prize Ticket", "PrizeTicket"],["O", "金币", "Gold Coin", "GoldCoin"],["O", "宝藏图腾", "Treasure Totem", "TreasureTotem"],["O", "挑战鱼饵", "Challenge Bait", "ChallengeBait"],["O", "胡萝卜种子", "Carrot Seeds", "CarrotSeeds"],["O", "胡萝卜", "Carrot", "Carrot"],["O", "金皮西葫芦种子", "Summer Squash Seeds", "SummerSquashSeeds"],["O", "金皮西葫芦", "Summer Squash", "SummerSquash"],["O", "西蓝花种子", "Broccoli Seeds", "BroccoliSeeds"],["O", "西蓝花", "Broccoli", "Broccoli"],["O", "霜瓜种子", "Powdermelon Seeds", "PowdermelonSeeds"],["O", "霜瓜", "Powdermelon", "Powdermelon"],["O", "远古斑点", "Artifact Spot", "SeedSpot"],["O", "Smoked", "Smoked", "SmokedFish"],["O", "星之书", "Book Of Stars", "PurpleBook"],["O", "星露谷年历", "Stardew Valley Almanac", "SkillBook_0"],["O", "樵夫周刊", "Woodcutter's Weekly", "SkillBook_2"],["O", "鱼饵和浮漂", "Bait And Bobber", "SkillBook_1"],["O", "采矿月刊", "Mining Monthly", "SkillBook_3"],["O", "战斗季刊", "Combat Quarterly", "SkillBook_4"],["O", "小巷自助餐", "The Alleyway Buffet", "Book_Trash"],["O", "捕蟹秘籍", "The Art O' Crabbing", "Book_Crabbing"],["O", "矮人安全手册", "Dwarvish Safety Manual", "Book_Bombs"],["O", "海之宝石", "Jewels Of The Sea", "Book_Roe"],["O", "浣熊日记", "Raccoon Journal", "Book_WildSeeds"],["O", "伐木秘事", "Woody's Secret", "Book_Woodcutting"],["O", "铜墙铁壁", "Jack Be Nimble, Jack Be Thick", "Book_Defense"],["O", "交友导论", "Friendship 101", "Book_Friendship"],["O", "怪物图鉴", "Monster Compendium", "Book_Void"],["O", "风之道 第一部分", "Way Of The Wind pt. 1", "Book_Speed"],["O", "洞穴地图绘制法", "Mapping Cave Systems", "Book_Marlon"],["O", "价格目录", "Price Catalogue", "Book_PriceCatalogue"],["O", "酱料女皇烹饪秘籍", "Queen Of Sauce Cookbook", "Book_QueenOfSauce"],["O", "钻石猎人", "The Diamond Hunter", "Book_Diamonds"],["O", "谜之书", "Book of Mysteries", "Book_Mystery"],["O", "动物目录", "Animal Catalogue", "Book_AnimalCatalogue"],["O", "风之道 第二部分", "Way Of The Wind pt. 2", "Book_Speed2"],["O", "金色动物饼干", "Golden Animal Cracker", "GoldenAnimalCracker"],["O", "金色谜之盒", "Golden Mystery Box", "GoldenMysteryBox"],["O", "海凝胶", "Sea Jelly", "SeaJelly"],["O", "洞穴凝胶", "Cave Jelly", "CaveJelly"],["O", "河凝胶", "River Jelly", "RiverJelly"],["O", "虾虎鱼", "Goby", "Goby"],["O", "石头", "Stone", "VolcanoCoalNode0"],["O", "石头", "Stone", "VolcanoCoalNode1"],["O", "石头", "Stone", "PotOfGold"],["O", "古代珍宝鉴定指南", "Treasure Appraisal Guide", "Book_Artifact"],["O", "马术秘籍", "Horse: The Book", "Book_Horse"],["O", "蝴蝶粉", "Butterfly Powder", "ButterflyPowder"],["O", "宠物饲养证", "Pet License", "PetLicense"],["O", "蓝色草籽", "Blue Grass Starter", "BlueGrassStarter"],["O", "苔藓汤", "Moss Soup", "MossSoup"],["O", "草中窜", "Ol' Slitherlegs", "Book_Grass"],["O", "石头", "Stone", "BasicCoalNode0"],["O", "石头", "Stone", "BasicCoalNode1"],["T", "斧头", "Axe", "(T)Axe"],["T", "铜斧头", "Copper Axe", "(T)CopperAxe"],["T", "钢斧头", "Steel Axe", "(T)SteelAxe"],["T", "金斧头", "Gold Axe", "(T)GoldAxe"],["T", "铱斧头", "Iridium Axe", "(T)IridiumAxe"],["T", "竹鱼竿", "Bamboo Pole", "(T)BambooPole"],["T", "训练用鱼竿", "Training Rod", "(T)TrainingRod"],["T", "玻璃纤维棒", "Fiberglass Rod", "(T)FiberglassRod"],["T", "铱金鱼竿", "Iridium Rod", "(T)IridiumRod"],["T", "高级铱金鱼竿", "Advanced Iridium Rod", "(T)AdvancedIridiumRod"],["T", "锄头", "Hoe", "(T)Hoe"],["T", "铜锄头", "Copper Hoe", "(T)CopperHoe"],["T", "钢锄头", "Steel Hoe", "(T)SteelHoe"],["T", "金锄头", "Gold Hoe", "(T)GoldHoe"],["T", "铱锄头", "Iridium Hoe", "(T)IridiumHoe"],["T", "灯笼", "Lantern", "(T)Lantern"],["T", "挤奶桶", "Milk Pail", "(T)MilkPail"],["T", "铜淘盘", "Copper Pan", "(T)Pan"],["T", "钢淘盘", "Steel Pan", "(T)SteelPan"],["T", "金淘盘", "Gold Pan", "(T)GoldPan"],["T", "铱淘盘", "Iridium Pan", "(T)IridiumPan"],["T", "十字镐", "Pickaxe", "(T)Pickaxe"],["T", "铜十字镐", "Copper Pickaxe", "(T)CopperPickaxe"],["T", "钢十字镐", "Steel Pickaxe", "(T)SteelPickaxe"],["T", "金十字镐", "Gold Pickaxe", "(T)GoldPickaxe"],["T", "铱十字镐", "Iridium Pickaxe", "(T)IridiumPickaxe"],["T", "回程魔杖", "Return Scepter", "(T)ReturnScepter"],["T", "剪刀", "Shears", "(T)Shears"],["T", "喷壶", "Watering Can", "(T)WateringCan"],["T", "铜喷壶", "Copper Watering Can", "(T)CopperWateringCan"],["T", "钢喷壶", "Steel Watering Can", "(T)SteelWateringCan"],["T", "金喷壶", "Gold Watering Can", "(T)GoldWateringCan"],["T", "铱喷壶", "Iridium Watering Can", "(T)IridiumWateringCan"],["T", "铜垃圾桶", "Copper Trash Can", "(T)CopperTrashCan"],["T", "钢垃圾桶", "Steel Trash Can", "(T)SteelTrashCan"],["T", "金垃圾桶", "Gold Trash Can", "(T)GoldTrashCan"],["T", "铱垃圾桶", "Iridium Trash Can", "(T)IridiumTrashCan"],["W", "生锈的剑", "Rusty Sword", "(W)0"],["W", "镀银军刀", "Silver Saber", "(W)1"],["W", "黑暗剑", "Dark Sword", "(W)2"],["W", "圣剑", "Holy Blade", "(W)3"],["W", "银河剑", "Galaxy Sword", "(W)4"],["W", "骨剑", "Bone Sword", "(W)5"],["W", "铁刃", "Iron Edge", "(W)6"],["W", "圣堂之刃", "Templar's Blade", "(W)7"],["W", "黑曜石之刃", "Obsidian Edge", "(W)8"],["W", "熔岩武士刀", "Lava Katana", "(W)9"],["W", "双刃大剑", "Claymore", "(W)10"],["W", "钢制轻剑", "Steel Smallsword", "(W)11"],["W", "木剑", "Wooden Blade", "(W)12"],["W", "昆虫头部", "Insect Head", "(W)13"],["W", "海王星大剑", "Neptune's Glaive", "(W)14"],["W", "森林剑", "Forest Sword", "(W)15"],["W", "刻刀", "Carving Knife", "(W)16"],["W", "铁制短剑", "Iron Dirk", "(W)17"],["W", "飞贼之胫", "Burglar's Shank", "(W)18"],["W", "暗影匕首", "Shadow Dagger", "(W)19"],["W", "精灵之刃", "Elf Blade", "(W)20"],["W", "水晶匕首", "Crystal Dagger", "(W)21"],["W", "疾风利剑", "Wind Spire", "(W)22"],["W", "银河匕首", "Galaxy Dagger", "(W)23"],["W", "木棒", "Wood Club", "(W)24"],["W", "亚历克斯的棒球棍", "Alex's Bat", "(W)25"],["W", "铅棒", "Lead Rod", "(W)26"],["W", "木锤", "Wood Mallet", "(W)27"],["W", "巨锤", "The Slammer", "(W)28"],["W", "银河之锤", "Galaxy Hammer", "(W)29"],["W", "山姆的旧吉他", "Sam's Old Guitar", "(W)30"],["W", "股骨", "Femur", "(W)31"],["W", "弹弓", "Slingshot", "(W)32"],["W", "高级弹弓", "Master Slingshot", "(W)33"],["W", "银河弹弓", "Galaxy Slingshot", "(W)34"],["W", "艾利欧特的铅笔", "Elliott's Pencil", "(W)35"],["W", "玛鲁的扳手", "Maru's Wrench", "(W)36"],["W", "哈维的锤子", "Harvey's Mallet", "(W)37"],["W", "潘妮的煎锅", "Penny's Fryer", "(W)38"],["W", "莉亚的削木刀", "Leah's Whittler", "(W)39"],["W", "阿比盖尔的占卜写板", "Abby's Planchette", "(W)40"],["W", "塞巴斯蒂安的遗失之锤", "Seb's Lost Mace", "(W)41"],["W", "海莉的烫发棒", "Haley's Iron", "(W)42"],["W", "海盗剑", "Pirate's Sword", "(W)43"],["W", "弯刀", "Cutlass", "(W)44"],["W", "蛇形邪剑", "Wicked Kris", "(W)45"],["W", "长柄锤", "Kudgel", "(W)46"],["W", "镰刀", "Scythe", "(W)47"],["W", "雪怪之牙", "Yeti Tooth", "(W)48"],["W", "细剑", "Rapier", "(W)49"],["W", "钢刀", "Steel Falchion", "(W)50"],["W", "残破的三叉戟", "Broken Trident", "(W)51"],["W", "淬火阔剑", "Tempered Broadsword", "(W)52"],["W", "金色的镰刀", "Golden Scythe", "(W)53"],["W", "矮人剑", "Dwarf Sword", "(W)54"],["W", "矮人锤", "Dwarf Hammer", "(W)55"],["W", "矮人匕首", "Dwarf Dagger", "(W)56"],["W", "龙牙弯刀", "Dragontooth Cutlass", "(W)57"],["W", "龙牙棒", "Dragontooth Club", "(W)58"],["W", "龙牙小刀", "Dragontooth Shiv", "(W)59"],["W", "骨化剑", "Ossified Blade", "(W)60"],["W", "铱针", "Iridium Needle", "(W)61"],["W", "无限之刃", "Infinity Blade", "(W)62"],["W", "无限之锤", "Infinity Gavel", "(W)63"],["W", "无限匕首", "Infinity Dagger", "(W)64"],["W", "彩虹猫之刃", "Meowmere", "(W)65"],["W", "铱镰刀", "Iridium Scythe", "(W)66"],["BC", "家居植物", "House Plant", "(BC)0"],["BC", "家居植物", "House Plant", "(BC)1"],["BC", "家居植物", "House Plant", "(BC)2"],["BC", "家居植物", "House Plant", "(BC)3"],["BC", "家居植物", "House Plant", "(BC)4"],["BC", "家居植物", "House Plant", "(BC)5"],["BC", "家居植物", "House Plant", "(BC)6"],["BC", "家居植物", "House Plant", "(BC)7"],["BC", "稻草人", "Scarecrow", "(BC)8"],["BC", "避雷针", "Lightning Rod", "(BC)9"],["BC", "蜂房", "Bee House", "(BC)10"],["BC", "小桶", "Keg", "(BC)12"],["BC", "熔炉", "Furnace", "(BC)13"],["BC", "罐头瓶", "Preserves Jar", "(BC)15"],["BC", "压酪机", "Cheese Press", "(BC)16"],["BC", "织布机", "Loom", "(BC)17"],["BC", "产油机", "Oil Maker", "(BC)19"],["BC", "回收机", "Recycling Machine", "(BC)20"],["BC", "宝石复制机", "Crystalarium", "(BC)21"],["BC", "桌子部件（左）", "Table Piece L", "(BC)22"],["BC", "桌子部件（右）", "Table Piece R", "(BC)23"],["BC", "蛋黄酱机", "Mayonnaise Machine", "(BC)24"],["BC", "种子生产器", "Seed Maker", "(BC)25"],["BC", "木椅", "Wood Chair", "(BC)26"],["BC", "木椅", "Wood Chair", "(BC)27"],["BC", "骨架模型", "Skeleton Model", "(BC)28"],["BC", "方尖碑", "Obelisk", "(BC)29"],["BC", "鸡雕像", "Chicken Statue", "(BC)31"],["BC", "石堆", "Stone Cairn", "(BC)32"],["BC", "装甲", "Suit Of Armor", "(BC)33"],["BC", "船标", "Sign Of The Vessel", "(BC)34"],["BC", "普通圆木", "Basic Log", "(BC)35"],["BC", "草坪火烈鸟", "Lawn Flamingo", "(BC)36"],["BC", "木牌", "Wood Sign", "(BC)37"],["BC", "石牌", "Stone Sign", "(BC)38"],["BC", "深色牌子", "Dark Sign", "(BC)39"],["BC", "大绿杖", "Big Green Cane", "(BC)40"],["BC", "绿杖", "Green Canes", "(BC)41"],["BC", "混色杖", "Mixed Cane", "(BC)42"],["BC", "红杖", "Red Canes", "(BC)43"],["BC", "大红杖", "Big Red Cane", "(BC)44"],["BC", "装饰干草捆", "Ornamental Hay Bale", "(BC)45"],["BC", "圆木段", "Log Section", "(BC)46"],["BC", "墓石", "Grave Stone", "(BC)47"],["BC", "季节性装饰", "Seasonal Decor", "(BC)48"],["BC", "石蛙", "Stone Frog", "(BC)52"],["BC", "石鹦鹉", "Stone Parrot", "(BC)53"],["BC", "石猫头鹰", "Stone Owl", "(BC)54"],["BC", "石祝尼魔", "Stone Junimo", "(BC)55"],["BC", "史莱姆球", "Slime Ball", "(BC)56"],["BC", "花盆", "Garden Pot", "(BC)62"],["BC", "书架", "Bookcase", "(BC)64"],["BC", "漂亮的桌子", "Fancy Table", "(BC)65"],["BC", "远古桌子", "Ancient Table", "(BC)66"],["BC", "远古凳子", "Ancient Stool", "(BC)67"],["BC", "祖父的钟", "Grandfather Clock", "(BC)68"],["BC", "泰迪熊闹钟", "Teddy Timer", "(BC)69"],["BC", "枯死的树", "Dead Tree", "(BC)70"],["BC", "楼梯", "Staircase", "(BC)71"],["BC", "高高的火把", "Tall Torch", "(BC)72"],["BC", "仪式面具", "Ritual Mask", "(BC)73"],["BC", "篝火", "Bonfire", "(BC)74"],["BC", "小手鼓", "Bongo", "(BC)75"],["BC", "装饰长矛", "Decorative Spears", "(BC)76"],["BC", "圆石", "Boulder", "(BC)78"],["BC", "门", "Door", "(BC)79"],["BC", "门", "Door", "(BC)80"],["BC", "上锁的门", "Locked Door", "(BC)81"],["BC", "上锁的门", "Locked Door", "(BC)82"],["BC", "邪恶雕像", "Wicked Statue", "(BC)83"],["BC", "邪恶雕像", "Wicked Statue", "(BC)84"],["BC", "树懒骨架（左）", "Sloth Skeleton L", "(BC)85"],["BC", "树懒骨架（中）", "Sloth Skeleton M", "(BC)86"],["BC", "树懒骨架（右）", "Sloth Skeleton R", "(BC)87"],["BC", "直立的晶洞", "Standing Geode", "(BC)88"],["BC", "黑曜石花瓶", "Obsidian Vase", "(BC)89"],["BC", "碎骨机", "Bone Mill", "(BC)90"],["BC", "唱歌的石头", "Singing Stone", "(BC)94"],["BC", "石猫头鹰", "Stone Owl", "(BC)95"],["BC", "奇怪的胶囊", "Strange Capsule", "(BC)96"],["BC", "空置的胶囊", "Empty Capsule", "(BC)98"],["BC", "喂料斗", "Feed Hopper", "(BC)99"],["BC", "孵化器", "Incubator", "(BC)101"],["BC", "加热器", "Heater", "(BC)104"],["BC", "树液采集器", "Tapper", "(BC)105"],["BC", "相机", "Camera", "(BC)106"],["BC", "绒毛兔子", "Plush Bunny", "(BC)107"],["BC", "一簇鲜花", "Tub o' Flowers", "(BC)108"],["BC", "珍奇乌鸦", "Rarecrow", "(BC)110"],["BC", "装饰瓶子", "Decorative Pitcher", "(BC)111"],["BC", "风干太阳花", "Dried Sunflowers", "(BC)112"],["BC", "珍奇乌鸦", "Rarecrow", "(BC)113"],["BC", "煤炭窑", "Charcoal Kiln", "(BC)114"],["BC", "星露谷英雄奖杯", "Stardew Hero Trophy", "(BC)116"],["BC", "汽水机", "Soda Machine", "(BC)117"],["BC", "木桶", "Barrel", "(BC)118"],["BC", "木箱", "Crate", "(BC)119"],["BC", "木桶", "Barrel", "(BC)120"],["BC", "木箱", "Crate", "(BC)121"],["BC", "木桶", "Barrel", "(BC)122"],["BC", "木箱", "Crate", "(BC)123"],["BC", "木桶", "Barrel", "(BC)124"],["BC", "木箱", "Crate", "(BC)125"],["BC", "珍奇乌鸦", "Rarecrow", "(BC)126"],["BC", "无尽财富之雕像", "Statue Of Endless Fortune", "(BC)127"],["BC", "蘑菇盒子", "Mushroom Box", "(BC)128"],["BC", "宝箱", "Chest", "(BC)130"],["BC", "珍奇乌鸦", "Rarecrow", "(BC)136"],["BC", "珍奇乌鸦", "Rarecrow", "(BC)137"],["BC", "珍奇乌鸦", "Rarecrow", "(BC)138"],["BC", "珍奇乌鸦", "Rarecrow", "(BC)139"],["BC", "珍奇乌鸦", "Rarecrow", "(BC)140"],["BC", "草原之王街机系统", "Prairie King Arcade System", "(BC)141"],["BC", "木头火炬", "Wooden Brazier", "(BC)143"],["BC", "石头火炬", "Stone Brazier", "(BC)144"],["BC", "金制火炬", "Gold Brazier", "(BC)145"],["BC", "篝火", "Campfire", "(BC)146"],["BC", "树桩火炬", "Stump Brazier", "(BC)147"],["BC", "镂空火炬", "Carved Brazier", "(BC)148"],["BC", "骷髅火炬", "Skull Brazier", "(BC)149"],["BC", "木桶火炬", "Barrel Brazier", "(BC)150"],["BC", "大理石火炬", "Marble Brazier", "(BC)151"],["BC", "木灯柱", "Wood Lamp-post", "(BC)152"],["BC", "铁灯柱", "Iron Lamp-post", "(BC)153"],["BC", "虫饵盒", "Worm Bin", "(BC)154"],["BC", "??HMTGF??", "??HMTGF??", "(BC)155"],["BC", "史莱姆孵化器", "Slime Incubator", "(BC)156"],["BC", "史莱姆压蛋器", "Slime Egg-Press", "(BC)158"],["BC", "祝尼魔赛车街机系统", "Junimo Kart Arcade System", "(BC)159"],["BC", "完美雕像", "Statue Of Perfection", "(BC)160"],["BC", "??粉色柠檬??", "??Pinky Lemon??", "(BC)161"],["BC", "??碎屑雕像??", "??Foroguemon??", "(BC)162"],["BC", "木桶", "Cask", "(BC)163"],["BC", "刘易斯黄金像", "Solid Gold Lewis", "(BC)164"],["BC", "自动采集器", "Auto-Grabber", "(BC)165"],["BC", "豪华稻草人", "Deluxe Scarecrow", "(BC)167"],["BC", "木桶", "Barrel", "(BC)174"],["BC", "木箱", "Crate", "(BC)175"],["BC", "晶球破开器", "Geode Crusher", "(BC)182"],["BC", "季节性植物", "Seasonal Plant", "(BC)184"],["BC", "季节性植物", "Seasonal Plant", "(BC)188"],["BC", "季节性植物", "Seasonal Plant", "(BC)192"],["BC", "季节性植物", "Seasonal Plant", "(BC)196"],["BC", "季节性植物", "Seasonal Plant", "(BC)200"],["BC", "季节性植物", "Seasonal Plant", "(BC)204"],["BC", "工作台", "Workbench", "(BC)208"],["BC", "迷你点唱机", "Mini-Jukebox", "(BC)209"],["BC", "碎木机", "Wood Chipper", "(BC)211"],["BC", "电话", "Telephone", "(BC)214"],["BC", "迷你冰箱", "Mini-Fridge", "(BC)216"],["BC", "被诅咒的P.K.街机系统", "Cursed P.K. Arcade System", "(BC)219"],["BC", "Item Pedestal", "Item Pedestal", "(BC)221"],["BC", "太阳能板", "Solar Panel", "(BC)231"],["BC", "石箱", "Stone Chest", "(BC)232"],["BC", "迷你图腾尖塔", "Mini-Obelisk", "(BC)238"],["BC", "农场电脑", "Farm Computer", "(BC)239"],["BC", "咖啡机", "Coffee Maker", "(BC)246"],["BC", "缝纫机", "Sewing Machine", "(BC)247"],["BC", "迷你出货箱", "Mini-Shipping Bin", "(BC)248"],["BC", "鸵鸟孵化器", "Ostrich Incubator", "(BC)254"],["BC", "祝尼魔箱", "Junimo Chest", "(BC)256"],["BC", "木桶", "Barrel", "(BC)262"],["BC", "木箱", "Crate", "(BC)263"],["BC", "重型树液采集器", "Heavy Tapper", "(BC)264"],["BC", "分解机", "Deconstructor", "(BC)265"],["BC", "自动抚摸机", "Auto-Petter", "(BC)272"],["BC", "加料器", "Hopper", "(BC)275"],["BC", "篝火", "Campfire", "(BC)278"],["BC", "真正完美的雕像", "Statue Of True Perfection", "(BC)280"],["BC", "文字标牌", "Text Sign", "(BC)TextSign"],["BC", "蘑菇树桩", "Mushroom Log", "(BC)MushroomLog"],["BC", "鱼饵制造机", "Bait Maker", "(BC)BaitMaker"],["BC", "烘干机", "Dehydrator", "(BC)Dehydrator"],["BC", "重型熔炉", "Heavy Furnace", "(BC)HeavyFurnace"],["BC", "祝福雕像", "Statue Of Blessings", "(BC)StatueOfBlessings"],["BC", "矮人之王雕像", "Statue Of The Dwarf King", "(BC)StatueOfTheDwarfKing"],["BC", "铁砧", "Anvil", "(BC)Anvil"],["BC", "迷你锻造台", "Mini-Forge", "(BC)MiniForge"],["BC", "熏鱼机", "Fish Smoker", "(BC)FishSmoker"],["BC", "高级虫饵盒", "Deluxe Worm Bin", "(BC)DeluxeWormBin"],["BC", "大箱子", "Big Chest", "(BC)BigChest"],["BC", "石制大箱子", "Big Stone Chest", "(BC)BigStoneChest"],["F", "橡木椅子", "Oak Chair", "(F)0"],["F", "胡桃木椅子", "Walnut Chair", "(F)3"],["F", "桦木椅子", "Birch Chair", "(F)6"],["F", "红木椅子", "Mahogany Chair", "(F)9"],["F", "红色餐椅", "Red Diner Chair", "(F)12"],["F", "蓝色餐椅", "Blue Diner Chair", "(F)15"],["F", "乡村椅", "Country Chair", "(F)18"],["F", "早餐椅", "Breakfast Chair", "(F)21"],["F", "粉红办公椅", "Pink Office Chair", "(F)24"],["F", "紫色办公椅", "Purple Office Chair", "(F)27"],["F", "绿色办公凳", "Green Office Stool", "(F)30"],["F", "橙色办公凳", "Orange Office Stool", "(F)31"],["F", "暗黑王座", "Dark Throne", "(F)64"],["F", "餐椅", "Dining Chair", "(F)67"],["F", "餐椅", "Dining Chair", "(F)70"],["F", "绿色毛绒座椅", "Green Plush Seat", "(F)73"],["F", "粉色毛绒座椅", "Pink Plush Seat", "(F)76"],["F", "凛冬座椅", "Winter Chair", "(F)79"],["F", "时髦座椅", "Groovy Chair", "(F)82"],["F", "可爱座椅", "Cute Chair", "(F)85"],["F", "树桩座位", "Stump Seat", "(F)88"],["F", "金属座椅", "Metal Chair", "(F)91"],["F", "绿色板凳", "Green Stool", "(F)94"],["F", "蓝色板凳", "Blue Stool", "(F)95"],["F", "国王座椅", "King Chair", "(F)128"],["F", "水晶椅", "Crystal Chair", "(F)131"],["F", "热带椅子", "Tropical Chair", "(F)134"],["F", "橡木长椅", "Oak Bench", "(F)192"],["F", "胡桃木长椅", "Walnut Bench", "(F)197"],["F", "桦木长椅", "Birch Bench", "(F)202"],["F", "红木长椅", "Mahogany Bench", "(F)207"],["F", "现代长椅", "Modern Bench", "(F)212"],["F", "蓝色单人沙发", "Blue Armchair", "(F)288"],["F", "红色单人沙发", "Red Armchair", "(F)294"],["F", "绿色单人沙发", "Green Armchair", "(F)300"],["F", "黄色单人沙发", "Yellow Armchair", "(F)306"],["F", "棕色单人沙发", "Brown Armchair", "(F)312"],["F", "蓝色沙发", "Blue Couch", "(F)416"],["F", "红色沙发", "Red Couch", "(F)424"],["F", "绿色沙发", "Green Couch", "(F)432"],["F", "黄色沙发", "Yellow Couch", "(F)440"],["F", "棕色沙发", "Brown Couch", "(F)512"],["F", "暗黑沙发", "Dark Couch", "(F)520"],["F", "法师沙发", "Wizard Couch", "(F)528"],["F", "林木沙发", "Woodsy Couch", "(F)536"],["F", "橡木梳妆台", "Oak Dresser", "(F)704"],["F", "胡桃木梳妆台", "Walnut Dresser", "(F)709"],["F", "桦木梳妆台", "Birch Dresser", "(F)714"],["F", "红木梳妆台", "Mahogany Dresser", "(F)719"],["F", "咖啡桌", "Coffee Table", "(F)724"],["F", "石桌", "Stone Slab", "(F)727"],["F", "冬日餐桌", "Winter Dining Table", "(F)800"],["F", "节日餐桌", "Festive Dining Table", "(F)807"],["F", "红木餐桌", "Mahogany Dining Table", "(F)814"],["F", "现代餐桌", "Modern Dining Table", "(F)821"],["F", "长仙人掌", "Long Cactus", "(F)984"],["F", "长棕榈", "Long Palm", "(F)985"],["F", "异国情调的树", "Exotic Tree", "(F)986"],["F", "豪华树", "Deluxe Tree", "(F)989"],["F", "橡木桌", "Oak Table", "(F)1120"],["F", "胡桃木桌", "Walnut Table", "(F)1122"],["F", "桦木桌", "Birch Table", "(F)1124"],["F", "红木桌", "Mahogany Table", "(F)1126"],["F", "日之桌", "Sun Table", "(F)1128"],["F", "月之桌", "Moon Table", "(F)1130"],["F", "现代桌", "Modern Table", "(F)1132"],["F", "酒桌", "Pub Table", "(F)1134"],["F", "豪华桌", "Luxury Table", "(F)1136"],["F", "预言桌", "Diviner Table", "(F)1138"],["F", "新石器风格桌", "Neolithic Table", "(F)1140"],["F", "拼图桌", "Puzzle Table", "(F)1142"],["F", "凛冬之桌", "Winter Table", "(F)1144"],["F", "糖果桌", "Candy Table", "(F)1146"],["F", "夏威夷式宴会桌", "Luau Table", "(F)1148"],["F", "暗黑桌", "Dark Table", "(F)1150"],["F", "橡木茶几", "Oak Tea-Table", "(F)1216"],["F", "胡桃木茶几", "Walnut Tea-Table", "(F)1218"],["F", "桦木茶几", "Birch Tea-Table", "(F)1220"],["F", "红木茶几", "Mahogany Tea-Table", "(F)1222"],["F", "现代茶几", "Modern Tea-Table", "(F)1224"],["F", "家具目录", "Furniture Catalogue", "(F)1226"],["F", "海洋地毯", "Oceanic Rug", "(F)1228"],["F", "碗柜", "China Cabinet", "(F)1280"],["F", "艺术家书架", "Artist Bookcase", "(F)1283"],["F", "豪华书架", "Luxury Bookcase", "(F)1285"],["F", "现代书架", "Modern Bookcase", "(F)1287"],["F", "深色书架", "Dark Bookcase", "(F)1289"],["F", "陶瓷柱子", "Ceramic Pillar", "(F)1291"],["F", "金柱子", "Gold Pillar", "(F)1292"],["F", "工业管道", "Industrial Pipe", "(F)1293"],["F", "室内椰子树", "Indoor Palm", "(F)1294"],["F", "图腾雕像", "Totem Pole", "(F)1295"],["F", "修剪过的松树", "Manicured Pine", "(F)1296"],["F", "修剪过的树", "Topiary Tree", "(F)1297"],["F", "直立的晶洞", "Standing Geode", "(F)1298"],["F", "黑曜石花瓶", "Obsidian Vase", "(F)1299"],["F", "唱歌的石头", "Singing Stone", "(F)1300"],["F", "树懒骨架（左）", "Sloth Skeleton L", "(F)1301"],["F", "树懒骨架（中）", "Sloth Skeleton M", "(F)1302"],["F", "树懒骨架（右）", "Sloth Skeleton R", "(F)1303"],["F", "骷髅", "Skeleton", "(F)1304"],["F", "鸡雕像", "Chicken Statue", "(F)1305"],["F", "莉亚做的雕像", "Leah's Sculpture", "(F)1306"],["F", "风干太阳花", "Dried Sunflowers", "(F)1307"],["F", "目录", "Catalogue", "(F)1308"],["F", "山姆的音响", "Sam's Boombox", "(F)1309"],["F", "小型植物", "Small Plant", "(F)1362"],["F", "桌上盆栽", "Table Plant", "(F)1363"],["F", "装饰碗", "Decorative Bowl", "(F)1364"],["F", "福坦熊", "Futan Bear", "(F)1365"],["F", "地球仪", "Globe", "(F)1366"],["F", "轮船模型", "Model Ship", "(F)1367"],["F", "小巧水晶", "Small Crystal", "(F)1368"],["F", "装饰灯笼", "Decorative Lantern", "(F)1369"],["F", "温布斯雕像", "Wumbus Statue", "(F)1371"],["F", "波波雕像", "Bobo Statue", "(F)1373"],["F", "紫蛇雕像", "Purple Serpent Statue", "(F)1375"],["F", "家居植物", "House Plant", "(F)1376"],["F", "家居植物", "House Plant", "(F)1377"],["F", "家居植物", "House Plant", "(F)1378"],["F", "家居植物", "House Plant", "(F)1379"],["F", "家居植物", "House Plant", "(F)1380"],["F", "家居植物", "House Plant", "(F)1381"],["F", "家居植物", "House Plant", "(F)1382"],["F", "家居植物", "House Plant", "(F)1383"],["F", "家居植物", "House Plant", "(F)1384"],["F", "家居植物", "House Plant", "(F)1385"],["F", "家居植物", "House Plant", "(F)1386"],["F", "家居植物", "House Plant", "(F)1387"],["F", "家居植物", "House Plant", "(F)1388"],["F", "家居植物", "House Plant", "(F)1389"],["F", "家居植物", "House Plant", "(F)1390"],["F", "橡木小茶几", "Oak End Table", "(F)1391"],["F", "胡桃木小茶几", "Walnut End Table", "(F)1393"],["F", "桦木小茶几", "Birch End Table", "(F)1395"],["F", "红木小茶几", "Mahogany End Table", "(F)1397"],["F", "新式小茶几", "Modern End Table", "(F)1399"],["F", "祖母小茶几", "Grandmother End Table", "(F)1400"],["F", "冬日小茶几", "Winter End Table", "(F)1401"],["F", "日历", "Calendar", "(F)1402"],["F", "冬日星树", "Tree of the Winter Star", "(F)1440"],["F", "乡村台灯", "Country Lamp", "(F)1443"],["F", "箱式台灯", "Box Lamp", "(F)1445"],["F", "现代台灯", "Modern Lamp", "(F)1447"],["F", "经典台灯", "Classic Lamp", "(F)1449"],["F", "红色地毯", "Red Rug", "(F)1451"],["F", "拼色地毯", "Patchwork Rug", "(F)1456"],["F", "深色地毯", "Dark Rug", "(F)1461"],["F", "廉价电视", "Budget TV", "(F)1466"],["F", "等离子电视", "Plasma TV", "(F)1468"],["F", "绿蛇雕像", "Green Serpent Statue", "(F)1471"],["F", "《穆扎玛鲁》", "'The Muzzamaroo'", "(F)1539"],["F", "《生态山之夜》", "'A Night On Eco-Hill'", "(F)1541"],["F", "《小径》", "'Pathways'", "(F)1543"],["F", "《烧焦的祭品》", "'Burnt Offering'", "(F)1545"],["F", "《宝石海的女王》", "'Queen of the Gem Sea'", "(F)1547"],["F", "《香草别墅》", "'Vanilla Villa'", "(F)1550"],["F", "《原始运动》", "'Primal Motion'", "(F)1552"],["F", "《翡翠山》", "'Jade Hills'", "(F)1554"],["F", "《太阳#44》", "'Sun #44'", "(F)1557"],["F", "壁花朋友", "Wallflower Pal", "(F)1559"],["F", "《塔尖》", "'Spires'", "(F)1561"],["F", "《高速公路 89》", "'Highway 89'", "(F)1563"],["F", "卡利科瀑布", "Calico Falls", "(F)1565"],["F", "刺绣花朵", "Needlepoint Flower", "(F)1567"],["F", "骷髅海报", "Skull Poster", "(F)1600"],["F", "《太阳#45》", "'Sun #45'", "(F)1601"],["F", "《小树苗》", "'Little Tree'", "(F)1602"],["F", "《蓝莓》", "'Blueberries'", "(F)1603"],["F", "《蓝色都市》", "'Blue City'", "(F)1604"],["F", "小照片", "Little Photos", "(F)1605"],["F", "《舞动的小草》", "'Dancing Grass'", "(F)1606"],["F", "《VGA 乐园》", "'VGA Paradise'", "(F)1607"],["F", "Joja 可乐灯", "J. Cola Light", "(F)1609"],["F", "《风筝大师 '95》", "'Kitemaster '95'", "(F)1612"],["F", "普通窗户", "Basic Window", "(F)1614"],["F", "小型窗户", "Small Window", "(F)1616"],["F", "红色木屋地毯", "Red Cottage Rug", "(F)1618"],["F", "绿色木屋地毯", "Green Cottage Rug", "(F)1623"],["F", "怪物地毯", "Monster Rug", "(F)1628"],["F", "封上的窗户", "Boarded Window", "(F)1630"],["F", "神秘地毯", "Mystic Rug", "(F)1664"],["F", "大福坦熊", "Lg. Futan Bear", "(F)1669"],["F", "熊雕像", "Bear Statue", "(F)1671"],["F", "舷窗", "Porthole", "(F)1673"],["F", "锚", "Anchor", "(F)1675"],["F", "世界地图", "World Map", "(F)1676"],["F", "华丽窗户", "Ornate Window", "(F)1678"],["F", "落地电视", "Floor TV", "(F)1680"],["F", "木雕窗户", "Carved Window", "(F)1682"],["F", "色块组画", "Colorful Set", "(F)1684"],["F", "云朵贴纸", "Cloud Decal", "(F)1687"],["F", "云朵贴纸", "Cloud Decal", "(F)1692"],["F", "祝尼魔毛绒玩具", "Junimo Plush", "(F)1733"],["F", "航海地毯", "Nautical Rug", "(F)1737"],["F", "粗麻布地毯", "Burlap Rug", "(F)1742"],["F", "树柱", "Tree Column", "(F)1744"],["F", "小灯串", "L. Light String", "(F)1745"],["F", "小型松树", "S. Pine", "(F)1747"],["F", "盆景树", "Bonsai Tree", "(F)1748"],["F", "金属窗", "Metal Window", "(F)1749"],["F", "蜡烛灯", "Candle Lamp", "(F)1751"],["F", "矿工标志", "Miner's Crest", "(F)1753"],["F", "竹席", "Bamboo Mat", "(F)1755"],["F", "华丽灯", "Ornate Lamp", "(F)1758"],["F", "小祝尼魔毛绒玩具", "Small Junimo Plush", "(F)1760"],["F", "小祝尼魔毛绒玩具", "Small Junimo Plush", "(F)1761"],["F", "小祝尼魔毛绒玩具", "Small Junimo Plush", "(F)1762"],["F", "小祝尼魔毛绒玩具", "Small Junimo Plush", "(F)1763"],["F", "福坦兔", "Futan Rabbit", "(F)1764"],["F", "木刻毛毯", "Woodcut Rug", "(F)1777"],["F", "红砖壁炉", "Brick Fireplace", "(F)1792"],["F", "石壁炉", "Stone Fireplace", "(F)1794"],["F", "铱壁炉", "Iridium Fireplace", "(F)1796"],["F", "火炉", "Stove Fireplace", "(F)1798"],["F", "怪物壁炉", "Monster Fireplace", "(F)1800"],["F", "我的第一幅画", "My First Painting", "(F)1802"],["F", "挂盾", "Hanging Shield", "(F)1811"],["F", "怪物吊饰", "Monster Danglers", "(F)1812"],["F", "天花板旗帜", "Ceiling Flags", "(F)1814"],["F", "天花板垂叶", "Ceiling Leaves", "(F)1817"],["F", "天花板垂叶", "Ceiling Leaves", "(F)1818"],["F", "天花板垂叶", "Ceiling Leaves", "(F)1819"],["F", "天花板垂叶", "Ceiling Leaves", "(F)1820"],["F", "天花板垂叶", "Ceiling Leaves", "(F)1821"],["F", "《红鹰》", "'Red Eagle'", "(F)1838"],["F", "《美人鱼肖像》", "'Portrait Of A Mermaid'", "(F)1840"],["F", "《太阳王国》", "'Solar Kingdom'", "(F)1842"],["F", "《云》", "'Clouds'", "(F)1844"],["F", "《1000 年后》", "'1000 Years From Now'", "(F)1846"],["F", "《三棵树》", "'Three Trees'", "(F)1848"],["F", "《蛇》", "'The Serpent'", "(F)1850"],["F", "《热带鱼 #173》", "'Tropical Fish #173'", "(F)1852"],["F", "《粘土之地》", "'Land Of Clay'", "(F)1854"],["F", "华丽壁炉", "Elegant Fireplace", "(F)1866"],["F", "海盗旗", "Pirate Flag", "(F)1900"],["F", "海盗地毯", "Pirate Rug", "(F)1902"],["F", "草莓贴纸", "Strawberry Decal", "(F)1907"],["F", "水果沙拉地毯", "Fruit Salad Rug", "(F)1909"],["F", "夜空贴纸 #1", "Night Sky Decal #1", "(F)1914"],["F", "夜空贴纸 #2", "Night Sky Decal #2", "(F)1915"],["F", "夜空贴纸 #3", "Night Sky Decal #3", "(F)1916"],["F", "壁挂南瓜", "Wall Pumpkin", "(F)1917"],["F", "小壁挂南瓜", "Small Wall Pumpkin", "(F)1918"],["F", "《勇敢的小树苗》", "'The Brave Little Sapling'", "(F)1952"],["F", "《神秘事迹》", "'Mysterium'", "(F)1953"],["F", "《草原之王之旅：大电影》", "'Journey Of The Prairie King: The Motion Picture'", "(F)1954"],["F", "《温布斯》", "'Wumbus'", "(F)1955"],["F", "《祖祖城特快列车》", "'The Zuzu City Express'", "(F)1956"],["F", "《冷星牧场的奇迹》", "'The Miracle At Coldstar Ranch'", "(F)1957"],["F", "《自然奇观：探索我们这充满活力的世界》", "'Natural Wonders: Exploring Our Vibrant World'", "(F)1958"],["F", "《它在雨中嚎叫》", "'It Howls In The Rain'", "(F)1959"],["F", "室内吊篮", "Indoor Hanging Basket", "(F)1960"],["F", "冬季树贴纸", "Winter Tree Decal", "(F)1961"],["F", "骨头地毯", "Bone Rug", "(F)1964"],["F", "蝴蝶笼", "Butterfly Hutch", "(F)1971"],["F", "壁挂向日葵", "Wall Flower", "(F)1973"],["F", "壁挂小向日葵", "S. Wall Flower", "(F)1974"],["F", "云彩帘子", "Clouds Banner", "(F)1975"],["F", "雪地地毯", "Snowy Rug", "(F)1978"],["F", "床", "Bed", "(F)2048"],["F", "双人床", "Double Bed", "(F)2052"],["F", "星空双人床", "Starry Double Bed", "(F)2058"],["F", "草莓双人床", "Strawberry Double Bed", "(F)2064"],["F", "海盗双人床", "Pirate Double Bed", "(F)2070"],["F", "儿童床", "Child Bed", "(F)2076"],["F", "热带床", "Tropical Bed", "(F)2176"],["F", "热带双人床", "Tropical Double Bed", "(F)2180"],["F", "豪华红色双人床", "Deluxe Red Double Bed", "(F)2186"],["F", "现代双人床", "Modern Double Bed", "(F)2192"],["F", "大鱼缸", "Large Fish Tank", "(F)2304"],["F", "豪华鱼缸", "Deluxe Fish Tank", "(F)2312"],["F", "小鱼缸", "Small Fish Tank", "(F)2322"],["F", "热带电视", "Tropical TV", "(F)2326"],["F", "《火山》照片", "'Volcano' Photo", "(F)2329"],["F", "丛林火炬", "Jungle Torch", "(F)2331"],["F", "饕餮雕像", "Gourmand Statue", "(F)2332"],["F", "金字塔贴纸", "Pyramid Decal", "(F)2334"],["F", "棕榈树墙饰", "Palm Wall Ornament", "(F)2393"],["F", "铱制科罗布斯", "Iridium Krobus", "(F)2396"],["F", "普通火炬", "Plain Torch", "(F)2397"],["F", "树桩火炬", "Stump Torch", "(F)2398"],["F", "水生动物保护所", "Aquatic Sanctuary", "(F)2400"],["F", "现代鱼缸", "Modern Fish Tank", "(F)2414"],["F", "救生圈", "Lifesaver", "(F)2418"],["F", "绿叶画", "Foliage Print", "(F)2419"],["F", "《小船》", "'Boat'", "(F)2421"],["F", "《林景》", "'Vista'", "(F)2423"],["F", "壁篮", "Wall Basket", "(F)2425"],["F", "装饰垃圾桶", "Decorative Trash Can", "(F)2427"],["F", "淡绿色地毯", "Light Green Rug", "(F)2488"],["F", "原野双人床", "Wild Double Bed", "(F)2496"],["F", "渔夫双人床", "Fisher Double Bed", "(F)2502"],["F", "桦木双人床", "Birch Double Bed", "(F)2508"],["F", "奇异双人床", "Exotic Double Bed", "(F)2514"],["F", "长版《翡翠山》", "'Jade Hills Extended'", "(F)2584"],["F", "彩色帘子", "Pastel Banner", "(F)2624"],["F", "冬季帘子", "Winter Banner", "(F)2625"],["F", "月光水母帘子", "Moonlight Jellies Banner", "(F)2626"],["F", "丛林贴纸", "Jungle Decal", "(F)2627"],["F", "丛林贴纸", "Jungle Decal", "(F)2628"],["F", "丛林贴纸", "Jungle Decal", "(F)2629"],["F", "丛林贴纸", "Jungle Decal", "(F)2630"],["F", "星空门贴纸", "Starport Decal", "(F)2631"],["F", "装饰耙子", "Decorative Pitchfork", "(F)2632"],["F", "木制镶板", "Wood Panel", "(F)2633"],["F", "装饰斧头", "Decorative Axe", "(F)2634"],["F", "圆木镶板", "Log Panel", "(F)2635"],["F", "圆木镶板", "Log Panel", "(F)2636"],["F", "地板分隔条（右）", "Floor Divider R", "(F)2637"],["F", "地板分隔条（左）", "Floor Divider L", "(F)2638"],["F", "地板分隔条（右）", "Floor Divider R", "(F)2639"],["F", "地板分隔条（左）", "Floor Divider L", "(F)2640"],["F", "地板分隔条（右）", "Floor Divider R", "(F)2641"],["F", "地板分隔条（左）", "Floor Divider L", "(F)2642"],["F", "地板分隔条（右）", "Floor Divider R", "(F)2643"],["F", "地板分隔条（左）", "Floor Divider L", "(F)2644"],["F", "地板分隔条（右）", "Floor Divider R", "(F)2645"],["F", "地板分隔条（左）", "Floor Divider L", "(F)2646"],["F", "地板分隔条（右）", "Floor Divider R", "(F)2647"],["F", "地板分隔条（左）", "Floor Divider L", "(F)2648"],["F", "地板分隔条（右）", "Floor Divider R", "(F)2649"],["F", "地板分隔条（左）", "Floor Divider L", "(F)2650"],["F", "地板分隔条（右）", "Floor Divider R", "(F)2651"],["F", "地板分隔条（左）", "Floor Divider L", "(F)2652"],["F", "冰雪帘子", "Icy Banner", "(F)2653"],["F", "壁挂棕榈树", "Wall Palm", "(F)2654"],["F", "壁挂仙人掌", "Wall Cactus", "(F)2655"],["F", "棕色长沙发", "Large Brown Couch", "(F)2720"],["F", "《冰封之梦》", "'Frozen Dreams'", "(F)2730"],["F", "《物理 101》", "'Physics 101'", "(F)2732"],["F", "壁挂灯", "Wall Sconce", "(F)2734"],["F", "壁挂灯", "Wall Sconce", "(F)2736"],["F", "壁挂灯", "Wall Sconce", "(F)2738"],["F", "壁挂灯", "Wall Sconce", "(F)2740"],["F", "花地毯", "Blossom Rug", "(F)2742"],["F", "壁挂灯", "Wall Sconce", "(F)2748"],["F", "壁挂灯", "Wall Sconce", "(F)2750"],["F", "大号绿色地毯", "Large Green Rug", "(F)2784"],["F", "冰地毯", "Icy Rug", "(F)2790"],["F", "古典地毯", "Old World Rug", "(F)2794"],["F", "大号红色地毯", "Large Red Rug", "(F)2798"],["F", "大号木屋地毯", "Large Cottage Rug", "(F)2802"],["F", "壁挂灯", "Wall Sconce", "(F)2812"],["F", "松鼠雕像", "Squirrel Figurine", "(F)2814"],["F", "新潮地毯", "Funky Rug", "(F)2870"],["F", "现代地毯", "Modern Rug", "(F)2875"],["F", "仙人掌", "Cactus", "(F)FreeCactus"],["F", "咸鱼挂件", "Hanging Fish", "(F)HangingFish"],["F", "复古电视", "Retro TV", "(F)RetroTV"],["F", "艺术照片", "Art Photo", "(F)ArtPhoto"],["F", "艺术照片 2", "Art Photo 2", "(F)ArtPhoto2"],["F", "矮书架", "Short Bookcase", "(F)ShortBookcase"],["F", "皮埃尔的招牌", "Pierre's Sign", "(F)PierresSign"],["F", "山姆的滑板", "Sam's Skateboard", "(F)SamsSkateboard"],["F", "小鸡贴纸", "Chicken Decal", "(F)ChickenDecal"],["F", "异域宫殿", "Exotic Palace", "(F)ExoticPalace"],["F", "元素周期表", "Periodic Table", "(F)PeriodicTable"],["F", "沾满尘土的头骨", "Dusty Skull", "(F)DustySkull"],["F", "无线电台桌", "Radio Desk", "(F)RadioDesk"],["F", "模型飞机", "Model Planes", "(F)ModelPlanes"],["F", "卡利科三花雕像", "Calico Statue", "(F)CatStatue"],["F", "日照沙丘", "Sun Dunes", "(F)SunDunes"],["F", "沙漠桌子", "Desert Table", "(F)DesertTable"],["F", "沙漠椅子", "Desert Chair", "(F)DesertChair"],["F", "沙漠壁炉", "Desert Fireplace", "(F)DesertFireplace"],["F", "沙子地毯", "Sandy Rug", "(F)SandyRug"],["F", "沙漠地毯", "Desert Rug", "(F)DesertRug"],["F", "沙漠小茶几", "Desert End Table", "(F)DesertEndTable"],["F", "沙漠旗", "Desert Flags", "(F)DesertFlags"],["F", "装饰木桶", "Decorative Barrel", "(F)DecorativeBarrel"],["F", "鳟鱼标本", "Mounted Trout", "(F)MountedTrout_Painting"],["F", "《鱿鱼娃》", "'Squid Kid'", "(F)SquidKid_Painting"],["F", "奶牛贴纸", "Cow Decal", "(F)CowDecal"],["F", "蓝白条纹床", "Blue Pinstripe Bed", "(F)BluePinstripeBed"],["F", "丛林鱼缸", "Jungle Tank", "(F)JungleTank"],["F", "CCFishTank", "CCFishTank", "(F)CCFishTank"],["F", "蓝白条纹双人床", "Blue Pinstripe Double Bed", "(F)BluePinstripeDoubleBed"],["F", "Joja 床", "Joja Bed", "(F)JojaBed"],["F", "Joja 保险箱", "Joja Vault", "(F)JojaVault"],["F", "Joja 椅子", "Joja Chair", "(F)JojaChair"],["F", "J", "J", "(F)J"],["F", "Joja 可乐茶几", "Joja Cola Tea Table", "(F)JojaColaTeaTable"],["F", "Joja 桌子", "Joja Table", "(F)JojaTable"],["F", "J. 图画", "J. Painting", "(F)JPainting"],["F", "J. 灯", "J. Light", "(F)JLight"],["F", "Joja 家具目录", "Joja Furniture Catalogue", "(F)JojaCatalogue"],["F", "Joja 可乐图画", "Joja Cola Painting", "(F)JojaColaPainting"],["F", "Joja 可乐墙饰", "Joja Cola Ornament", "(F)JojaColaOrnament"],["F", "Joja 壁炉", "Joja Fireplace", "(F)JojaFireplace"],["F", "Joja 可乐罐", "Joja Cola Cans", "(F)JojaColaCans"],["F", "收银机", "Cash Register", "(F)CashRegister"],["F", "塑料植物", "Plastic Plant", "(F)PlasticPlant"],["F", "塑料树苗", "Plastic Sapling", "(F)PlasticSapling"],["F", "灰色 Joja 垫子", "Gray Joja Cushion", "(F)GrayJojaCushion"],["F", "Joja 垫子", "Joja Cushion", "(F)JojaCushion"],["F", "Joja 箱子堆", "Stacked Joja Boxes", "(F)StackedJojaCrates"],["F", "Joja 沙发", "Joja Couch", "(F)JojaCouch"],["F", "年度最佳经理", "Manager of the Year", "(F)MorrisPortrait"],["F", "Joja 总部图画", "Joja HQ Painting", "(F)JojaHQPainting"],["F", "Joja 箱子", "Joja Crate", "(F)JojaCrate"],["F", "Joja 购物车", "Joja Shopping Cart", "(F)JojaShoppingCart"],["F", "Joja 大箱子", "Large Joja Crate", "(F)LargeJojaCrate"],["F", "Joja 可乐冰箱", "Joja Cola Fridge", "(F)JojaColaFridge"],["F", "Joja 抽屉柜", "Joja Dresser", "(F)JojaDresser"],["F", "灰色 Joja 抽屉柜", "Gray Joja Dresser", "(F)GrayJojaDresser"],["F", "Joja 大地毯", "Large Joja Rug", "(F)LargeJojaRug"],["F", "Joja 小地毯", "Small Joja Rug", "(F)SmallJojaRug"],["F", "方形 Joja 地毯", "Square Joja Rug", "(F)SquareJojaRug"],["F", "Joja 地毯", "Joja Rug", "(F)JojaRug"],["F", "Joja 咖啡桌", "Joja Coffee Table", "(F)JojaCoffeeTable"],["F", "灰色 Joja 咖啡桌", "Gray Joja Coffee Table", "(F)GrayJojaCoffeeTable"],["F", "Joja 落地灯", "Joja Lamp", "(F)JojaLamp"],["F", "灰色 Joja 书架", "Gray Joja Bookcase", "(F)GrayJojaBookcase"],["F", "Joja 书架", "Joja Bookcase", "(F)JojaBookcase"],["F", "Joja 凳子", "Joja Stool", "(F)JojaStool"],["F", "Joja 小茶几", "Joja End Table", "(F)JojaEndTable"],["F", "灰色 Joja 小茶几", "Gray Joja End Table", "(F)GrayJojaEndTable"],["F", "Joja 装饰门", "Decorative Joja Door", "(F)DecorativeJojaDoor"],["F", "法师床", "Wizard Bed", "(F)WizardBed"],["F", "法师大书架", "Large Wizard Bookcase", "(F)LargeWizardBookcase"],["F", "法师书架", "Wizard Bookcase", "(F)WizardBookcase"],["F", "法师矮书架", "Short Wizard Bookcase", "(F)ShortWizardBookcase"],["F", "法师小书架", "Small Wizard Bookcase", "(F)SmallWizardBookcase"],["F", "法师凳子", "Wizard Stool", "(F)WizardStool"],["F", "法师壁炉", "Wizard Fireplace", "(F)WizardFireplace"],["F", "法师抽屉柜", "Wizard Dresser", "(F)WizardDresser"],["F", "法师书桌", "Wizard Study", "(F)WizardStudy"],["F", "法师小茶几", "Wizard End Table", "(F)WizardEndTable"],["F", "女巫的扫帚", "Witch's Broom", "(F)WitchBroom"],["F", "坩埚", "Cauldron", "(F)Cauldron"],["F", "卷叶树", "Curly Tree", "(F)CurlyTree"],["F", "沼泽植物", "Swamp Plant", "(F)LeafyPlant"],["F", "法师椅子", "Wizard Chair", "(F)WizardChair"],["F", "法师桌子", "Wizard Table", "(F)WizardTable"],["F", "法师垫子", "Wizard Cushion", "(F)WizardCushion"],["F", "深色法师垫子", "Dark Wizard Cushion", "(F)DarkWizardCushion"],["F", "法师茶几", "Wizard Tea Table", "(F)WizardTeaTable"],["F", "小药水架", "Small Elixir Shelf", "(F)SmallElixirShelf"],["F", "药水架", "Elixir Shelf", "(F)ElixirShelf"],["F", "双层小药水架", "Small Stacked Elixir Shelf", "(F)SmallStackedElixirShelf"],["F", "双层药水架", "Stacked Elixir Shelf", "(F)StackedElixirShelf"],["F", "多瓶药水", "Elixir Bundle", "(F)ElixirBundle"],["F", "两瓶药水", "Two Elixirs", "(F)CoupleElixirs"],["F", "药水桌子", "Elixir Table", "(F)ElixirTable"],["F", "药水长桌", "Long Elixir Table", "(F)LongElixirTable"],["F", "法师落地灯", "Wizard Lamp", "(F)WizardLamp"],["F", "《符文》", "'Runes'", "(F)Runes"],["F", "《法师塔》", "'Wizard's Tower'", "(F)WizardTower"],["F", "红蘑菇盆栽", "Potted Red Mushroom", "(F)PottedRedMushroom"],["F", "法师目录", "Wizard Catalogue", "(F)WizardCatalogue"],["F", "《虚空漩涡》", "'Void Swirls'", "(F)VoidSwirls"],["F", "法师壁挂书架", "Wizard Bookshelf", "(F)WizardBookshelf"],["F", "符号", "Glyph", "(F)Glyph"],["F", "石砖地板", "Stone Flooring", "(F)StoneFlooring"],["F", "符文地毯", "Rune Rug", "(F)RuneRug"],["F", "漩涡地毯", "Swirl Rug", "(F)SwirlRug"],["F", "星月地毯", "Starry Moon Rug", "(F)StarryMoonRug"],["F", "水晶球", "Crystal Ball", "(F)CrystalBall"],["F", "紫水晶球", "Amethyst Crystal Ball", "(F)AmethystCrystalBall"],["F", "黄水晶球", "Topaz Crystal Ball", "(F)TopazCrystalBall"],["F", "蓝水晶球", "Aquamarine Crystal Ball", "(F)AquamarineCrystalBall"],["F", "绿水晶球", "Emerald Crystal Ball", "(F)EmeraldCrystalBall"],["F", "红水晶球", "Ruby Crystal Ball", "(F)RubyCrystalBall"],["F", "一小叠书", "Small Book Stack", "(F)SmallBookStack"],["F", "一叠书", "Book Stack", "(F)BookStack"],["F", "一大叠书", "Large Book Stack", "(F)LargeBookStack"],["F", "紫色书", "Purple Book", "(F)PurpleBook"],["F", "蓝色书", "Blue Book", "(F)BlueBook"],["F", "黄色书", "Yellow Book", "(F)YellowBook"],["F", "红色书", "Red Book", "(F)RedBook"],["F", "绿色书", "Green Book", "(F)GreenBook"],["F", "棕色书", "Brown Book", "(F)BrownBook"],["F", "散落的紫色书", "Fallen Purple Book", "(F)FallenPurpleBook"],["F", "散落的蓝色书", "Fallen Blue Book", "(F)FallenBlueBook"],["F", "散落的黄色书", "Fallen Yellow Book", "(F)FallenYellowBook"],["F", "散落的红色书", "Fallen Red Book", "(F)FallenRedBook"],["F", "散落的绿色书", "Fallen Green Book", "(F)FallenGreenBook"],["F", "散落的棕色书", "Fallen Brown Book", "(F)FallenBrownBook"],["F", "一小堆书", "Small Book Pile", "(F)SmallBookPile"],["F", "一堆书", "Book Pile", "(F)BookPile"],["F", "一大堆书", "Large Book Pile", "(F)LargeBookPile"],["F", "法师装饰门", "Decorative Wizard Door", "(F)DecorativeWizardDoor"],["F", "祝尼魔床", "Junimo Bed", "(F)JunimoBed"],["F", "祝尼魔屋", "Junimo Hut", "(F)JunimoHut"],["F", "大祝尼魔屋", "Large Junimo Hut", "(F)LargeJunimoHut"],["F", "小祝尼魔屋", "Small Junimo Hut", "(F)SmallJunimoHut"],["F", "祝尼魔壁炉", "Junimo Fireplace", "(F)JunimoFireplace"],["F", "祝尼魔书架", "Junimo Bookcase", "(F)JunimoBookcase"],["F", "祝尼魔罐子", "Junimo Pot", "(F)JunimoPot"],["F", "祝尼魔袋子", "Junimo Bag", "(F)JunimoBag"],["F", "祝尼魔包裹", "Junimo Bundle", "(F)JunimoBundle"],["F", "祝尼魔凳子", "Junimo Stool", "(F)JunimoStool"],["F", "祝尼魔桌子", "Junimo Table", "(F)JunimoTable"],["F", "祝尼魔椅子", "Junimo Chair", "(F)JunimoChair"],["F", "祝尼魔小罐子", "Small Junimo Pot", "(F)SmallJunimoPot"],["F", "祝尼魔花", "Junimo Flower", "(F)JunimoFlower"],["F", "祝尼魔小茶几", "Junimo End Table", "(F)JunimoEndTable"],["F", "祝尼魔目录", "Junimo Catalogue", "(F)JunimoCatalogue"],["F", "祝尼魔茶几", "Junimo Tea Table", "(F)JunimoTeaTable"],["F", "祝尼魔抽屉柜", "Junimo Dresser", "(F)JunimoDresser"],["F", "祝尼魔落地灯", "Junimo Lamp", "(F)JunimoLamp"],["F", "祝尼魔植物", "Junimo Plant", "(F)JunimoPlant"],["F", "祝尼魔壁挂牌匾", "Junimo Wall Plaque", "(F)JunimoWallPlaque"],["F", "祝尼魔牌匾", "Junimo Plaque", "(F)JunimoPlaque"],["F", "祝尼魔垫子", "Junimo Cushion", "(F)JunimoCushion"],["F", "深色祝尼魔垫子", "Dark Junimo Cushion", "(F)DarkJunimoCushion"],["F", "祝尼魔树", "Junimo Tree", "(F)JunimoTree"],["F", "祝尼魔沙发", "Junimo Couch", "(F)JunimoCouch"],["F", "绿色睡觉祝尼魔", "Green Sleeping Junimo", "(F)GreenSleepingJunimo"],["F", "蓝色睡觉祝尼魔", "Blue Sleeping Junimo", "(F)BlueSleepingJunimo"],["F", "红色睡觉祝尼魔", "Red Sleeping Junimo", "(F)RedSleepingJunimo"],["F", "紫色睡觉祝尼魔", "Purple Sleeping Junimo", "(F)PurpleSleepingJunimo"],["F", "黄色睡觉祝尼魔", "Yellow Sleeping Junimo", "(F)YellowSleepingJunimo"],["F", "橙色睡觉祝尼魔", "Orange Sleeping Junimo", "(F)OrangeSleepingJunimo"],["F", "灰色睡觉祝尼魔", "Gray Sleeping Junimo", "(F)GraySleepingJunimo"],["F", "方形祝尼魔地毯", "Square Junimo Rug", "(F)SquareJunimoRug"],["F", "祝尼魔地毯", "Junimo Rug", "(F)JunimoRug"],["F", "祝尼魔地垫", "Junimo Mat", "(F)JunimoMat"],["F", "圆形祝尼魔地毯", "Circular Junimo Rug", "(F)CircularJunimoRug"],["F", "祝尼魔小地垫", "Small Junimo Mat", "(F)SmallJunimoMat"],["F", "《社区中心》", "'Community Center'", "(F)CommunityCenter"],["F", "《小伙伴们》", "'Little Buddies'", "(F)LittleBuddies"],["F", "《星之果实》", "'Stardrop'", "(F)Stardrop"],["F", "《小屋》", "'Hut'", "(F)Hut"],["F", "阿比盖尔的肖像", "Abigail Portrait", "(F)AbigailPortrait"],["F", "艾米丽的肖像", "Emily Portrait", "(F)EmilyPortrait"],["F", "海莉的肖像", "Haley Portrait", "(F)HaleyPortrait"],["F", "莉亚的肖像", "Leah Portrait", "(F)LeahPortrait"],["F", "玛鲁的肖像", "Maru Portrait", "(F)MaruPortrait"],["F", "潘妮的肖像", "Penny Portrait", "(F)PennyPortrait"],["F", "亚历克斯的肖像", "Alex Portrait", "(F)AlexPortrait"],["F", "艾利欧特的肖像", "Elliott Portrait", "(F)ElliottPortrait"],["F", "哈维的肖像", "Harvey Portrait", "(F)HarveyPortrait"],["F", "山姆的肖像", "Sam Portrait", "(F)SamPortrait"],["F", "塞巴斯蒂安的肖像", "Sebastian Portrait", "(F)SebastianPortrait"],["F", "谢恩的肖像", "Shane Portrait", "(F)ShanePortrait"],["F", "科罗布斯的肖像", "Krobus Portrait", "(F)KrobusPortrait"],["F", "祝尼魔之星", "Junimo Star", "(F)JunimoStar"],["F", "公告板", "Bulletin Board", "(F)BulletinBoard"],["F", "宣传册展示架", "Brochure Cabinet", "(F)BrochureCabinet"],["F", "叶子墙板", "Leafy Wall Panel", "(F)LeafyWallPanel"],["F", "浅色叶子墙板", "Light Leafy Wall Panel", "(F)LightLeafyWallPanel"],["F", "深色叶子墙板", "Dark Leafy Wall Panel", "(F)DarkLeafyWallPanel"],["F", "祝尼魔装饰门", "Decorative Junimo Door", "(F)DecorativeJunimoDoor"],["F", "复古床", "Retro Bed", "(F)RetroBed"],["F", "复古抽屉柜", "Retro Dresser", "(F)RetroDresser"],["F", "复古书架", "Retro Bookcase", "(F)RetroBookcase"],["F", "复古壁炉", "Retro Fireplace", "(F)RetroFireplace"],["F", "复古沙发", "Retro Couch", "(F)RetroCouch"],["F", "复古垫子", "Retro Cushion", "(F)RetroCushion"],["F", "深色复古垫子", "Dark Retro Cushion", "(F)DarkRetroCushion"],["F", "复古凳子", "Retro Stool", "(F)RetroStool"],["F", "复古花", "Retro Flower", "(F)RetroFlower"],["F", "复古椅子", "Retro Chair", "(F)RetroChair"],["F", "复古桌子", "Retro Table", "(F)RetroTable"],["F", "复古植物", "Retro Plant", "(F)RetroPlant"],["F", "复古小茶几", "Retro End Table", "(F)RetroEndTable"],["F", "复古茶几", "Retro Tea Table", "(F)RetroTeaTable"],["F", "复古目录", "Retro Catalogue", "(F)RetroCatalogue"],["F", "复古橱柜", "Retro Cabinet", "(F)RetroCabinet"],["F", "复古收音机", "Retro Radio", "(F)RetroRadio"],["F", "复古帘子", "Retro Banner", "(F)RetroBanner"],["F", "《时髦》", "'Groovy'", "(F)Groovy"],["F", "复古落地灯", "Retro Lamp", "(F)RetroLamp"],["F", "复古地毯", "Retro Rug", "(F)RetroRug"],["F", "复古方形地毯", "Retro Square Rug", "(F)RetroSquareRug"],["F", "复古地垫", "Retro Mat", "(F)RetroMat"],["F", "复古大地毯", "Large Retro Rug", "(F)LargeRetroRug"],["F", "《抽象》", "'Abstract'", "(F)Abstract"],["F", "《星际飞船》", "'Starship'", "(F)Starship"],["F", "《双星》", "'Binary'", "(F)Binary"],["F", "《黑白格子》", "'Checkers'", "(F)Checkers"],["F", "《UFO》", "'UFO'", "(F)UFO"],["F", "复古装饰门", "Decorative Retro Door", "(F)DecorativeRetroDoor"],["F", "装饰门", "Decorative Door", "(F)DecorativeDoor1"],["F", "装饰门", "Decorative Door", "(F)DecorativeDoor2"],["F", "装饰门", "Decorative Door", "(F)DecorativeDoor3"],["F", "装饰门", "Decorative Door", "(F)DecorativeDoor4"],["F", "装饰门", "Decorative Door", "(F)DecorativeDoor5"],["F", "装饰门", "Decorative Door", "(F)DecorativeDoor6"],["F", "挂钟", "Wall Clock", "(F)WallClock"],["F", "装饰活板门", "Decorative Hatch", "(F)DecorativeHatch"],["F", "装饰橡木梯子", "Decorative Oak Ladder", "(F)DecorativeOakLadder"],["F", "装饰胡桃木梯子", "Decorative Walnut Ladder", "(F)DecorativeWalnutLadder"],["F", "立式钢琴", "Upright Piano", "(F)UprightPiano"],["F", "衣帽架", "Coat Stand", "(F)CoatStand"],["F", "鸟屋", "Bird House", "(F)BirdHouse"],["F", "装饰铲子", "Decorative Shovel", "(F)DecorativeShovel"],["F", "挂剑", "Wall Sword", "(F)WallSword"],["F", "装饰剑", "Decorative Sword", "(F)DecorativeSword"],["F", "酒桌", "Wine Table", "(F)WineTable"],["F", "烈酒桌", "Spirits Table", "(F)SpiritsTable"],["F", "大盆栽", "Tall House Plant", "(F)TallHousePlant"],["F", "香龙血树", "Corn Plant", "(F)CornPlant"],["F", "蓝色垫子", "Blue Cushion", "(F)BlueCushion"],["F", "黄色垫子", "Yellow Cushion", "(F)YellowCushion"],["F", "绿色垫子", "Green Cushion", "(F)GreenCushion"],["F", "红色垫子", "Red Cushion", "(F)RedCushion"],["F", "棕色垫子", "Brown Cushion", "(F)BrownCushion"],["F", "黑色垫子", "Black Cushion", "(F)BlackCushion"],["F", "宠物喂食碗", "Food Pet Bowl", "(F)FoodPetBowl"],["F", "宠物喝水碗", "Water Pet Bowl", "(F)WaterPetBowl"],["F", "橡木台灯小茶几", "Oak Lamp End Table", "(F)OakLampEndTable"],["F", "胡桃木台灯小茶几", "Walnut Lamp End Table", "(F)WalnutLampEndTable"],["F", "桦木台灯小茶几", "Birch Lamp End Table", "(F)BirchLampEndTable"],["F", "桃花心木台灯小茶几", "Mahogany Lamp End Table", "(F)MahoganyLampEndTable"],["F", "三角窗户", "Triangle Window", "(F)TriangleWindow"],["F", "晾衣绳", "Clothesline", "(F)Clothesline"],["F", "垃圾目录", "Trash Catalogue", "(F)TrashCatalogue"],["F", "高雅花瓶", "Elegant Vase", "(F)ElegantVase"],["F", "猫爬架", "Cat Tree", "(F)CatTree"],["F", "深色猫爬架", "Dark Cat Tree", "(F)DarkCatTree"],["F", "电灯开关", "Light Switch", "(F)LightSwitch"],["F", "插座", "Outlet", "(F)Outlet"],["F", "狗屋", "Doghouse", "(F)Doghouse"],["F", "深色狗屋", "Dark Doghouse", "(F)DarkDoghouse"],["F", "丰盛餐桌", "Bountiful Dining Table", "(F)BountifulDiningTable"],["F", "塑料草坪小茶几", "Plastic Lawn End Table", "(F)PlasticLawnEndTable"],["F", "塑料草坪椅子", "Plastic Lawn Chair", "(F)PlasticLawnChair"],["F", "坏电视", "Broken Television", "(F)BrokenTelevision"],["F", "塑料六连环", "Six-Pack Rings", "(F)SixPackRings"],["F", "绿色瓶子", "Green Bottle", "(F)GreenBottle"],["F", "塑料袋", "Plastic Bag", "(F)PlasticBag"],["F", "易拉罐", "Aluminum Can", "(F)AluminumCan"],["F", "蓝色瓶子", "Blue Bottle", "(F)BlueBottle"],["F", "半埋轮胎", "Buried Tire", "(F)BuriedTire"],["F", "轮胎", "Tire", "(F)Tire"],["F", "包装纸", "Wrapper", "(F)Wrapper"],["F", "打翻的饮料", "Spilled Beverage", "(F)SpilledBeverage"],["F", "脏乱的上衣", "Messy Shirt", "(F)MessyShirt"],["F", "脏乱的短裤", "Messy Shorts", "(F)MessyShorts"],["F", "发霉的沙发", "Moldy Couch", "(F)MoldyCouch"],["F", "精致盆栽", "Fancy House Plant", "(F)FancyTree1"],["F", "精致盆栽", "Fancy House Plant", "(F)FancyTree2"],["F", "精致盆栽", "Fancy House Plant", "(F)FancyTree3"],["F", "家居植物", "House Plant", "(F)FancyHousePlant3"],["F", "家居植物", "House Plant", "(F)FancyHousePlant1"],["F", "家居植物", "House Plant", "(F)FancyHousePlant2"],["F", "家居植物", "House Plant", "(F)FancyHousePlant4"],["F", "家居植物", "House Plant", "(F)FancyHousePlant5"],["F", "猪的图画", "Pig Painting", "(F)PigPainting"],["F", "床", "Midnight Beach Bed", "(F)MidnightBeachBed"],["F", "双人床", "Midnight Beach Double Bed", "(F)MidnightBeachDoubleBed"],["F", "黑暗钢琴", "Dark Piano", "(F)DarkPiano"],["S", "经典背带裤", "Classic Overalls", "(S)1000"],["S", "上衣", "Shirt", "(S)1001"],["S", "薄荷女式衬衫", "Mint Blouse", "(S)1002"],["S", "深色上衣", "Dark Shirt", "(S)1003"],["S", "骷髅 T 恤", "Skull Shirt", "(S)1004"],["S", "浅蓝色上衣", "Light Blue Shirt", "(S)1005"],["S", "棕黄色条纹衫", "Tan Striped Shirt", "(S)1006"],["S", "绿色背带裤", "Green Overalls", "(S)1007"],["S", "“Good Grief”衫", "", "(S)1008"],["S", "海蓝色上衣", "Aquamarine Shirt", "(S)1009"],["S", "西装上衣", "Suit Top", "(S)1010"],["S", "绿色腰带衫", "Green Belted Shirt", "(S)1011"],["S", "黄绿色条纹衫", "Lime Green Striped Shirt", "(S)1012"],["S", "红色条纹衫", "Red Striped Shirt", "(S)1013"],["S", "骨架 T 恤", "Skeleton Shirt", "(S)1014"],["S", "橘黄色上衣", "Orange Shirt", "(S)1015"],["S", "夜空 T 恤", "Night Sky Shirt", "(S)1016"],["S", "镇长吊带衫", "Mayoral Suspenders", "(S)1017"],["S", "棕色夹克衫", "Brown Jacket", "(S)1018"],["S", "水手服", "Sailor Shirt", "(S)1019"],["S", "绿色背心", "Green Vest", "(S)1020"],["S", "黄绿上衣", "Yellow and Green Shirt", "(S)1021"],["S", "上衣", "Shirt", "(S)1022"],["S", "上衣", "Shirt", "(S)1023"],["S", "上衣", "Shirt", "(S)1024"],["S", "上衣", "Shirt", "(S)1025"],["S", "浅蓝色条纹衫", "Light Blue Striped Shirt", "(S)1026"],["S", "粉色条纹衫", "Pink Striped Shirt", "(S)1027"],["S", "爱心 T 恤", "Heart Shirt", "(S)1028"],["S", "工作服", "Work Shirt", "(S)1029"],["S", "店主的夹克衫", "Store Owner's Jacket", "(S)1030"],["S", "上衣", "Shirt", "(S)1031"],["S", "上衣", "Shirt", "(S)1032"],["S", "上衣", "Shirt", "(S)1033"],["S", "绿色束腰上衣", "Green Tunic", "(S)1034"],["S", "靓红女式衬衫", "Fancy Red Blouse", "(S)1035"],["S", "上衣", "Shirt", "(S)1036"],["S", "上衣", "Shirt", "(S)1037"],["S", "白 T 恤（男）", "Plain Shirt (M)", "(S)1038"],["S", "复古彩虹衫", "Retro Rainbow Shirt", "(S)1039"],["S", "上衣", "Shirt", "(S)1040"],["S", "白 T 恤（女）", "Plain Shirt (F)", "(S)1041"],["S", "黄绿色束腰上衣", "Lime Green Tunic", "(S)1042"],["S", "上衣", "Shirt", "(S)1043"],["S", "上衣", "Shirt", "(S)1044"],["S", "上衣", "Shirt", "(S)1045"],["S", "上衣", "Shirt", "(S)1046"],["S", "上衣", "Shirt", "(S)1047"],["S", "上衣", "Shirt", "(S)1048"],["S", "上衣", "Shirt", "(S)1049"],["S", "上衣", "Shirt", "(S)1050"],["S", "上衣", "Shirt", "(S)1051"],["S", "上衣", "Shirt", "(S)1052"],["S", "上衣", "Shirt", "(S)1053"],["S", "上衣", "Shirt", "(S)1054"],["S", "上衣", "Shirt", "(S)1055"],["S", "上衣", "Shirt", "(S)1056"],["S", "上衣", "Shirt", "(S)1057"],["S", "上衣", "Shirt", "(S)1058"],["S", "上衣", "Shirt", "(S)1059"],["S", "上衣", "Shirt", "(S)1060"],["S", "上衣", "Shirt", "(S)1061"],["S", "上衣", "Shirt", "(S)1062"],["S", "上衣", "Shirt", "(S)1063"],["S", "上衣", "Shirt", "(S)1064"],["S", "上衣", "Shirt", "(S)1065"],["S", "上衣", "Shirt", "(S)1066"],["S", "上衣", "Shirt", "(S)1067"],["S", "上衣", "Shirt", "(S)1068"],["S", "上衣", "Shirt", "(S)1069"],["S", "上衣", "Shirt", "(S)1070"],["S", "白色背带裤上衣", "White Overalls Shirt", "(S)1071"],["S", "上衣", "Shirt", "(S)1072"],["S", "上衣", "Shirt", "(S)1073"],["S", "上衣", "Shirt", "(S)1074"],["S", "上衣", "Shirt", "(S)1075"],["S", "上衣", "Shirt", "(S)1076"],["S", "上衣", "Shirt", "(S)1077"],["S", "上衣", "Shirt", "(S)1078"],["S", "上衣", "Shirt", "(S)1079"],["S", "上衣", "Shirt", "(S)1080"],["S", "上衣", "Shirt", "(S)1081"],["S", "上衣", "Shirt", "(S)1082"],["S", "上衣", "Shirt", "(S)1083"],["S", "上衣", "Shirt", "(S)1084"],["S", "上衣", "Shirt", "(S)1085"],["S", "上衣", "Shirt", "(S)1086"],["S", "平整领结衫", "Neat Bow Shirt", "(S)1087"],["S", "上衣", "Shirt", "(S)1088"],["S", "上衣", "Shirt", "(S)1089"],["S", "上衣", "Shirt", "(S)1090"],["S", "上衣", "Shirt", "(S)1091"],["S", "上衣", "Shirt", "(S)1092"],["S", "上衣", "Shirt", "(S)1093"],["S", "上衣", "Shirt", "(S)1094"],["S", "上衣", "Shirt", "(S)1095"],["S", "上衣", "Shirt", "(S)1096"],["S", "上衣", "Shirt", "(S)1097"],["S", "上衣", "Shirt", "(S)1098"],["S", "上衣", "Shirt", "(S)1099"],["S", "上衣", "Shirt", "(S)1100"],["S", "上衣", "Shirt", "(S)1101"],["S", "上衣", "Shirt", "(S)1102"],["S", "上衣", "Shirt", "(S)1103"],["S", "上衣", "Shirt", "(S)1104"],["S", "上衣", "Shirt", "(S)1105"],["S", "上衣", "Shirt", "(S)1106"],["S", "上衣", "Shirt", "(S)1107"],["S", "上衣", "Shirt", "(S)1108"],["S", "上衣", "Shirt", "(S)1109"],["S", "上衣", "Shirt", "(S)1110"],["S", "上衣", "Shirt", "(S)1111"],["S", "上衣", "Shirt", "(S)1112"],["S", "上衣", "Shirt", "(S)1113"],["S", "上衣", "Shirt", "(S)1114"],["S", "上衣", "Shirt", "(S)1115"],["S", "上衣", "Shirt", "(S)1116"],["S", "上衣", "Shirt", "(S)1117"],["S", "上衣", "Shirt", "(S)1118"],["S", "上衣", "Shirt", "(S)1119"],["S", "上衣", "Shirt", "(S)1120"],["S", "上衣", "Shirt", "(S)1121"],["S", "上衣", "Shirt", "(S)1122"],["S", "领带衬衫", "Shirt And Tie", "(S)1123"],["S", "上衣", "Shirt", "(S)1124"],["S", "上衣", "Shirt", "(S)1125"],["S", "上衣", "Shirt", "(S)1126"],["S", "艾米丽的魔法衣", "Emily's Magic Shirt", "(S)1127"],["S", "条纹衫", "Striped Shirt", "(S)1128"],["S", "背心（男）", "Tank Top (M)", "(S)1129"],["S", "背心（女）", "Tank Top (F)", "(S)1130"],["S", "牛仔披风", "Cowboy Poncho", "(S)1131"],["S", "短背心（男）", "Crop Tank Top (M)", "(S)1132"],["S", "短背心（女）", "Crop Tank Top (F)", "(S)1133"],["S", "比基尼上装", "Bikini Top", "(S)1134"],["S", "温布斯 T 恤", "Wumbus Shirt", "(S)1135"],["S", "80's衬衣（女）", "80's Shirt (F)", "(S)1136"],["S", "运动员夹克", "Letterman Jacket", "(S)1137"],["S", "黑皮夹克", "Black Leather Jacket", "(S)1138"],["S", "吊带上衣", "Strapped Top", "(S)1139"],["S", "纽扣衬衫", "Button Down Shirt", "(S)1140"],["S", "短上衣", "Crop Top Shirt", "(S)1141"],["S", "抹胸背心", "Tube Top", "(S)1142"],["S", "扎染上衣", "Tie Dye Shirt", "(S)1143"],["S", "上衣", "Shirt", "(S)1144"],["S", "上衣", "Shirt", "(S)1145"],["S", "上衣", "Shirt", "(S)1146"],["S", "上衣", "Shirt", "(S)1147"],["S", "钢胸甲", "Steel Breastplate", "(S)1148"],["S", "铜胸甲", "Copper Breastplate", "(S)1149"],["S", "金胸甲", "Gold Breastplate", "(S)1150"],["S", "铱胸甲", "Iridium Breastplate", "(S)1151"],["S", "80's衬衣（男）", "80's Shirt (M)", "(S)1152"],["S", "冒充肌肉 T 恤", "Fake Muscles Shirt", "(S)1153"],["S", "法兰绒上衣", "Flannel Shirt", "(S)1154"],["S", "轰炸机夹克", "Bomber Jacket", "(S)1155"],["S", "原始人上衣", "Caveman Shirt", "(S)1156"],["S", "钓鱼背心", "Fishing Vest", "(S)1157"],["S", "鱼 T 恤", "Fish Shirt", "(S)1158"],["S", "衬衫皮带", "Shirt And Belt", "(S)1159"],["S", "灰色卫衣", "Gray Hoodie", "(S)1160"],["S", "蓝色卫衣", "Blue Hoodie", "(S)1161"],["S", "红色卫衣", "Red Hoodie", "(S)1162"],["S", "牛仔夹克", "Denim Jacket", "(S)1163"],["S", "运动风衣", "Track Jacket", "(S)1164"],["S", "白色武术服", "White Gi", "(S)1165"],["S", "橘色武术服", "Orange Gi", "(S)1166"],["S", "灰色背心", "Gray Vest", "(S)1167"],["S", "海藻上衣", "Kelp Shirt", "(S)1168"],["S", "带刺背心", "Studded Vest", "(S)1169"],["S", "花哨上衣", "Gaudy Shirt", "(S)1170"],["S", "绿洲礼服", "Oasis Gown", "(S)1171"],["S", "铁匠围裙", "Blacksmith Apron", "(S)1172"],["S", "平整领结衫", "Neat Bow Shirt", "(S)1173"],["S", "高腰上衣", "High-Waisted Shirt", "(S)1174"],["S", "高腰上衣", "High-Waisted Shirt", "(S)1175"],["S", "普通套头衫（男）", "Basic Pullover (M)", "(S)1176"],["S", "普通套头衫（女）", "Basic Pullover (F)", "(S)1177"],["S", "龟脖毛衣", "Turtleneck Sweater", "(S)1178"],["S", "铱能量上衣", "Iridium Energy Shirt", "(S)1179"],["S", "隧道队球衣", "Tunnelers Jersey", "(S)1180"],["S", "上衣", "Shirt", "(S)1181"],["S", "上衣", "Shirt", "(S)1182"],["S", "灰色西装", "Gray Suit", "(S)1183"],["S", "红色无尾礼服", "Red Tuxedo", "(S)1184"],["S", "藏青色无尾礼服", "Navy Tuxedo", "(S)1185"],["S", "节日上衣", "Holiday Shirt", "(S)1186"],["S", "叶子上衣", "Leafy Top", "(S)1187"],["S", "晚安睡衣", "Goodnight Shirt", "(S)1188"],["S", "绿色皮带衬衫", "Green Belted Shirt", "(S)1189"],["S", "笑脸 T 恤", "Happy Shirt", "(S)1190"],["S", "衬衫领结", "Shirt with Bow", "(S)1191"],["S", "丑角上衣", "Jester Shirt", "(S)1192"],["S", "海洋上衣", "Ocean Shirt", "(S)1193"],["S", "深色条纹衫", "Dark Striped Shirt", "(S)1194"],["S", "丝巾上衣", "Bandana Shirt", "(S)1195"],["S", "背包 T 恤", "Backpack Shirt", "(S)1196"],["S", "紫色女式衬衫", "Purple Blouse", "(S)1197"],["S", "老式 Polo 衫", "Vintage Polo", "(S)1198"],["S", "托加长袍", "Toga Shirt", "(S)1199"],["S", "星星 T 恤", "Star Shirt", "(S)1200"],["S", "时髦上衣（男）", "Classy Top (M)", "(S)1201"],["S", "时髦上衣（女）", "Classy Top (F)", "(S)1202"],["S", "丝巾上衣", "Bandana Shirt", "(S)1203"],["S", "假日 T 恤", "Vacation Shirt", "(S)1204"],["S", "园丁上衣", "Green Thumb Shirt", "(S)1205"],["S", "丝巾上衣", "Bandana Shirt", "(S)1206"],["S", "史莱姆 T 恤", "Slime Shirt", "(S)1207"],["S", "挖掘机上衣", "Excavator Shirt", "(S)1208"],["S", "运动衫", "Sports Shirt", "(S)1209"],["S", "爱心 T 恤", "Heart Shirt", "(S)1210"],["S", "深色夹克", "Dark Jacket", "(S)1211"],["S", "日落 T 恤", "Sunset Shirt", "(S)1212"],["S", "厨师工作服", "Chef Coat", "(S)1213"],["S", "大海 T 恤", "Shirt O' The Sea", "(S)1214"],["S", "神秘衣", "Arcane Shirt", "(S)1215"],["S", "纯色背带裤", "Plain Overalls", "(S)1216"],["S", "无袖背带裤", "Sleeveless Overalls", "(S)1217"],["S", "开衫", "Cardigan", "(S)1218"],["S", "由巴上衣", "Yoba Shirt", "(S)1219"],["S", "项链 T 恤", "Necklace Shirt", "(S)1220"],["S", "皮带外套", "Belted Coat", "(S)1221"],["S", "金边 T 恤", "Gold Trimmed Shirt", "(S)1222"],["S", "五彩 T 恤", "Prismatic Shirt", "(S)1223"],["S", "吊坠 T 恤", "Pendant Shirt", "(S)1224"],["S", "高热 T 恤", "High Heat Shirt", "(S)1225"],["S", "火焰 T 恤", "Flames Shirt", "(S)1226"],["S", "古老 T 恤", "Antiquity Shirt", "(S)1227"],["S", "淡雅箭头 T 恤", "Soft Arrow Shirt", "(S)1228"],["S", "玩偶 T 恤", "Doll Shirt", "(S)1229"],["S", "珠宝 T 恤", "Jewelry Shirt", "(S)1230"],["S", "帆布夹克", "Canvas Jacket", "(S)1231"],["S", "垃圾桶 T 恤", "Trash Can Shirt", "(S)1232"],["S", "铁锈 T 恤", "Rusty Shirt", "(S)1233"],["S", "电路板 T 恤", "Circuitboard Shirt", "(S)1234"],["S", "绒毛 T 恤", "Fluffy Shirt", "(S)1235"],["S", "酱汁 T 恤", "Sauce-Stained Shirt", "(S)1236"],["S", "棕色西装", "Brown Suit", "(S)1237"],["S", "金 T 恤", "Golden Shirt", "(S)1238"],["S", "船长服", "Captain's Uniform", "(S)1239"],["S", "警服", "Officer Uniform", "(S)1240"],["S", "护林员制服", "Ranger Uniform", "(S)1241"],["S", "蓝色长背心", "Blue Long Vest", "(S)1242"],["S", "皇室披风", "Regal Mantle", "(S)1243"],["S", "遗物 T 恤", "Relic Shirt", "(S)1244"],["S", "波波 T 恤", "Bobo Shirt", "(S)1245"],["S", "煎蛋 T 恤", "Fried Egg Shirt", "(S)1246"],["S", "汉堡 T 恤", "Burger Shirt", "(S)1247"],["S", "有领衬衫", "Collared Shirt", "(S)1248"],["S", "烤面包 T 恤", "Toasted Shirt", "(S)1249"],["S", "鲤鱼 T 恤", "Carp Shirt", "(S)1250"],["S", "红色法兰绒上衣", "Red Flannel Shirt", "(S)1251"],["S", "薄饼 T 恤", "Tortilla Shirt", "(S)1252"],["S", "暖色法兰绒上衣", "Warm Flannel Shirt", "(S)1253"],["S", "砂糖 T 恤", "Sugar Shirt", "(S)1254"],["S", "绿色法兰绒上衣", "Green Flannel Shirt", "(S)1255"],["S", "油渍 T 恤", "Oil Stained Shirt", "(S)1256"],["S", "羊肚菌 T 恤", "Morel Shirt", "(S)1257"],["S", "春季 T 恤", "Spring Shirt", "(S)1258"],["S", "水手服", "Sailor Shirt", "(S)1259"],["S", "雨衣", "Rain Coat", "(S)1260"],["S", "水手服", "Sailor Shirt", "(S)1261"],["S", "深色丝巾上衣", "Dark Bandana Shirt", "(S)1262"],["S", "深色荧光衬衫", "Dark Highlight Shirt", "(S)1263"],["S", "泛光 T 恤", "Omni Shirt", "(S)1264"],["S", "新娘上衣", "Bridal Shirt", "(S)1265"],["S", "棕色背带裤", "Brown Overalls", "(S)1266"],["S", "橘红色领结衫", "Orange Bow Shirt", "(S)1267"],["S", "白色背带裤", "White Overalls", "(S)1268"],["S", "手冲咖啡 T 恤", "Pour-Over Shirt", "(S)1269"],["S", "绿色 T 恤夹克", "Green Jacket Shirt", "(S)1270"],["S", "短夹克", "Short Jacket", "(S)1271"],["S", "圆点上衣", "Polka Dot Shirt", "(S)1272"],["S", "白点上衣", "White Dot Shirt", "(S)1273"],["S", "迷彩上衣", "Camo Shirt", "(S)1274"],["S", "泥土 T 恤", "Dirt Shirt", "(S)1275"],["S", "蟹黄糕上衣", "Crab Cake Shirt", "(S)1276"],["S", "丝绸上衣", "Silky Shirt", "(S)1277"],["S", "蓝色纽扣汗衫", "Blue Buttoned Vest", "(S)1278"],["S", "褪色牛仔上衣", "Faded Denim Shirt", "(S)1279"],["S", "红色纽扣汗衫", "Red Buttoned Vest", "(S)1280"],["S", "绿色纽扣汗衫", "Green Buttoned Vest", "(S)1281"],["S", "番茄 T 恤", "Tomato Shirt", "(S)1282"],["S", "流苏背心", "Fringed Vest", "(S)1283"],["S", "杂乱 T 恤", "Globby Shirt", "(S)1284"],["S", "午夜狗 T 恤", "Midnight Dog Jacket", "(S)1285"],["S", "虾爱好者 T 恤", "Shrimp Enthusiast Shirt", "(S)1286"],["S", "绿茶 T 恤", "Tea Shirt", "(S)1287"],["S", "饰品上衣", "Trinket Shirt", "(S)1288"],["S", "暗色西装", "Darkness Suit", "(S)1289"],["S", "矿物狗外套", "Mineral Dog Jacket", "(S)1290"],["S", "洋红色 T 恤", "Magenta Shirt", "(S)1291"],["S", "姜汁背带裤", "Ginger Overalls", "(S)1292"],["S", "香蕉 T 恤", "Banana Shirt", "(S)1293"],["S", "黄色西装", "Yellow Suit", "(S)1294"],["S", "热粉色衬衫", "Hot Pink Shirt", "(S)1295"],["S", "热带日出 T 恤", "Tropical Sunrise Shirt", "(S)1296"],["S", "姜岛比基尼", "Island Bikini", "(S)1297"],["S", "魔法斑点衣", "Magic Sprinkle Shirt", "(S)1997"],["S", "五彩上衣", "Prismatic Shirt", "(S)1998"],["S", "五彩上衣", "Prismatic Shirt", "(S)1999"],["S", "谜之上衣", "Mystery Shirt", "(S)MysteryShirt"],["S", "普通套头衫（男）", "Basic Pullover (M)", "(S)SoftEdgePullover"],["H", "牛仔帽", "Cowboy Hat", "(H)0"],["H", "圆顶礼帽", "Bowler Hat", "(H)1"],["H", "大礼帽", "Top Hat", "(H)2"],["H", "墨西哥帽", "Sombrero", "(H)3"],["H", "草帽", "Straw Hat", "(H)4"],["H", "大檐帽", "Official Cap", "(H)5"],["H", "蓝色软帽", "Blue Bonnet", "(H)6"],["H", "紫红小帽", "Plum Chapeau", "(H)7"],["H", "骷髅面具", "Skeleton Mask", "(H)8"],["H", "哥布林面具", "Goblin Mask", "(H)9"],["H", "小鸡面具", "Chicken Mask", "(H)10"],["H", "护耳", "Earmuffs", "(H)11"],["H", "精美蝴蝶结", "Delicate Bow", "(H)12"],["H", "热带风小发卡", "Tropiclip", "(H)13"],["H", "蝴蝶结", "Butterfly Bow", "(H)14"],["H", "猎人帽", "Hunter's Cap", "(H)15"],["H", "司机帽", "Trucker Hat", "(H)16"],["H", "水手帽", "Sailor's Cap", "(H)17"],["H", "老伙计帽", "Good Ol' Cap", "(H)18"],["H", "软呢帽", "Fedora", "(H)19"],["H", "凉帽", "Cool Cap", "(H)20"],["H", "幸运蝴蝶结", "Lucky Bow", "(H)21"],["H", "波尔卡蝴蝶结", "Polka Bow", "(H)22"],["H", "土地神帽", "Gnome's Cap", "(H)23"],["H", "眼罩", "Eye Patch", "(H)24"],["H", "圣诞帽", "Santa Hat", "(H)25"],["H", "三重冕", "Tiara", "(H)26"],["H", "安全帽", "Hard Hat", "(H)27"],["H", "防雨帽", "Sou'wester", "(H)28"],["H", "雏菊发卡", "Daisy", "(H)29"],["H", "西瓜发卡", "Watermelon Band", "(H)30"],["H", "老鼠耳朵", "Mouse Ears", "(H)31"],["H", "猫耳", "Cat Ears", "(H)32"],["H", "牛仔女郎帽", "Cowgal Hat", "(H)33"],["H", "专业牛仔帽", "Cowpoke Hat", "(H)34"],["H", "射手帽", "Archer's Cap", "(H)35"],["H", "熊猫帽子（TGP 玩家专属）", "Panda Hat", "(H)36"],["H", "蓝色牛仔帽", "Blue Cowboy Hat", "(H)37"],["H", "红色牛仔帽", "Red Cowboy Hat", "(H)38"],["H", "锥帽", "Cone Hat", "(H)39"],["H", "活的帽子", "Living Hat", "(H)40"],["H", "艾米丽的魔法帽", "Emily's Magic Hat", "(H)41"],["H", "蘑菇帽", "Mushroom Cap", "(H)42"],["H", "恐龙帽", "Dinosaur Hat", "(H)43"],["H", "图腾面具", "Totem Mask", "(H)44"],["H", "标志帽", "Logo Cap", "(H)45"],["H", "可穿戴的矮人头盔", "Wearable Dwarf Helm", "(H)46"],["H", "时尚帽", "Fashion Hat", "(H)47"],["H", "南瓜面具", "Pumpkin Mask", "(H)48"],["H", "骨发夹", "Hair Bone", "(H)49"],["H", "骑士头盔", "Knight's Helmet", "(H)50"],["H", "护卫头盔", "Squire's Helmet", "(H)51"],["H", "斑点头巾", "Spotted Headscarf", "(H)52"],["H", "毛线帽", "Beanie", "(H)53"],["H", "宽松毛线帽", "Floppy Beanie", "(H)54"],["H", "钓鱼帽", "Fishing Hat", "(H)55"],["H", "水滴鱼面具", "Blobfish Mask", "(H)56"],["H", "派对帽", "Party Hat", "(H)57"],["H", "派对帽", "Party Hat", "(H)58"],["H", "派对帽", "Party Hat", "(H)59"],["H", "神秘帽", "Arcane Hat", "(H)60"],["H", "厨师帽", "Chef Hat", "(H)61"],["H", "海盗帽", "Pirate Hat", "(H)62"],["H", "平顶帽", "Flat Topped Hat", "(H)63"],["H", "优雅头巾", "Elegant Turban", "(H)64"],["H", "白色头巾", "White Turban", "(H)65"],["H", "垃圾帽", "Garbage Hat", "(H)66"],["H", "金色面具", "Golden Mask", "(H)67"],["H", "螺旋桨帽", "Propeller Hat", "(H)68"],["H", "新娘面纱", "Bridal Veil", "(H)69"],["H", "女巫帽", "Witch Hat", "(H)70"],["H", "淘盘", "Copper Pan", "(H)71"],["H", "绿色头巾", "Green Turban", "(H)72"],["H", "魔法牛仔帽", "Magic Cowboy Hat", "(H)73"],["H", "魔法头巾", "Magic Turban", "(H)74"],["H", "金色头盔", "Golden Helmet", "(H)75"],["H", "豪华海盗帽", "Deluxe Pirate Hat", "(H)76"],["H", "粉色蝴蝶结", "Pink Bow", "(H)77"],["H", "青蛙帽", "Frog Hat", "(H)78"],["H", "小帽子", "Small Cap", "(H)79"],["H", "蓝鸟面具", "Bluebird Mask", "(H)80"],["H", "豪华牛仔帽", "Deluxe Cowboy Hat", "(H)81"],["H", "齐先生的帽子", "Mr. Qi's Hat", "(H)82"],["H", "黑色牛仔帽", "Dark Cowboy Hat", "(H)83"],["H", "防辐射护目镜", "Radioactive Goggles", "(H)84"],["H", "侠客帽", "Swashbuckler Hat", "(H)85"],["H", "齐氏面具", "Qi Mask", "(H)86"],["H", "星星头盔", "Star Helmet", "(H)87"],["H", "太阳镜", "Sunglasses", "(H)88"],["H", "护目镜", "Goggles", "(H)89"],["H", "采集者帽", "Forager's Hat", "(H)90"],["H", "老虎帽", "Tiger Hat", "(H)91"],["H", "???", "???", "(H)92"],["H", "战士头盔", "Warrior Helmet", "(H)93"],["H", "阿比盖尔的蝴蝶结", "Abigail's Bow", "(H)AbigailsBow"],["H", "三角帽", "Tricorn Hat", "(H)TricornHat"],["H", "Joja 棒球帽", "Joja Cap", "(H)JojaCap"],["H", "月桂花冠", "Laurel Wreath Crown", "(H)LaurelWreathCrown"],["H", "吉尔的帽子", "Gil's Hat", "(H)GilsHat"],["H", "蓝色蝴蝶结", "Blue Bow", "(H)BlueBow"],["H", "黑丝绒蝴蝶结", "Dark Velvet Bow", "(H)DarkVelvetBow"],["H", "木乃伊头套", "Mummy Mask", "(H)MummyMask"],["H", "渔夫帽", "Bucket Hat", "(H)BucketHat"],["H", "鱿鱼帽", "Squid Hat", "(H)SquidHat"],["H", "棒球帽", "Sports Cap", "(H)SportsCap"],["H", "红色菲斯帽", "Red Fez", "(H)RedFez"],["H", "浣熊帽", "Raccoon Hat", "(H)RaccoonHat"],["H", "钢淘盘", "Steel Pan", "(H)SteelPanHat"],["H", "金淘盘", "Gold Pan", "(H)GoldPanHat"],["H", "铱淘盘", "Iridium Pan", "(H)IridiumPanHat"],["H", "盲盒帽", "Mystery Hat", "(H)MysteryHat"],["H", "黑色棒球帽", "Dark Ballcap", "(H)DarkBallcap"],["H", "小矮妖帽子", "Leprechaun Hat", "(H)LeprechuanHat"],["H", "祝尼魔帽子", "Junimo Hat", "(H)JunimoHat"],["H", "纸帽子", "Paper Hat", "(H)PaperHat"],["H", "报童帽", "Pageboy Cap", "(H)PageboyCap"],["H", "小丑帽", "Jester Hat", "(H)JesterHat"],["H", "蓝丝带", "Blue Ribbon", "(H)BlueRibbon"],["H", "州长帽", "Governor's Hat", "(H)GovernorsHat"],["H", "白色蝴蝶结", "White Bow", "(H)WhiteBow"],["H", "太空头盔", "Space Helmet", "(H)SpaceHelmet"],["H", "无限之冠", "Infinity Crown", "(H)InfinityCrown"],["P", "农夫裤", "Farmer Pants", "(P)0"],["P", "短裤", "Shorts", "(P)1"],["P", "长裙", "Long Dress", "(P)2"],["P", "短裙", "Skirt", "(P)3"],["P", "褶裙", "Pleated Skirt", "(P)4"],["P", "恐龙裤", "Dinosaur Pants", "(P)5"],["P", "草裙", "Grass Skirt", "(P)6"],["P", "夏威夷草裙", "Luau Skirt", "(P)7"],["P", "精灵裤", "Genie Pants", "(P)8"],["P", "紧身裤", "Tight Pants", "(P)9"],["P", "宽松裤", "Baggy Pants", "(P)10"],["P", "简单长裙", "Simple Dress", "(P)11"],["P", "休闲裤", "Relaxed Fit Pants", "(P)12"],["P", "休闲短裤", "Relaxed Fit Shorts", "(P)13"],["P", "圆点短裤", "Polka Dot Shorts", "(P)14"],["P", "镶边幸运紫色短裤", "Trimmed Lucky Purple Shorts", "(P)15"],["P", "五彩裤子", "Prismatic Pants", "(P)998"],["P", "五彩神怪裤", "Prismatic Genie Pants", "(P)999"],["B", "运动鞋", "Sneakers", "(B)504"],["B", "橡胶靴", "Rubber Boots", "(B)505"],["B", "皮靴", "Leather Boots", "(B)506"],["B", "工作靴", "Work Boots", "(B)507"],["B", "战靴", "Combat Boots", "(B)508"],["B", "冻土靴", "Tundra Boots", "(B)509"],["B", "热能靴", "Thermal Boots", "(B)510"],["B", "黑暗之靴", "Dark Boots", "(B)511"],["B", "蹈火者靴", "Firewalker Boots", "(B)512"],["B", "神怪之鞋", "Genie Shoes", "(B)513"],["B", "太空之靴", "Space Boots", "(B)514"],["B", "牛仔之靴", "Cowboy Boots", "(B)515"],["B", "艾米丽的魔法靴", "Emily's Magic Boots", "(B)804"],["B", "矮精灵鞋子", "Leprechaun Shoes", "(B)806"],["B", "灰烬小丑鞋", "Cinderclown Shoes", "(B)853"],["B", "美人鱼靴", "Mermaid Boots", "(B)854"],["B", "龙鳞靴", "Dragonscale Boots", "(B)855"],["B", "水晶鞋", "Crystal Shoes", "(B)878"],["TR", "魔法发胶", "Magic Hair Gel", "(TR)MagicHairDye"],["TR", "青蛙蛋", "Frog Egg", "(TR)FrogEgg"],["TR", "魔法箭筒", "Magic Quiver", "(TR)MagicQuiver"],["TR", "仙女盒", "Fairy Box", "(TR)FairyBox"],["TR", "鹦鹉蛋", "Parrot Egg", "(TR)ParrotEgg"],["TR", "寒冰法杖", "Ice Rod", "(TR)IceRod"],["TR", "黄金马刺", "Golden Spur", "(TR)IridiumSpur"],["TR", "蜥怪的爪子", "Basilisk Paw", "(TR)BasiliskPaw"],["M", "假人模特（男）", "Mannequin (M)", "(M)MannequinMale"],["M", "假人模特（女）", "Mannequin (F)", "(M)MannequinFemale"],["M", "被诅咒的假人模特（男）", "Cursed Mannequin (M)", "(M)CursedMannequinMale"],["M", "被诅咒的假人模特（女）", "Cursed Mannequin (F)", "(M)CursedMannequinFemale"],["WP", "墙纸", "Wallpaper", "(WP)0"],["WP", "墙纸", "Wallpaper", "(WP)1"],["WP", "墙纸", "Wallpaper", "(WP)2"],["WP", "墙纸", "Wallpaper", "(WP)3"],["WP", "墙纸", "Wallpaper", "(WP)4"],["WP", "墙纸", "Wallpaper", "(WP)5"],["WP", "墙纸", "Wallpaper", "(WP)6"],["WP", "墙纸", "Wallpaper", "(WP)7"],["WP", "墙纸", "Wallpaper", "(WP)8"],["WP", "墙纸", "Wallpaper", "(WP)9"],["WP", "墙纸", "Wallpaper", "(WP)10"],["WP", "墙纸", "Wallpaper", "(WP)11"],["WP", "墙纸", "Wallpaper", "(WP)12"],["WP", "墙纸", "Wallpaper", "(WP)13"],["WP", "墙纸", "Wallpaper", "(WP)14"],["WP", "墙纸", "Wallpaper", "(WP)15"],["WP", "墙纸", "Wallpaper", "(WP)16"],["WP", "墙纸", "Wallpaper", "(WP)17"],["WP", "墙纸", "Wallpaper", "(WP)18"],["WP", "墙纸", "Wallpaper", "(WP)19"],["WP", "墙纸", "Wallpaper", "(WP)20"],["WP", "墙纸", "Wallpaper", "(WP)21"],["WP", "墙纸", "Wallpaper", "(WP)22"],["WP", "墙纸", "Wallpaper", "(WP)23"],["WP", "墙纸", "Wallpaper", "(WP)24"],["WP", "墙纸", "Wallpaper", "(WP)25"],["WP", "墙纸", "Wallpaper", "(WP)26"],["WP", "墙纸", "Wallpaper", "(WP)27"],["WP", "墙纸", "Wallpaper", "(WP)28"],["WP", "墙纸", "Wallpaper", "(WP)29"],["WP", "墙纸", "Wallpaper", "(WP)30"],["WP", "墙纸", "Wallpaper", "(WP)31"],["WP", "墙纸", "Wallpaper", "(WP)32"],["WP", "墙纸", "Wallpaper", "(WP)33"],["WP", "墙纸", "Wallpaper", "(WP)34"],["WP", "墙纸", "Wallpaper", "(WP)35"],["WP", "墙纸", "Wallpaper", "(WP)36"],["WP", "墙纸", "Wallpaper", "(WP)37"],["WP", "墙纸", "Wallpaper", "(WP)38"],["WP", "墙纸", "Wallpaper", "(WP)39"],["WP", "墙纸", "Wallpaper", "(WP)40"],["WP", "墙纸", "Wallpaper", "(WP)41"],["WP", "墙纸", "Wallpaper", "(WP)42"],["WP", "墙纸", "Wallpaper", "(WP)43"],["WP", "墙纸", "Wallpaper", "(WP)44"],["WP", "墙纸", "Wallpaper", "(WP)45"],["WP", "墙纸", "Wallpaper", "(WP)46"],["WP", "墙纸", "Wallpaper", "(WP)47"],["WP", "墙纸", "Wallpaper", "(WP)48"],["WP", "墙纸", "Wallpaper", "(WP)49"],["WP", "墙纸", "Wallpaper", "(WP)50"],["WP", "墙纸", "Wallpaper", "(WP)51"],["WP", "墙纸", "Wallpaper", "(WP)52"],["WP", "墙纸", "Wallpaper", "(WP)53"],["WP", "墙纸", "Wallpaper", "(WP)54"],["WP", "墙纸", "Wallpaper", "(WP)55"],["WP", "墙纸", "Wallpaper", "(WP)56"],["WP", "墙纸", "Wallpaper", "(WP)57"],["WP", "墙纸", "Wallpaper", "(WP)58"],["WP", "墙纸", "Wallpaper", "(WP)59"],["WP", "墙纸", "Wallpaper", "(WP)60"],["WP", "墙纸", "Wallpaper", "(WP)61"],["WP", "墙纸", "Wallpaper", "(WP)62"],["WP", "墙纸", "Wallpaper", "(WP)63"],["WP", "墙纸", "Wallpaper", "(WP)64"],["WP", "墙纸", "Wallpaper", "(WP)65"],["WP", "墙纸", "Wallpaper", "(WP)66"],["WP", "墙纸", "Wallpaper", "(WP)67"],["WP", "墙纸", "Wallpaper", "(WP)68"],["WP", "墙纸", "Wallpaper", "(WP)69"],["WP", "墙纸", "Wallpaper", "(WP)70"],["WP", "墙纸", "Wallpaper", "(WP)71"],["WP", "墙纸", "Wallpaper", "(WP)72"],["WP", "墙纸", "Wallpaper", "(WP)73"],["WP", "墙纸", "Wallpaper", "(WP)74"],["WP", "墙纸", "Wallpaper", "(WP)75"],["WP", "墙纸", "Wallpaper", "(WP)76"],["WP", "墙纸", "Wallpaper", "(WP)77"],["WP", "墙纸", "Wallpaper", "(WP)78"],["WP", "墙纸", "Wallpaper", "(WP)79"],["WP", "墙纸", "Wallpaper", "(WP)80"],["WP", "墙纸", "Wallpaper", "(WP)81"],["WP", "墙纸", "Wallpaper", "(WP)82"],["WP", "墙纸", "Wallpaper", "(WP)83"],["WP", "墙纸", "Wallpaper", "(WP)84"],["WP", "墙纸", "Wallpaper", "(WP)85"],["WP", "墙纸", "Wallpaper", "(WP)86"],["WP", "墙纸", "Wallpaper", "(WP)87"],["WP", "墙纸", "Wallpaper", "(WP)88"],["WP", "墙纸", "Wallpaper", "(WP)89"],["WP", "墙纸", "Wallpaper", "(WP)90"],["WP", "墙纸", "Wallpaper", "(WP)91"],["WP", "墙纸", "Wallpaper", "(WP)92"],["WP", "墙纸", "Wallpaper", "(WP)93"],["WP", "墙纸", "Wallpaper", "(WP)94"],["WP", "墙纸", "Wallpaper", "(WP)95"],["WP", "墙纸", "Wallpaper", "(WP)96"],["WP", "墙纸", "Wallpaper", "(WP)97"],["WP", "墙纸", "Wallpaper", "(WP)98"],["WP", "墙纸", "Wallpaper", "(WP)99"],["WP", "墙纸", "Wallpaper", "(WP)100"],["WP", "墙纸", "Wallpaper", "(WP)101"],["WP", "墙纸", "Wallpaper", "(WP)102"],["WP", "墙纸", "Wallpaper", "(WP)103"],["WP", "墙纸", "Wallpaper", "(WP)104"],["WP", "墙纸", "Wallpaper", "(WP)105"],["WP", "墙纸", "Wallpaper", "(WP)106"],["WP", "墙纸", "Wallpaper", "(WP)107"],["WP", "墙纸", "Wallpaper", "(WP)108"],["WP", "墙纸", "Wallpaper", "(WP)109"],["WP", "墙纸", "Wallpaper", "(WP)110"],["WP", "墙纸", "Wallpaper", "(WP)111"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:0"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:1"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:2"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:3"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:4"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:5"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:6"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:7"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:8"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:9"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:10"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:11"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:12"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:13"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:14"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:15"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:16"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:17"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:18"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:19"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:20"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:21"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:22"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:23"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:24"],["WP", "墙纸", "Wallpaper", "(WP)MoreWalls:25"],["FL", "地板", "Floor", "(FL)0"],["FL", "地板", "Floor", "(FL)1"],["FL", "地板", "Floor", "(FL)2"],["FL", "地板", "Floor", "(FL)3"],["FL", "地板", "Floor", "(FL)4"],["FL", "地板", "Floor", "(FL)5"],["FL", "地板", "Floor", "(FL)6"],["FL", "地板", "Floor", "(FL)7"],["FL", "地板", "Floor", "(FL)8"],["FL", "地板", "Floor", "(FL)9"],["FL", "地板", "Floor", "(FL)10"],["FL", "地板", "Floor", "(FL)11"],["FL", "地板", "Floor", "(FL)12"],["FL", "地板", "Floor", "(FL)13"],["FL", "地板", "Floor", "(FL)14"],["FL", "地板", "Floor", "(FL)15"],["FL", "地板", "Floor", "(FL)16"],["FL", "地板", "Floor", "(FL)17"],["FL", "地板", "Floor", "(FL)18"],["FL", "地板", "Floor", "(FL)19"],["FL", "地板", "Floor", "(FL)20"],["FL", "地板", "Floor", "(FL)21"],["FL", "地板", "Floor", "(FL)22"],["FL", "地板", "Floor", "(FL)23"],["FL", "地板", "Floor", "(FL)24"],["FL", "地板", "Floor", "(FL)25"],["FL", "地板", "Floor", "(FL)26"],["FL", "地板", "Floor", "(FL)27"],["FL", "地板", "Floor", "(FL)28"],["FL", "地板", "Floor", "(FL)29"],["FL", "地板", "Floor", "(FL)30"],["FL", "地板", "Floor", "(FL)31"],["FL", "地板", "Floor", "(FL)32"],["FL", "地板", "Floor", "(FL)33"],["FL", "地板", "Floor", "(FL)34"],["FL", "地板", "Floor", "(FL)35"],["FL", "地板", "Floor", "(FL)36"],["FL", "地板", "Floor", "(FL)37"],["FL", "地板", "Floor", "(FL)38"],["FL", "地板", "Floor", "(FL)39"],["FL", "地板", "Floor", "(FL)40"],["FL", "地板", "Floor", "(FL)41"],["FL", "地板", "Floor", "(FL)42"],["FL", "地板", "Floor", "(FL)43"],["FL", "地板", "Floor", "(FL)44"],["FL", "地板", "Floor", "(FL)45"],["FL", "地板", "Floor", "(FL)46"],["FL", "地板", "Floor", "(FL)47"],["FL", "地板", "Floor", "(FL)48"],["FL", "地板", "Floor", "(FL)49"],["FL", "地板", "Floor", "(FL)50"],["FL", "地板", "Floor", "(FL)51"],["FL", "地板", "Floor", "(FL)52"],["FL", "地板", "Floor", "(FL)53"],["FL", "地板", "Floor", "(FL)54"],["FL", "地板", "Floor", "(FL)55"],["FL", "地板", "Floor", "(FL)56"],["FL", "地板", "Floor", "(FL)57"],["FL", "地板", "Floor", "(FL)58"],["FL", "地板", "Floor", "(FL)59"],["FL", "地板", "Floor", "(FL)60"],["FL", "地板", "Floor", "(FL)61"],["FL", "地板", "Floor", "(FL)62"],["FL", "地板", "Floor", "(FL)63"],["FL", "地板", "Floor", "(FL)64"],["FL", "地板", "Floor", "(FL)65"],["FL", "地板", "Floor", "(FL)66"],["FL", "地板", "Floor", "(FL)67"],["FL", "地板", "Floor", "(FL)68"],["FL", "地板", "Floor", "(FL)69"],["FL", "地板", "Floor", "(FL)70"],["FL", "地板", "Floor", "(FL)71"],["FL", "地板", "Floor", "(FL)72"],["FL", "地板", "Floor", "(FL)73"],["FL", "地板", "Floor", "(FL)74"],["FL", "地板", "Floor", "(FL)75"],["FL", "地板", "Floor", "(FL)76"],["FL", "地板", "Floor", "(FL)77"],["FL", "地板", "Floor", "(FL)78"],["FL", "地板", "Floor", "(FL)79"],["FL", "地板", "Floor", "(FL)80"],["FL", "地板", "Floor", "(FL)81"],["FL", "地板", "Floor", "(FL)82"],["FL", "地板", "Floor", "(FL)83"],["FL", "地板", "Floor", "(FL)84"],["FL", "地板", "Floor", "(FL)85"],["FL", "地板", "Floor", "(FL)86"],["FL", "地板", "Floor", "(FL)87"],["FL", "地板", "Floor", "(FL)MoreFloors:0"],["FL", "地板", "Floor", "(FL)MoreFloors:1"],["FL", "地板", "Floor", "(FL)MoreFloors:2"],["FL", "地板", "Floor", "(FL)MoreFloors:3"],["FL", "地板", "Floor", "(FL)MoreFloors:4"],["FL", "地板", "Floor", "(FL)MoreFloors:5"],["FL", "地板", "Floor", "(FL)MoreFloors:6"],["FL", "地板", "Floor", "(FL)MoreFloors:7"],["FL", "地板", "Floor", "(FL)MoreFloors:8"]];
+
+(function () {
+  var grid=document.getElementById('egrid'), none=document.getElementById('enone');
+  var q=document.getElementById('eq'), stat=document.getElementById('estat');
+  var typesBox=document.getElementById('etypes'), onlyOBtn=document.getElementById('eonlyO');
+  if(!grid||typeof EDATA==='undefined') return;
+  var LABEL={O:'物体',BC:'大型可制作物',T:'工具',W:'武器',F:'家具',S:'上衣',H:'帽子',P:'裤子',B:'鞋子',TR:'饰品',M:'人偶',WP:'壁纸',FL:'地板'};
+  var ORDER=['O','T','W','BC','F','S','H','P','B','TR','M','WP','FL'];
+  var counts={}, total=0;
+  EDATA.forEach(function(d){ counts[d[0]]=(counts[d[0]]||0)+1; total++; });
+  var curType='ALL', onlyO=false;
+  function resetTypeBtn(){ [].slice.call(typesBox.children).forEach(function(x){ x.classList.remove('on'); }); }
+
+  var allBtn=document.createElement('button');
+  allBtn.className='etp on'; allBtn.type='button';
+  allBtn.innerHTML='全部 <span class="n">'+total+'</span>';
+  allBtn.addEventListener('click',function(){ curType='ALL'; resetTypeBtn(); allBtn.classList.add('on'); apply(); });
+  typesBox.appendChild(allBtn);
+  ORDER.forEach(function(tp){
+    if(!counts[tp]) return;
+    var btn=document.createElement('button');
+    btn.className='etp'; btn.type='button';
+    btn.innerHTML=LABEL[tp]+' <span class="n">('+tp+') '+counts[tp]+'</span>';
+    btn.addEventListener('click',function(){ curType=tp; resetTypeBtn(); btn.classList.add('on'); apply(); });
+    typesBox.appendChild(btn);
+  });
+
+  function copyText(txt){
+    if(navigator.clipboard&&navigator.clipboard.writeText) return navigator.clipboard.writeText(txt);
+    return new Promise(function(res,rej){
+      try{ var ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); res();
+      }catch(e){ rej(e); }
+    });
+  }
+
+  var nodes=[], frag=document.createDocumentFragment();
+  EDATA.forEach(function(d){
+    var type=d[0], zh=d[1], en=d[2], code=d[3], isO=(type==='O');
+    var el=document.createElement('div'); el.className='eit';
+    var m=document.createElement('div'); m.className='eim';
+    var a1=document.createElement('div'); a1.className='ezh'; a1.textContent=zh||en;
+    var a2=document.createElement('div'); a2.className='een'; a2.textContent=(zh&&en&&zh!==en)?en:'';
+    var g=document.createElement('span'); g.className='etg '+(isO?'g':'q');
+    g.textContent=isO?'可命名获取':LABEL[type]+' · 需 SMAPI';
+    m.appendChild(a1); if(a2.textContent) m.appendChild(a2); m.appendChild(g);
+    var cd=document.createElement('div'); cd.className='ecd'+(isO?'':' q'); cd.textContent=code;
+    cd.title=isO?('点击复制 ['+code+']'):('点击复制 '+code+'（需 SMAPI 控制台）');
+    cd.addEventListener('click',function(){
+      copyText(isO?('['+code+']'):code).then(function(){
+        cd.classList.add('ok'); cd.textContent='已复制';
+        setTimeout(function(){ cd.classList.remove('ok'); cd.textContent=code; },850);
+      },function(){ cd.textContent='复制失败'; setTimeout(function(){ cd.textContent=code; },850); });
+    });
+    el.appendChild(m); el.appendChild(cd);
+    el._k=(zh+' '+en+' '+code+' '+type).toLowerCase(); el._t=type;
+    frag.appendChild(el); nodes.push(el);
+  });
+  grid.appendChild(frag);
+
+  function apply(){
+    var k=(q.value||'').trim().toLowerCase(), n=0;
+    for(var i=0;i<nodes.length;i++){
+      var el=nodes[i], show=true;
+      if(curType!=='ALL'&&el._t!==curType) show=false;
+      if(show&&onlyO&&el._t!=='O') show=false;
+      if(show&&k&&el._k.indexOf(k)<0) show=false;
+      el.style.display=show?'':'none';
+      if(show) n++;
+    }
+    stat.textContent=(k||curType!=='ALL'||onlyO)?('匹配 '+n+' 项'):('共 '+total+' 项');
+    none.style.display=n?'none':'block';
+  }
+  onlyOBtn.addEventListener('click',function(){ onlyO=!onlyO; onlyOBtn.classList.toggle('on',onlyO); apply(); });
+  q.addEventListener('input',apply);
+  document.getElementById('eclr').addEventListener('click',function(){
+    q.value=''; onlyO=false; onlyOBtn.classList.remove('on'); curType='ALL'; resetTypeBtn(); allBtn.classList.add('on'); apply(); q.focus();
+  });
+  apply();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "Name": "InGameGuide",
+  "Author": "ly",
+  "Version": "1.0.0",
+  "Description": "游戏内内置新手图文教程 + 物品代码实时查询面板（F2 教程 / F3 查询）",
+  "UniqueID": "ly.InGameGuide",
+  "EntryDll": "InGameGuide.dll",
+  "MinimumApiVersion": "4.0.0",
+  "UpdateKeys": []
+}

@@ -1,0 +1,26 @@
+# 编译产物与缓存
+[Bb]in/
+[Oo]bj/
+*.dll
+*.cache
+*.pdb
+
+# 尚未完成的 Mod，暂不公开
+InGameCodex/
+
+# 第三方 Mod 的安装包与 manifest 备份（体积大，版权不属于本项目）
+Mod安装包备份/
+Manifest备份/
+
+# 本地参考资料，已有一份在 InGameGuide/_input 下
+教程/
+
+# Python 缓存
+__pycache__/
+*.pyc
+
+# 编辑器与系统文件
+.vs/
+.vscode/
+.idea/
+Thumbs.db
