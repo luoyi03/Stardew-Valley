@@ -5,6 +5,9 @@
 *.cache
 *.pdb
 
+# 发布产物（exe 体积大，不入库）
+*.exe
+
 # 尚未完成的 Mod，暂不公开
 InGameCodex/
 
