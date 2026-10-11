@@ -15,7 +15,8 @@ InGameCodex/docs/
 Mod安装包备份/
 Manifest备份/
 
-# 本地参考资料，已有一份在 InGameGuide/_input 下
+# 教程 HTML 等参考资料只留本地，不入库
+InGameGuide/_input/
 教程/
 
 # Python 缓存
