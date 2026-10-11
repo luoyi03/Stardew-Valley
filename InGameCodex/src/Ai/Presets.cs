@@ -16,7 +16,7 @@ namespace InGameCodex.Ai
 
         public static readonly List<Preset> All = new()
         {
-            new Preset { Id = "moyu", Label = "魔芋（你当前在用）", Short = "魔芋", BaseUrl = "https://www.moyu.cn/v1", Model = "DeepSeek-V4.1-flash" },
+            new Preset { Id = "moyu", Label = "魔芋", Short = "魔芋", BaseUrl = "https://www.moyu.cn/v1", Model = "DeepSeek-V4.1-flash" },
             new Preset { Id = "longcat", Label = "美团 LongCat", Short = "美团", BaseUrl = "https://api.longcat.chat/openai", Model = "LongCat-2.0", Note = "推理模型，回答上限建议 ≥2000" },
             new Preset { Id = "zhipu", Label = "智谱 GLM", Short = "智谱", BaseUrl = "https://open.bigmodel.cn/api/paas/v4", Model = "glm-4.5-air", Note = "glm-5.3 系列需付费资源包" },
             new Preset { Id = "siliconflow", Label = "硅基流动", Short = "硅基流动", BaseUrl = "https://api.siliconflow.cn/v1", Model = "Qwen/Qwen2.5-7B-Instruct", Note = "账户需充值" },
