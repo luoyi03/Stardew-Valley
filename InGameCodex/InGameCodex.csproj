@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AssemblyName>InGameCodex</AssemblyName>
+    <RootNamespace>InGameCodex</RootNamespace>
+    <Version>1.0.0</Version>
+    <EnableHarmony>true</EnableHarmony>
+    <GamePath>E:\Steam\steamapps\common\Stardew Valley</GamePath>
+    <IgnoreModFilePaths>^\.;^bin;^obj;^tools</IgnoreModFilePaths>
+    <NoWarn>NETSDK1138;CS1591;NU1701</NoWarn>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="assets\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

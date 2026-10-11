@@ -1,0 +1,10 @@
+{
+  "Name": "InGameCodex",
+  "Author": "ly",
+  "Version": "1.0.0",
+  "Description": "游戏内图鉴：物品的来源与用途、NPC 喜好、献祭进度、图鉴完成度，并可直接获取物品（F6）",
+  "UniqueID": "ly.InGameCodex",
+  "EntryDll": "InGameCodex.dll",
+  "MinimumApiVersion": "4.0.0",
+  "UpdateKeys": []
+}

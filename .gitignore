@@ -8,8 +8,8 @@
 # 发布产物（exe 体积大，不入库）
 *.exe
 
-# 尚未完成的 Mod，暂不公开
-InGameCodex/
+# InGameCodex 的源码要上传，但开发文档（需求/进度/探针日志）只留本地
+InGameCodex/docs/
 
 # 第三方 Mod 的安装包与 manifest 备份（体积大，版权不属于本项目）
 Mod安装包备份/
