@@ -21,7 +21,7 @@
 
 | 方案 | 地址 | 默认模型 |
 | --- | --- | --- |
-| 魔芋（你当前在用） | `https://www.moyu.cn/v1` | `DeepSeek-V4.1-flash` |
+| 魔芋 | `https://www.moyu.cn/v1` | `DeepSeek-V4.1-flash` |
 | 美团 LongCat | `https://api.longcat.chat/openai` | `LongCat-2.0`（推理模型，回答上限建议 ≥2000） |
 | 智谱 GLM | `https://open.bigmodel.cn/api/paas/v4` | `glm-4.5-air`（`glm-5.3` 系列需付费资源包） |
 | 硅基流动 | `https://api.siliconflow.cn/v1` | `Qwen/Qwen2.5-7B-Instruct`（账户需充值） |
