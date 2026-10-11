@@ -1,0 +1,72 @@
+<Window x:Class="SMM.SourceDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="补写更新源"
+        Height="470" Width="760" MinHeight="470" MinWidth="680"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Icon="/Assets/app.ico"
+        Background="{StaticResource B.Window}"
+        TextOptions.TextFormattingMode="Display"
+        FontFamily="Microsoft YaHei UI, Segoe UI">
+    <Grid Margin="20,18,20,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="TxtTitle" Grid.Row="0" Text="补写更新源" Style="{StaticResource T.Title}" />
+        <TextBlock x:Name="TxtSub" Grid.Row="1" Style="{StaticResource T.Dim}" Margin="0,6,0,0"
+                   TextWrapping="Wrap" />
+
+        <Border Grid.Row="2" Style="{StaticResource Card}" Margin="0,14,0,0">
+            <StackPanel>
+                <TextBlock Text="把这个 Mod 的更新源填在这里" Style="{StaticResource T.Section}" Margin="0,0,0,6" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="TxtInput" Grid.Column="0" MinHeight="32"
+                             Tag="例：3753 或 Nexus 网页链接，也可以填 GitHub 仓库链接"
+                             KeyDown="TxtInput_KeyDown" />
+                    <Button x:Name="BtnProbe" Grid.Column="1" Content="验证一下" Style="{StaticResource Btn}"
+                            Margin="8,0,0,0" Click="BtnProbe_Click" />
+                </Grid>
+                <TextBlock x:Name="TxtProbe" Style="{StaticResource T.Dim}" Margin="0,8,0,0"
+                           TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="3" Style="{StaticResource Card}" Margin="0,12,0,0">
+            <StackPanel>
+                <TextBlock Text="怎么找这个编号" Style="{StaticResource T.Section}" Margin="0,0,0,6" />
+                <TextBlock Style="{StaticResource T.Dim}" TextWrapping="Wrap"
+                           Text="到 Nexus 搜这个 Mod，打开它的页面，地址栏里 /mods/ 后面那串数字就是编号。比如 https://www.nexusmods.com/stardewvalley/mods/3753 → 编号是 3753。" />
+                <TextBlock Style="{StaticResource T.Dim}" TextWrapping="Wrap" Margin="0,4,0,0"
+                           Text="GitHub 上的 Mod 也可以填仓库地址，但要作者发过 Release 才装得动。" />
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <Button x:Name="BtnSearch" Content="在 N 网搜索这个名字" Style="{StaticResource Btn}"
+                            Click="BtnSearch_Click" />
+                    <Button x:Name="BtnCopy" Content="复制这个名字" Style="{StaticResource Btn}" Margin="8,0,0,0"
+                            Click="BtnCopy_Click" />
+                    <TextBlock x:Name="TxtSearchName" VerticalAlignment="Center" Margin="10,0,0,0"
+                               Foreground="{StaticResource B.TextDim}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <TextBlock Grid.Row="4" x:Name="TxtWarn" Style="{StaticResource T.Dim}" Margin="0,12,0,0"
+                   TextWrapping="Wrap" VerticalAlignment="Top" />
+
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+            <Button x:Name="BtnSave" Content="保存并检查更新" Style="{StaticResource BtnAccent}"
+                    Click="BtnSave_Click" />
+            <Button Content="取消" Style="{StaticResource Btn}" Margin="8,0,0,0" Click="BtnCancel_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

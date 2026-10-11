@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>StardewModManager</AssemblyName>
+    <RootNamespace>SMM</RootNamespace>
+    <Version>1.0.0</Version>
+    <Product>星露谷 Mod 管理器</Product>
+    <AssemblyTitle>星露谷 Mod 管理器</AssemblyTitle>
+    <Company>luoyi03</Company>
+    <NeutralLanguage>zh-CN</NeutralLanguage>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <NoWarn>CS1591;NETSDK1138;NU1701</NoWarn>
+    <DebugType>none</DebugType>
+
+    <!-- exe 图标。改动图标：换 Assets\icon-source.png 后跑 Tools\make-icon.ps1，再重新打包 -->
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 让窗口也能用同一个图标（不设 Window.Icon 时会自动取 exe 图标，这里显式带上更稳） -->
+    <Resource Include="Assets\app.ico" />
+  </ItemGroup>
+
+</Project>

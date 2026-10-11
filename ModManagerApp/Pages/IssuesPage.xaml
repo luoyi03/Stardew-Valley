@@ -1,0 +1,77 @@
+<UserControl x:Class="SMM.IssuesPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{StaticResource B.Window}">
+    <Grid Margin="16,14,16,14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+            <Button x:Name="BtnRecheck" Content="重新检查" Style="{StaticResource BtnAccent}" Click="BtnRecheck_Click" />
+            <Button x:Name="BtnFixAll" Content="一键修复可自动处理的问题" Style="{StaticResource Btn}"
+                    Margin="8,0,0,0" Click="BtnFixAll_Click" />
+            <Button x:Name="BtnSmapiPage" Content="打开 SMAPI 官网" Style="{StaticResource Btn}"
+                    Margin="8,0,0,0" Click="BtnSmapiPage_Click" />
+        </StackPanel>
+
+        <Border Grid.Row="1" Background="#1A2B3138" BorderBrush="{StaticResource B.Border}" BorderThickness="1"
+                CornerRadius="8" Padding="12,9" Margin="0,0,0,10">
+            <TextBlock x:Name="TxtInfo" Foreground="{StaticResource B.TextDim}" FontSize="12" TextWrapping="Wrap" />
+        </Border>
+
+        <Border Grid.Row="2" Style="{StaticResource Card}" Padding="6">
+            <ListView x:Name="List" ItemContainerStyle="{StaticResource ModListItem}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="级别" Width="66">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding LevelText}" FontWeight="SemiBold"
+                                               VerticalAlignment="Center"
+                                               Foreground="{Binding Level, Converter={StaticResource LevelBrush}}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <GridViewColumn Header="类型" Width="120" DisplayMemberBinding="{Binding Kind}" />
+
+                        <GridViewColumn Header="Mod" Width="220">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding ModName}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="{Binding ModId}" FontSize="11"
+                                                   Foreground="{StaticResource B.TextDim}"
+                                                   TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <GridViewColumn Header="说明" Width="480">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Detail}" TextWrapping="Wrap" FontSize="12"
+                                               Foreground="{StaticResource B.TextDim}" MaxWidth="470" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <GridViewColumn Header="处理" Width="180">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="{Binding FixLabel}" Style="{StaticResource Btn}" Padding="10,4"
+                                            Click="BtnRowFix_Click"
+                                            Visibility="{Binding FixLabel, Converter={StaticResource EmptyToCollapsed}}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Border>
+    </Grid>
+</UserControl>
