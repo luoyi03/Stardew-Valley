@@ -49,6 +49,14 @@ namespace InGameCodex.Ai
             string q = question.Trim();
             List<CodexItem> items = MatchItems(index, q);
             List<CodexNpc> npcs = MatchNpcs(q);
+
+            if (items.Count == 0 && npcs.Count == 0)
+            {
+                // 一个字都没精确命中，多半是玩家打错了字：再来一轮「只差一个字」的近似匹配
+                items = MatchItems(index, q, true);
+                npcs = MatchNpcs(q, true);
+            }
+
             if (items.Count == 0 && npcs.Count == 0)
                 return result;
 
@@ -84,7 +92,7 @@ namespace InGameCodex.Ai
 
         // ---------------- 匹配 ----------------
 
-        private static List<CodexItem> MatchItems(ItemIndex index, string q)
+        private static List<CodexItem> MatchItems(ItemIndex index, string q, bool approx = false)
         {
             var hits = new List<KeyValuePair<int, CodexItem>>();
             foreach (CodexItem e in index.Items)
@@ -95,6 +103,8 @@ namespace InGameCodex.Ai
                 int best = 0;
                 best = Math.Max(best, HitLen(q, e.Name, 2));
                 best = Math.Max(best, HitLen(q, e.EnglishName, 3));
+                if (approx && best == 0)
+                    best = ApproxHitLen(q, e.Name, 3);
                 if (best > 0)
                     hits.Add(new KeyValuePair<int, CodexItem>(best, e));
             }
@@ -108,7 +118,7 @@ namespace InGameCodex.Ai
                 .ToList();
         }
 
-        private static List<CodexNpc> MatchNpcs(string q)
+        private static List<CodexNpc> MatchNpcs(string q, bool approx = false)
         {
             NpcIndex index = ModEntry.Npcs;
             if (index == null || !index.IsBuilt)
@@ -121,6 +131,8 @@ namespace InGameCodex.Ai
                     continue;
 
                 int best = Math.Max(HitLen(q, n.Name, 2), HitLen(q, n.Key, 4));
+                if (approx && best == 0)
+                    best = ApproxHitLen(q, n.Name, 3);
                 if (best > 0)
                     hits.Add(new KeyValuePair<int, CodexNpc>(best, n));
             }
@@ -142,6 +154,43 @@ namespace InGameCodex.Ai
             if (name.Contains("?"))
                 return 0;   // 游戏里没有正式名字的物品（???）不参与匹配
             return q.IndexOf(name, StringComparison.OrdinalIgnoreCase) >= 0 ? name.Length : 0;
+        }
+
+        /// <summary>
+        /// 近似命中：问句里出现「和名字只差一个字」的等长片段也算命中，用来兜住打错字的情况
+        /// （「依制撒水器」→「铱制洒水器」）。分数故意比精确命中低一档，免得把正确的名字顶掉。
+        /// </summary>
+        private static int ApproxHitLen(string q, string name, int minLen)
+        {
+            if (string.IsNullOrWhiteSpace(name) || name.Length < minLen)
+                return 0;
+            if (name.Contains("?"))
+                return 0;
+            if (q.Length > 40 || name.Length > q.Length)
+                return 0;   // 长问句里滑窗纯属浪费，30 个字以内的问题够用了
+
+            for (int i = 0; i + name.Length <= q.Length; i++)
+            {
+                if (OneCharApart(q, i, name))
+                    return name.Length - 1;
+            }
+
+            return 0;
+        }
+
+        /// <summary>q 从 start 起、长度与 name 相同的片段，是不是只差一个字符（只认等长替换，最常见也最便宜）。</summary>
+        private static bool OneCharApart(string q, int start, string name)
+        {
+            int diff = 0;
+            for (int i = 0; i < name.Length; i++)
+            {
+                if (q[start + i] == name[i])
+                    continue;
+                if (++diff > 1)
+                    return false;
+            }
+
+            return diff == 1;   // 完全相同的交给精确匹配，这里不重复报
         }
 
         // ---------------- 文本 ----------------

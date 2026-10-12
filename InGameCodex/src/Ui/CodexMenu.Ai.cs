@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -103,6 +105,9 @@ namespace InGameCodex.Ui
         private int _aiScrollGrab;
         private string _aiLastInput = "";
 
+        /// <summary>本次提问本地图鉴/教程有没有给出资料（一条都没给的话，才值得联网去查）。</summary>
+        private bool _aiLocalHit;
+
         /// <summary>本次提问命中的图鉴条目（挂到回答气泡下方，可点击跳转）。</summary>
         private List<CodexAiLink> _aiPendingLinks;
         private int _aiTick;
@@ -123,6 +128,8 @@ namespace InGameCodex.Ui
             AiSession = AiRuntime.EnsureSession();
             AiSubtitle = TutorialStore.Status;
             AiSession.SystemPromptBuilder = () => BuildSystemPrompt(_aiLastInput);
+            AiSession.WebContextNeeded = AiShouldWebSearch;
+            AiSession.WebContextBuilder = AiBuildWebContextAsync;
 
             if (AiQuickPrompts.Count == 0)
                 AiQuickPrompts.AddRange(AiGetQuickPrompts());
@@ -162,12 +169,15 @@ namespace InGameCodex.Ui
         {
             var cfg = AiRuntime.Config;
             var sb = new StringBuilder();
+            bool localHit = false;   // 本地图鉴/教程这次到底给没给出资料，没给才有必要联网
 
             sb.Append("你是《星露谷物语》的资深攻略助手，用简体中文回答玩家的问题。\n\n");
             sb.Append("回答要求：\n");
             sb.Append("- 先给结论，再给可执行步骤，尽量控制在 300 字以内；复杂问题可以分点。\n");
             sb.Append("- 涉及数值（价格/天气/掉落）要尽量准确，不确定就明说「不确定」。\n");
             sb.Append("- 不要编造模组名、版本号或不存在的内容。\n");
+            sb.Append("- 玩家可能打错字或用简称（例如「依制撒水器」指的就是「铱制洒水器」，「抚摸机」指的是「自动抚摸机」）：先在心里判断他真正想问的物品/人物/事件，按正确的理解回答，绝对不要因为字写错就说看不懂、或者不回答。\n");
+            sb.Append("- 你本身就懂《星露谷物语》：下面给的本地资料只是用来校准数值的参考，命中不到也很正常。无论有没有资料，都必须凭自己的知识把问题回答完整；禁止说「本地资料里没有」「教程里没写所以无法回答」这类推脱的话。\n");
             if (cfg != null && cfg.NoMarkdown)
                 sb.Append("- 不要使用 Markdown 语法（#、*、表格符号都不要用），用「1. 2.」或短句分行即可。\n");
             if (cfg != null && !string.IsNullOrWhiteSpace(cfg.ExtraSystemPrompt))
@@ -178,7 +188,10 @@ namespace InGameCodex.Ui
                 CodexAiResult codex = CodexAiData.Build(question, cfg?.MaxCodexChars ?? 2000);
                 _aiPendingLinks = codex.Links.Count > 0 ? codex.Links : null;
                 if (!string.IsNullOrWhiteSpace(codex.Text))
+                {
                     sb.Append(codex.Text);
+                    localHit = true;
+                }
             }
             else
             {
@@ -204,12 +217,39 @@ namespace InGameCodex.Ui
                 string reference = TutorialStore.Retrieve(question ?? "", cfg?.MaxTutorialChars ?? 2500);
                 if (!string.IsNullOrWhiteSpace(reference))
                 {
-                    sb.Append("\n【本地教程片段（优先依据这些内容回答；没有涉及的地方再用你自己的知识）】\n");
+                    sb.Append("\n【本地教程参考片段（数值上优先采信；它没写到的部分照样用你自己的知识回答）】\n");
                     sb.Append(reference).Append("\n");
+                    localHit = true;
                 }
             }
 
+            _aiLocalHit = localHit;
+
             return sb.ToString();
+        }
+
+        /// <summary>要不要为这次提问联网查资料：开了联网，而且本地图鉴/教程一条资料都没给出来。</summary>
+        private bool AiShouldWebSearch(string question)
+        {
+            var cfg = AiRuntime.Config;
+            if (cfg == null || !cfg.WebSearch)
+                return false;
+
+            return !_aiLocalHit && !string.IsNullOrWhiteSpace(question);
+        }
+
+        /// <summary>后台线程：去网上现查一次（AnySearch），把网页要点拼成要追加到系统提示的资料段。</summary>
+        private static Task<string> AiBuildWebContextAsync(string question)
+        {
+            var cfg = AiRuntime.Config;
+            if (cfg == null || !cfg.WebSearch || string.IsNullOrWhiteSpace(question))
+                return Task.FromResult("");
+
+            string q = question.Trim();
+            if (q.IndexOf("星露谷", StringComparison.Ordinal) < 0)
+                q = "星露谷物语 " + q;   // 带上游戏名，搜索命中率明显更高
+
+            return WebSearch.FetchAsync(q, cfg.WebSearchMaxResults, cfg.WebSearchKey, cfg.MaxWebChars, CancellationToken.None);
         }
 
         private List<string> AiGetQuickPrompts()

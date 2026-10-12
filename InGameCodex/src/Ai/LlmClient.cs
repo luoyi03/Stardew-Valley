@@ -22,8 +22,51 @@ namespace InGameCodex.Ai
             PropertyNameCaseInsensitive = true
         };
 
+        /// <summary>推理模型把额度全用在思考上时，自动翻倍重试的上限。</summary>
+        private const int RetryCeiling = 16000;
+
+        /// <summary>正文一个字都没有、但模型确实输出了思考内容（额度被思考吃光了）。</summary>
+        private sealed class ReasoningOnlyException : Exception
+        {
+            public ReasoningOnlyException() : base("模型只输出了推理内容") { }
+        }
+
         /// <summary>发起一次对话。流式时会逐段回调。</summary>
         public static async Task<string> ChatAsync(
+            string baseUrl,
+            string apiKey,
+            string model,
+            float temperature,
+            int maxTokens,
+            bool stream,
+            List<ChatMsg> messages,
+            Action<string> onDelta,
+            CancellationToken ct)
+        {
+            try
+            {
+                return await SendOnceAsync(baseUrl, apiKey, model, temperature, maxTokens, stream, messages, onDelta, ct).ConfigureAwait(false);
+            }
+            catch (ReasoningOnlyException)
+            {
+                // 推理模型（hy3 / LongCat 这类）思考一长就把额度吃光，正文一个字都留不下。
+                // 这时候别报错给玩家，直接加码重试一次：思考跑完之后还有余量写正文。
+                int bigger = Math.Min(Math.Max(Math.Max(maxTokens, 1) * 2, 4096), RetryCeiling);
+
+                try
+                {
+                    return await SendOnceAsync(baseUrl, apiKey, model, temperature, bigger, stream, messages, onDelta, ct).ConfigureAwait(false);
+                }
+                catch (ReasoningOnlyException)
+                {
+                    throw new Exception(
+                        "模型把 " + bigger + " 个 token 全花在思考上了，正文还是空的。"
+                        + "到 AI 设置里把「回答上限」再调大些（推理模型建议 6000 以上），或换个非推理模型再问。");
+                }
+            }
+        }
+
+        private static async Task<string> SendOnceAsync(
             string baseUrl,
             string apiKey,
             string model,
@@ -90,7 +133,7 @@ namespace InGameCodex.Ai
                 string text = ParseFull(full);
 
                 if (string.IsNullOrEmpty(text) && full.Contains("reasoning_content", StringComparison.OrdinalIgnoreCase))
-                    throw new Exception("模型只输出了推理内容，正文被 token 上限截断");
+                    throw new ReasoningOnlyException();
 
                 onDelta?.Invoke(text);
                 return text;
@@ -150,7 +193,7 @@ namespace InGameCodex.Ai
                 throw new Exception("接口返回的不是对话数据流（地址可能少了 /v1，正确写法类似 https://www.moyu.cn/v1）");
 
             if (sb.Length == 0 && sawReasoning)
-                throw new Exception("模型只输出了推理内容，正文被 token 上限截断");
+                throw new ReasoningOnlyException();
 
             return sb.ToString();
         }

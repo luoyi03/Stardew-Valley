@@ -34,8 +34,9 @@ namespace InGameCodex.Ai
         /// <summary>采样温度，越小越严谨。</summary>
         public float Temperature { get; set; } = 0.7f;
 
-        /// <summary>单次回答最大 token 数。推理型模型（如 LongCat）思考也要占额度，建议 ≥2000。</summary>
-        public int MaxTokens { get; set; } = 2500;
+        /// <summary>单次回答最大 token 数。推理型模型（hy3 / LongCat 这类）「思考」也吃这份额度，
+        /// 打错字之类让思考变长的提问很容易把额度吃光、导致正文一片空白，建议 ≥6000。</summary>
+        public int MaxTokens { get; set; } = 6000;
 
         /// <summary>超时秒数（流式回答是边听边算的整体上限）。</summary>
         public int TimeoutSeconds { get; set; } = 120;
@@ -62,6 +63,18 @@ namespace InGameCodex.Ai
 
         /// <summary>单次检索注入教程的最大字数。</summary>
         public int MaxTutorialChars { get; set; } = 2500;
+
+        /// <summary>本地图鉴和教程都答不上来时，去网上现查一次资料（AnySearch）。</summary>
+        public bool WebSearch { get; set; } = true;
+
+        /// <summary>AnySearch 密钥。留空就用匿名免费额度（每天有次数上限，个人用基本够）。</summary>
+        public string WebSearchKey { get; set; } = "";
+
+        /// <summary>联网取回几条结果喂给模型（越多越慢）。</summary>
+        public int WebSearchMaxResults { get; set; } = 3;
+
+        /// <summary>联网资料注入的最大字数。</summary>
+        public int MaxWebChars { get; set; } = 1200;
 
         /// <summary>额外追加到系统提示里的内容（比如「回答一律用粤语」）。</summary>
         public string ExtraSystemPrompt { get; set; } = "";

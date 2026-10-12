@@ -242,6 +242,9 @@ namespace InGameCodex.Ai
             }
 
             if (scored.Count == 0)
+                scored = CharLevelCandidates(query);   // 精确的 2 字组合全军覆没（多半是打错字），退一步用单字召回
+
+            if (scored.Count == 0)
                 return "";
 
             scored.Sort((a, b) => b.Score.CompareTo(a.Score));
@@ -286,6 +289,48 @@ namespace InGameCodex.Ai
             res.AddRange(en);
 
             return res.Distinct().Take(40).ToList();
+        }
+
+        /// <summary>几乎可以忽略的字：它们在任何段落里都到处都是，用来召回只会把水搅浑。</summary>
+        private static readonly string StopChars = "的了吗呢啊呀吧么个和与在是有会能要就都不这那什么如何请问一下可以我你他她它把给让到从为着过很太最";
+
+        /// <summary>
+        /// 字级兜底召回：错别字会让它前后相邻的 2 字组合全部匹配不上，
+        /// 但问句里剩下的字仍然足以指到正确的段落（「依制撒水器」→「铱制洒水器」那一节）。
+        /// </summary>
+        private static List<(float Score, Chunk Chunk)> CharLevelCandidates(string query)
+        {
+            var res = new List<(float, Chunk)>();
+
+            var chars = new List<string>();
+            foreach (char c in new string(query.Where(c => !char.IsWhiteSpace(c) && !char.IsPunctuation(c)).ToArray()))
+            {
+                string s = c.ToString();
+                if (StopChars.IndexOf(c) >= 0 || chars.Contains(s))
+                    continue;
+                chars.Add(s);
+            }
+
+            if (chars.Count < 2)
+                return res;
+
+            foreach (var c in Chunks)
+            {
+                string hay = c.Title + "\n" + c.Text;
+                int hits = 0;
+
+                foreach (string ch in chars)
+                {
+                    if (hay.IndexOf(ch, StringComparison.Ordinal) >= 0)
+                        hits++;
+                }
+
+                // 至少命中一半、且不少于 2 个字，否则等于把整本书都捞回来
+                if (hits >= 2 && hits * 2 >= chars.Count)
+                    res.Add((hits, c));
+            }
+
+            return res;
         }
 
         private static int CountContains(string hay, string needle)

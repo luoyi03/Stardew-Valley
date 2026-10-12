@@ -53,6 +53,16 @@ namespace InGameCodex.Ai
         public int Version { get; private set; } = 1;
 
         public Func<string> SystemPromptBuilder { get; set; }
+
+        /// <summary>这次提问要不要联网查资料（同步判断，联网的事不能在这干）。在 UI 线程调用。</summary>
+        public Func<string, bool> WebContextNeeded { get; set; }
+
+        /// <summary>真正去网上查（后台线程调用），返回要追加到系统提示后面的资料；查不到返回空串。</summary>
+        public Func<string, Task<string>> WebContextBuilder { get; set; }
+
+        /// <summary>界面上是否正挂着「正在联网查…」的占位文字。</summary>
+        private bool _webHint;
+
         public string AssistantName { get; set; } = "AI";
         public string UserName { get; set; } = "玩家";
 
@@ -124,7 +134,19 @@ namespace InGameCodex.Ai
         private void Start(string hidden)
         {
             string system = SystemPromptBuilder?.Invoke() ?? "";
-            _streaming = new ChatLine(MsgRole.Assistant, AssistantName, "");
+
+            string query = !string.IsNullOrWhiteSpace(hidden)
+                ? hidden
+                : (_history.Count > 0 ? _history[_history.Count - 1].Content : "");
+
+            // 隐藏触发（NPC 打招呼之类）走的不是玩家的提问，不联网
+            bool willSearch = string.IsNullOrWhiteSpace(hidden)
+                && WebContextBuilder != null
+                && WebContextNeeded != null
+                && WebContextNeeded(query);
+
+            _streaming = new ChatLine(MsgRole.Assistant, AssistantName, willSearch ? "（本地资料里没有，正在联网查…）" : "");
+            _webHint = willSearch;
             Lines.Add(_streaming);
 
             Busy = true;
@@ -150,6 +172,13 @@ namespace InGameCodex.Ai
 
                 try
                 {
+                    if (willSearch)
+                    {
+                        string extra = await WebContextBuilder(query).ConfigureAwait(false);
+                        if (!string.IsNullOrWhiteSpace(extra))
+                            messages[0] = new ChatMsg("system", system + "\n" + extra);
+                    }
+
                     answer = await LlmClient.ChatAsync(
                         cfg.BaseUrl, cfg.ApiKey, cfg.Model, cfg.Temperature, cfg.MaxTokens, cfg.Stream,
                         messages, piece => Enqueue(piece), token).ConfigureAwait(false);
@@ -189,7 +218,17 @@ namespace InGameCodex.Ai
             while (_deltas.TryDequeue(out string piece))
             {
                 if (_streaming != null)
+                {
+                    if (_webHint)
+                    {
+                        // 正文来了，先把「正在联网查…」的占位擦掉
+                        _webHint = false;
+                        _streaming.Text = "";
+                    }
+
                     _streaming.Text += piece;
+                }
+
                 got++;
             }
 
@@ -198,6 +237,13 @@ namespace InGameCodex.Ai
 
             if (!Busy && _pendingText != null)
             {
+                if (_webHint && _streaming != null)
+                {
+                    // 请求结束时正文一个字都没来过（非流式 / 出错 / 被取消），别把占位文字留在回答里
+                    _streaming.Text = "";
+                    _webHint = false;
+                }
+
                 string p = _pendingText;
                 _pendingText = null;
 

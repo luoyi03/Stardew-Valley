@@ -128,6 +128,9 @@ namespace InGameCodex.Ui
             _rows.Add(Num("教程注入字数上限", () => cfg.MaxTutorialChars, v => cfg.MaxTutorialChars = (int)v, 500f, 0f, 10000f));
             _rows.Add(Bool("注入图鉴数据（物品用途/来源、NPC 喜好）", () => cfg.UseCodexData, v => cfg.UseCodexData = v));
             _rows.Add(Num("图鉴注入字数上限", () => cfg.MaxCodexChars, v => cfg.MaxCodexChars = (int)v, 400f, 0f, 8000f));
+            _rows.Add(Bool("联网搜索（本地资料没有时去网上现查）", () => cfg.WebSearch, v => cfg.WebSearch = v));
+            _rows.Add(Text("联网搜索密钥（留空用免费匿名额度）", () => cfg.WebSearchKey ?? "", v => cfg.WebSearchKey = v));
+            _rows.Add(Num("联网取回条数", () => cfg.WebSearchMaxResults, v => cfg.WebSearchMaxResults = (int)v, 1f, 1f, 5f));
             _rows.Add(Bool("允许 AI 给物品（回答下方出「获取」按钮）", () => cfg.AiCanGiveItems, v => cfg.AiCanGiveItems = v));
             _rows.Add(Bool("回答不使用 Markdown 符号", () => cfg.NoMarkdown, v => cfg.NoMarkdown = v));
             _rows.Add(Text("额外要求（如：用粤语回答）", () => cfg.ExtraSystemPrompt ?? "", v => cfg.ExtraSystemPrompt = v));
@@ -770,13 +773,15 @@ namespace InGameCodex.Ui
                 _beforeSaveBool["UseLocalTutorial"] = cfg.UseLocalTutorial;
                 _beforeSaveInt["MaxTokens"] = cfg.MaxTokens;
                 _beforeSaveInt["MaxCodexChars"] = cfg.MaxCodexChars;
+                _beforeSaveBool["WebSearch"] = cfg.WebSearch;
 
                 cfg.MaxHistory = 3;
                 cfg.UseLocalTutorial = false;
-                cfg.MaxTokens = 800;
+                cfg.MaxTokens = 2000;   // 推理模型的「思考」也吃这份额度，压到 800 会只剩思考、没有正文
                 cfg.MaxCodexChars = Math.Max(400, cfg.MaxCodexChars / 2);
+                cfg.WebSearch = false;
 
-                _status = "省积分模式：上下文 3 轮 / 不注入教程 / 回答上限 800 / 图鉴注入减半（关掉会还原原值）";
+                _status = "省积分模式：上下文 3 轮 / 不注入教程 / 不联网 / 回答上限 2000 / 图鉴注入减半（关掉会还原原值）";
             }
             else if (_beforeSaveInt.Count > 0 || _beforeSaveBool.Count > 0)
             {
@@ -784,6 +789,7 @@ namespace InGameCodex.Ui
                 if (_beforeSaveBool.TryGetValue("UseLocalTutorial", out bool u)) cfg.UseLocalTutorial = u;
                 if (_beforeSaveInt.TryGetValue("MaxTokens", out int m)) cfg.MaxTokens = m;
                 if (_beforeSaveInt.TryGetValue("MaxCodexChars", out int cx)) cfg.MaxCodexChars = cx;
+                if (_beforeSaveBool.TryGetValue("WebSearch", out bool w)) cfg.WebSearch = w;
 
                 _beforeSaveInt.Clear();
                 _beforeSaveBool.Clear();
