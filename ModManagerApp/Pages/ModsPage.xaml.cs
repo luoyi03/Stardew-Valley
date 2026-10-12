@@ -180,13 +180,13 @@ namespace SMM
                 TxtSelDesc.Text = "";
                 BtnSelUpdate.IsEnabled = BtnSelToggle.IsEnabled = BtnSelPage.IsEnabled =
                     BtnSelFolder.IsEnabled = BtnSelDelete.IsEnabled =
-                    BtnSelSource.IsEnabled = BtnSelCopy.IsEnabled = false;
+                    BtnSelSource.IsEnabled = BtnSelCopy.IsEnabled = BtnSelName.IsEnabled = false;
                 return;
             }
 
             BtnSelUpdate.IsEnabled = BtnSelToggle.IsEnabled = BtnSelPage.IsEnabled =
                 BtnSelFolder.IsEnabled = BtnSelDelete.IsEnabled =
-                BtnSelSource.IsEnabled = BtnSelCopy.IsEnabled = true;
+                BtnSelSource.IsEnabled = BtnSelCopy.IsEnabled = BtnSelName.IsEnabled = true;
 
             if (sel.Count > 1)
             {
@@ -196,6 +196,7 @@ namespace SMM
                 TxtSelDesc.Text = "可以用上方按钮批量启用 / 禁用 / 删除 / 复制名称（一次一行）。";
                 BtnSelPage.IsEnabled = BtnSelFolder.IsEnabled = false;
                 BtnSelSource.IsEnabled = false;      // 补源一次只能填一个
+                BtnSelName.IsEnabled = false;        // 改中文名一次也只能改一个
                 return;
             }
 
@@ -205,7 +206,11 @@ namespace SMM
             TxtSelMeta.Text = $"v{m.Version}　·　作者：{(string.IsNullOrEmpty(m.Author) ? "—" : m.Author)}　·　"
                               + (m.ContentPackForId != null ? $"内容包（{m.ContentPackForId}）　·　" : "")
                               + $"状态：{s.StatusText}"
-                              + (s.LatestVersion != null ? $"（最新 {s.LatestVersion}）" : "");
+                              + (s.LatestVersion != null ? $"（最新 {s.LatestVersion}）" : "")
+                              + (string.IsNullOrWhiteSpace(m.OriginalName)
+                                 || string.Equals(m.OriginalName, m.Name, StringComparison.Ordinal)
+                                  ? ""
+                                  : $"　·　原名：{m.OriginalName}");
             TxtSelDesc.Text = string.IsNullOrWhiteSpace(m.Description)
                 ? $"路径：{m.Dir}"
                 : m.Description + "\n路径：" + m.Dir;
@@ -492,7 +497,28 @@ namespace SMM
 
         private void BtnOpenMods_Click(object sender, RoutedEventArgs e) => App.OpenFolder(Env.ModsPath);
 
-        // ==================== 补写更新源 / 复制名称 ====================
+        // ==================== 改中文名 / 补写更新源 / 复制名称 ====================
+
+        private async void BtnSelName_Click(object sender, RoutedEventArgs e)
+        {
+            if (_busy)
+                return;
+
+            var sel = Selected();
+            if (sel.Count != 1)
+            {
+                _shell.Toast("改中文名一次只能改一个 Mod");
+                return;
+            }
+
+            var mod = sel[0].Mod;
+            var dlg = new NameDialog(Env, mod) { Owner = Window.GetWindow(this) };
+            if (dlg.ShowDialog() != true)
+                return;
+
+            await _shell.ReloadModsAsync();
+            _shell.Toast(dlg.ResultMessage ?? "名字已更新");
+        }
 
         private async void BtnSelSource_Click(object sender, RoutedEventArgs e)
         {

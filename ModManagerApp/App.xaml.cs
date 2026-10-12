@@ -130,6 +130,19 @@ namespace SMM
                 }
                 sb.AppendLine();
 
+                sb.AppendLine("=== 中文名（写进 manifest.json）===");
+                sb.AppendLine($"配置里维护过中文名的：{env.Config.ChineseNames?.Count ?? 0} 个");
+                foreach (var m in mods)
+                {
+                    if (!ModNamer.HasChineseName(env, m))
+                        continue;
+                    sb.AppendLine($"  {m.Id} → {m.Name}（原名 {m.OriginalName}，manifest 里现在 = "
+                                  + (ModNamer.ReadCurrentName(m.Dir) ?? "?") + "）");
+                }
+                sb.AppendLine("  读写自测：" + NameWriteProbe());
+                sb.AppendLine("  真实清单副本：" + RealManifestProbe(mods));
+                sb.AppendLine();
+
                 var issues = Analyzer.Analyze(env, mods);
                 sb.AppendLine($"=== 问题检查：{issues.Count} 个 ===");
                 foreach (var i in issues)
@@ -253,6 +266,94 @@ namespace SMM
             catch { }
         }
 
+        /// <summary>
+        /// 中文名读写的自测：在临时目录造一个假 manifest，改名 → 校验中文没被转义、其它字段还在 → 还原。
+        /// 全程碰的是临时目录，不会动真实的 Mod 文件。
+        /// </summary>
+        private static string NameWriteProbe()
+        {
+            string dir = Path.Combine(Path.GetTempPath(), "smm-nametest-" + Guid.NewGuid().ToString("N").Substring(0, 8));
+            try
+            {
+                Directory.CreateDirectory(dir);
+                File.WriteAllText(Path.Combine(dir, "manifest.json"),
+                    "{\n  \"Name\": \"Test Mod\",\n  \"Author\": \"someone\",\n  \"Version\": \"1.0.0\",\n"
+                    + "  \"UniqueID\": \"test.mod\",\n  \"UpdateKeys\": [ \"Nexus:1\" ]\n}\n",
+                    new UTF8Encoding(false));
+
+                ModNamer.WriteName(dir, "测试模组");
+                string text = File.ReadAllText(Path.Combine(dir, "manifest.json"));
+                bool nameOk = text.Contains("\"测试模组\"");
+                bool keptOther = text.Contains("test.mod") && text.Contains("Nexus:1");
+                string readBack = ModNamer.ReadCurrentName(dir);
+
+                ModNamer.WriteName(dir, "Test Mod");
+                bool restored = ModNamer.ReadCurrentName(dir) == "Test Mod";
+
+                return $"改名={(nameOk ? "OK" : "✗")}"
+                       + $"　中文没被转义={(text.Contains("\\u") ? "✗ 转义了" : "OK")}"
+                       + $"　其它字段保留={(keptOther ? "OK" : "✗")}"
+                       + $"　读回={readBack}　还原={(restored ? "OK" : "✗")}";
+            }
+            catch (Exception ex)
+            {
+                return "✗ " + ex.Message;
+            }
+            finally
+            {
+                try { Installer.ForceDelete(dir); } catch { }
+            }
+        }
+
+        /// <summary>
+        /// 拿一个真实 Mod 的 manifest.json 复制到临时目录再改名，确认 UniqueID / 版本 / EntryDll /
+        /// 更新源都没被写坏。只动临时副本，原文件不碰。
+        /// </summary>
+        private static string RealManifestProbe(List<LocalMod> mods)
+        {
+            var first = mods?.FirstOrDefault(m => !string.IsNullOrWhiteSpace(m.Dir)
+                                                  && File.Exists(ModNamer.ManifestPath(m.Dir)));
+            if (first == null)
+                return "跳过（没找到可用的真实 manifest）";
+
+            string tmp = Path.Combine(Path.GetTempPath(), "smm-namecopy-" + Guid.NewGuid().ToString("N").Substring(0, 8));
+            try
+            {
+                Directory.CreateDirectory(tmp);
+                string copy = ModNamer.ManifestPath(tmp);
+                File.Copy(ModNamer.ManifestPath(first.Dir), copy, true);
+
+                var before = ModScanner.ParseManifestSafe(File.ReadAllText(copy), out _);
+                ModNamer.WriteName(tmp, "改名测试 Name Test");
+                string written = ModNamer.ReadCurrentName(tmp);
+                var after = ModScanner.ParseManifestSafe(File.ReadAllText(copy), out string err);
+
+                bool ok = after != null
+                          && before != null
+                          && written == "改名测试 Name Test"
+                          && after.Id == before.Id
+                          && after.Version == before.Version
+                          && after.EntryDll == before.EntryDll
+                          && after.Keys.Count == before.Keys.Count;
+
+                return $"{first.Id}：「{before?.Name}」→「{written}」　"
+                       + $"UniqueID={(after?.Id == before?.Id ? "OK" : "✗")}　"
+                       + $"版本={(after?.Version == before?.Version ? "OK" : "✗")}　"
+                       + $"EntryDll={(after?.EntryDll == before?.EntryDll ? "OK" : "✗")}　"
+                       + $"更新源={after?.Keys.Count}/{before?.Keys.Count}　"
+                       + $"重解析={(after != null ? "OK" : "✗ " + err)}　"
+                       + (ok ? "整体 OK" : "✗ 有字段对不上");
+            }
+            catch (Exception ex)
+            {
+                return "✗ " + ex.Message;
+            }
+            finally
+            {
+                try { Installer.ForceDelete(tmp); } catch { }
+            }
+        }
+
         // ==================== 截图模式（开发用） ====================
 
         private static void Trace(string dir, string msg)
@@ -333,6 +434,22 @@ namespace SMM
                 SaveShot(root, dir, file, W, ph);
                 Trace(dir, file + " 已写出");
             }
+
+            // 改中文名对话框单独拍一张
+            var demoMod = new LocalMod
+            {
+                Id = "smm.dialog.demo",
+                Name = "畜牧助手 (Better Ranching)",
+                OriginalName = "畜牧助手 (Better Ranching)",
+                Version = "2.0.5",
+                Dir = System.IO.Path.Combine(win.Env.ModsPath ?? "(未设置)", "BetterRanching")
+            };
+            var nameWin = new NameDialog(win.Env, demoMod);
+            var nameRoot = (System.Windows.FrameworkElement)nameWin.Content;
+            Layout(nameRoot, 720, 520);
+            SaveShot(nameRoot, dir, "7-改中文名.png", 720, 520);
+            Trace(dir, "7-改中文名.png 已写出");
+            nameWin.Close();
 
             win.Close();
             Trace(dir, "全部完成");
@@ -420,6 +537,14 @@ namespace SMM
                     dlg.UpdateLayout();
                     sb.AppendLine("  补写更新源对话框：OK");
                     dlg.Close();
+
+                    // 改中文名对话框
+                    var nameDlg = new NameDialog(win.Env, fakeMod);
+                    nameDlg.Measure(new System.Windows.Size(700, 460));
+                    nameDlg.Arrange(new System.Windows.Rect(0, 0, 700, 460));
+                    nameDlg.UpdateLayout();
+                    sb.AppendLine("  改中文名对话框：OK");
+                    nameDlg.Close();
 
                     win.Close();
                 }

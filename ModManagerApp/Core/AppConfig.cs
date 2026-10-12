@@ -40,6 +40,16 @@ namespace SMM
         public List<string> IgnoredModIds { get; set; } = new();
 
         /// <summary>
+        /// 用户自己维护的中文名：ModID → 中文名。
+        /// 保存时会同时写进该 Mod 的 manifest.json 的 Name 字段，这样游戏里（SMAPI 控制台 /
+        /// 游戏内 Mod 管理器）也显示中文名。Mod 更新覆盖 manifest 后会自动重新应用。
+        /// </summary>
+        public Dictionary<string, string> ChineseNames { get; set; } = new();
+
+        /// <summary>第一次改中文名时记下的 manifest 原名（英文），用于「恢复原名」。</summary>
+        public Dictionary<string, string> OriginalNames { get; set; } = new();
+
+        /// <summary>
         /// 「打开网页」用哪个浏览器：auto（有 Edge 用 Edge）/ default（系统默认）/
         /// edge / chrome / custom（用 BrowserPath）。
         /// </summary>
@@ -77,6 +87,8 @@ namespace SMM
                     cfg.FilePath = path;
                     cfg.ExtraUpdateKeys ??= new Dictionary<string, string>();
                     cfg.IgnoredModIds ??= new List<string>();
+                    cfg.ChineseNames ??= new Dictionary<string, string>();
+                    cfg.OriginalNames ??= new Dictionary<string, string>();
                     return cfg;
                 }
             }
@@ -107,6 +119,8 @@ namespace SMM
             CheckOnStart = false;
             ExtraUpdateKeys = new Dictionary<string, string>();
             IgnoredModIds = new List<string>();
+            ChineseNames = new Dictionary<string, string>();
+            OriginalNames = new Dictionary<string, string>();
             BrowserMode = Browser.Auto;
             BrowserPath = "";
             WatchFolderEnabled = true;

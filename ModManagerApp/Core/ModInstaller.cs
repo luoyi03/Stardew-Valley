@@ -230,6 +230,7 @@ namespace SMM
                 throw new Exception(err);
 
             ModScanner.TryReadVersion(mod.Dir, out string ver, out _);
+            ModNamer.ReapplyAll(env);        // 新包的 manifest 是英文名，把配过的中文名写回去
             env.Log($"已更新 {mod.Name} → {ver ?? "?"}（{Path.GetFileName(mod.Dir)}）");
             return $"已更新「{mod.Name}」到 {ver ?? "新版本"}，重启游戏后生效";
         }
@@ -308,6 +309,7 @@ namespace SMM
                 }
             }
 
+            ModNamer.ReapplyAll(env);        // 覆盖安装会把 manifest 里的中文名冲掉，装完写回来
             env.Log($"安装包处理完成：成功 {done.Count} 个，失败 {failed.Count} 个");
 
             if (done.Count == 0)

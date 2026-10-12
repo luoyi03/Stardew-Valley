@@ -147,6 +147,9 @@
                             Click="BtnSelUpdate_Click" />
                     <Button x:Name="BtnSelSource" Content="补写更新源" Style="{StaticResource Btn}"
                             Margin="8,0,0,0" Click="BtnSelSource_Click" />
+                    <Button x:Name="BtnSelName" Content="改中文名" Style="{StaticResource Btn}"
+                            Margin="8,0,0,0" Click="BtnSelName_Click"
+                            ToolTip="改成中文名后，游戏里（SMAPI 控制台、游戏内 Mod 管理器）也会显示中文" />
                     <Button x:Name="BtnSelCopy" Content="复制名称" Style="{StaticResource Btn}"
                             Margin="8,0,0,0" Click="BtnSelCopy_Click" />
                     <Button x:Name="BtnSelToggle" Content="禁用" Style="{StaticResource Btn}"

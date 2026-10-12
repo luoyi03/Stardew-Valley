@@ -147,16 +147,33 @@ namespace SMM
             if (string.IsNullOrWhiteSpace(id))
                 return null;
 
+            string manifestName = root.Str("Name");
+            if (string.IsNullOrWhiteSpace(manifestName))
+                manifestName = id;
+
             var mod = new LocalMod
             {
                 Id = id,
-                Name = root.Str("Name") ?? id,
+                Name = manifestName,
+                OriginalName = manifestName,
                 Version = root.Str("Version") ?? "0.0.0",
                 Author = root.Str("Author"),
                 Description = root.Str("Description"),
                 EntryDll = root.Str("EntryDll"),
                 MinimumApiVersion = root.Str("MinimumApiVersion")
             };
+
+            // 用户自己维护的中文名优先显示（manifest 里也已经写成中文，这里是为了
+            // 即使还没写进去也能立刻显示，同时记下原名方便「恢复原名」）。
+            var cfg = AppEnv.Current?.Config;
+            if (cfg?.ChineseNames != null && cfg.ChineseNames.TryGetValue(id, out string cn)
+                && !string.IsNullOrWhiteSpace(cn))
+            {
+                mod.Name = cn;
+                if (cfg.OriginalNames != null && cfg.OriginalNames.TryGetValue(id, out string orig)
+                    && !string.IsNullOrWhiteSpace(orig))
+                    mod.OriginalName = orig;
+            }
 
             if (root.TryGetProperty("ContentPackFor", out var cp) && cp.ValueKind == JsonValueKind.Object)
             {

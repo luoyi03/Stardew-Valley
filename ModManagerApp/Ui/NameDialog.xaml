@@ -1,0 +1,59 @@
+<Window x:Class="SMM.NameDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="改中文名"
+        Height="520" Width="720" MinHeight="520" MinWidth="620"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Icon="/Assets/app.ico"
+        Background="{StaticResource B.Window}"
+        TextOptions.TextFormattingMode="Display"
+        FontFamily="Microsoft YaHei UI, Segoe UI">
+    <Grid Margin="20,18,20,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="TxtTitle" Grid.Row="0" Text="改中文名" Style="{StaticResource T.Title}" />
+        <TextBlock x:Name="TxtSub" Grid.Row="1" Style="{StaticResource T.Dim}" Margin="0,6,0,0"
+                   TextWrapping="Wrap" />
+
+        <Border Grid.Row="2" Style="{StaticResource Card}" Margin="0,14,0,0">
+            <StackPanel>
+                <TextBlock Text="这个 Mod 想显示成什么名字" Style="{StaticResource T.Section}" Margin="0,0,0,6" />
+                <TextBox x:Name="TxtName" MinHeight="32" MaxLength="80"
+                         Tag="在这里填中文名，例如：更好的牧场" KeyDown="TxtName_KeyDown" />
+                <TextBlock x:Name="TxtOld" Style="{StaticResource T.Dim}" Margin="0,8,0,0"
+                           TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="3" Style="{StaticResource Card}" Margin="0,12,0,0">
+            <StackPanel>
+                <TextBlock Text="这个改动会做什么" Style="{StaticResource T.Section}" Margin="0,0,0,6" />
+                <TextBlock Style="{StaticResource T.Dim}" TextWrapping="Wrap"
+                           Text="保存后会把名字写进这个 Mod 自己的 manifest.json（只改 Name 这一项，UniqueID、更新源等都不动）。" />
+                <TextBlock Style="{StaticResource T.Dim}" TextWrapping="Wrap" Margin="0,4,0,0"
+                           Text="于是不只是这里，游戏里也会显示中文名：SMAPI 控制台启动时列的清单、游戏内 Mod 管理器里看到的名字，都会变成中文。重启游戏后生效。" />
+                <TextBlock Style="{StaticResource T.Dim}" TextWrapping="Wrap" Margin="0,4,0,0"
+                           Text="以后这个 Mod 更新、manifest 被覆盖成英文时，管理器会自动把中文名写回去。" />
+            </StackPanel>
+        </Border>
+
+        <TextBlock Grid.Row="4" x:Name="TxtError" Margin="0,12,0,0" TextWrapping="Wrap"
+                   VerticalAlignment="Top" Foreground="{StaticResource B.Danger}" />
+
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+            <Button x:Name="BtnRestore" Content="恢复英文原名" Style="{StaticResource Btn}"
+                    Click="BtnRestore_Click" />
+            <Button x:Name="BtnSave" Content="保存" Style="{StaticResource BtnAccent}"
+                    Margin="8,0,0,0" Click="BtnSave_Click" />
+            <Button Content="取消" Style="{StaticResource Btn}" Margin="8,0,0,0" Click="BtnCancel_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

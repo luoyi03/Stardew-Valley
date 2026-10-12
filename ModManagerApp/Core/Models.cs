@@ -43,6 +43,10 @@ namespace SMM
     {
         public string Id { get; set; }
         public string Name { get; set; }
+
+        /// <summary>manifest 里的原始名字（改过中文名时就是改之前的英文名）。</summary>
+        public string OriginalName { get; set; }
+
         public string Version { get; set; }
         public string Author { get; set; }
         public string Description { get; set; }
