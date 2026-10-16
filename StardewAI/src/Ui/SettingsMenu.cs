@@ -39,9 +39,22 @@ namespace StardewAI.Ui
 
             /// <summary>true = 点一下弹出真正的下拉清单（而不是原地循环切换）。</summary>
             public bool Dropdown;
+
+            /// <summary>属于哪个页签（分组在 BuildRows 里用 Section(...) 划）。</summary>
+            public string Group = "";
         }
 
         private readonly List<Row> _rows = new();
+
+        /// <summary>当前页签要显示的行（分页后绘制/点击都只看它）。</summary>
+        private readonly List<Row> _visible = new();
+
+        private readonly List<string> _groups = new();
+        private readonly List<Rectangle> _tabRects = new();
+        private string _activeGroup = "";
+        private string _sectionName = "";
+        private int _sectionStart;
+        private int _hoverTab = -1;
         private readonly IClickableMenu _returnMenu;
         private ModConfig _snapshot;
 
@@ -50,7 +63,7 @@ namespace StardewAI.Ui
         private int _maxScroll;
         private int _contentHeight;
 
-        private Rectangle _saveRect, _cancelRect, _defaultRect, _testRect;
+        private Rectangle _saveRect, _cancelRect, _defaultRect, _testRect, _sampleRect;
         private int _hoverRow = -1;
         private int _hoverBtn = -1;
 
@@ -80,6 +93,12 @@ namespace StardewAI.Ui
         /// <summary>还没连上网关时，模型行的默认候选。</summary>
         private static readonly string[] DefaultModels = { "hy3", "deepseek-v4.1-flash", "glm-5.3-flash" };
 
+        /// <summary>不管网关返回什么，都不出现在候选里的模型（不想看到的写这儿）。</summary>
+        private static readonly string[] HiddenModels = { "hy4-preview-f" };
+
+        /// <summary>不管网关返回什么，这几款始终留在候选里（想固定可选哪些就改这里）。</summary>
+        private static readonly string[] StandbyModels = { "hy3", "deepseek-v4.1-flash", "glm-5.3-flash" };
+
         private static Texture2D _textBoxTex;
 
         public SettingsMenu(IClickableMenu returnMenu)
@@ -101,6 +120,8 @@ namespace StardewAI.Ui
         {
             var cfg = ModEntry.Config;
 
+            Section("接口与模型");
+
             _rows.Add(EnumRow("模型方案（一键切换）", Preset.Ids(), Preset.Labels(),
                 () => Preset.Get(cfg.Preset) != null ? cfg.Preset : "custom",
                 v => cfg.Preset = v,
@@ -120,6 +141,8 @@ namespace StardewAI.Ui
             _rows.Add(Num("上下文保留多少轮", () => cfg.MaxHistory, v => cfg.MaxHistory = (int)v, 1f, 1f, 30f));
             _rows.Add(Bool("省积分模式（一键降低开销）", () => cfg.SaveMode, ApplySaveMode));
 
+            Section("回答与教程");
+
             _rows.Add(Bool("附带存档状态（季节/技能/背包）", () => cfg.IncludeGameState, v => cfg.IncludeGameState = v));
             _rows.Add(Bool("检索本地教程作答", () => cfg.UseLocalTutorial, v => cfg.UseLocalTutorial = v));
             _rows.Add(Num("教程注入字数上限", () => cfg.MaxTutorialChars, v => cfg.MaxTutorialChars = (int)v, 500f, 0f, 10000f));
@@ -127,17 +150,229 @@ namespace StardewAI.Ui
             _rows.Add(Bool("回答不使用 Markdown 符号", () => cfg.NoMarkdown, v => cfg.NoMarkdown = v));
             _rows.Add(Text("额外要求（如：用粤语回答）", () => cfg.ExtraSystemPrompt ?? "", v => cfg.ExtraSystemPrompt = v));
 
+            Section("NPC 与按键");
+
             _rows.Add(EnumRow("NPC 触发方式", new[] { "Hotkey", "Always" }, new[] { "Hotkey（按键触发）", "Always（说话即接管）" },
                 () => cfg.NpcMode ?? "Hotkey", v => cfg.NpcMode = v));
             _rows.Add(Text("NPC 黑名单（逗号分隔）", () => cfg.NpcBlacklist ?? "", v => cfg.NpcBlacklist = v));
             _rows.Add(Bool("NPC 主动打招呼", () => cfg.NpcAutoGreet, v => cfg.NpcAutoGreet = v));
             _rows.Add(Key("打开问答面板的按键", () => cfg.AskKey, v => cfg.AskKey = v));
-            _rows.Add(Key("与 NPC 聊天的按键", () => cfg.NpcChatKey, v => cfg.NpcChatKey = v));
+            _rows.Add(Key("打开伴侣对话的按键（默认 F7）", () => cfg.CompanionKey, v => cfg.CompanionKey = v));
+            _rows.Add(Bool("进存档就自动打开伴侣对话（默认关，不影响边玩边聊）", () => cfg.CompanionAutoOpen, v => cfg.CompanionAutoOpen = v));
+            _rows.Add(Key("与 NPC 聊天的按键（默认 F4）", () => cfg.NpcChatKey, v => cfg.NpcChatKey = v));
             _rows.Add(Bool("滚轮方向反转", () => cfg.InvertScroll, v => cfg.InvertScroll = v));
             _rows.Add(Text("快捷提问（用 | 分隔）", () => string.Join(" | ", cfg.QuickPrompts ?? new List<string>()), v => cfg.QuickPrompts = SplitList(v)));
+
+            // ---- 语音：她说话 + 听你说话（改完点「保存」写回 config.json） ----
+            Section("语音 · 她说话");
+
+            _rows.Add(Bool("语音总开关（她说话 / 听你说话）", () => cfg.VoiceEnabled, v => cfg.VoiceEnabled = v));
+            _rows.Add(Key("按住说话的按键（松开自动转写）", () => cfg.PttKey, v => cfg.PttKey = v));
+            _rows.Add(Bool("聊天框打开时也能按住说话（会吃掉这个字母）", () => cfg.PttInChat, v => cfg.PttInChat = v));
+            _rows.Add(Bool("把回答念出来", () => cfg.SpeakReplies, v => cfg.SpeakReplies = v));
+            _rows.Add(Bool("语音时要求模型用口语短句回答", () => cfg.VoiceShortReplies, v => cfg.VoiceShortReplies = v));
+            _rows.Add(Num("一次最多念多少字（0 = 不限）", () => cfg.SpeakMaxChars, v => cfg.SpeakMaxChars = (int)v, 50f, 0f, 2000f));
+
+            _rows.Add(EnumRow("语音合成后端", new[] { "openai", "fish", "sapi", "edge", "none" },
+                new[] { "openai（魔芋等，走 /audio/speech）", "fish（api.fish.audio，有免费模型）", "sapi（Windows 自带语音，离线）", "edge（本机 edge-tts）", "none（关闭）" },
+                () => NormalizeTtsBackend(cfg.TtsBackend),
+                v => cfg.TtsBackend = v));
+            _rows.Add(Text("Fish 地址", () => cfg.FishBaseUrl ?? "", v => cfg.FishBaseUrl = v.Trim()));
+            _rows.Add(Text("Fish 密钥 API Key", () => cfg.FishApiKey ?? "", v => cfg.FishApiKey = v.Trim(),
+                () => "（当前 " + (cfg.FishApiKey ?? "").Trim().Length + " 位）"));
+            _rows.Add(Text("Fish 模型（s2.1-pro-free 免费）", () => cfg.FishModel ?? "", v => cfg.FishModel = v.Trim()));
+            _rows.Add(EnumRow("Fish 延迟档", new[] { "balanced", "low", "normal" },
+                new[] { "balanced（推荐）", "low（最快，音质略降）", "normal（质量最好，最慢）" },
+                () => string.IsNullOrWhiteSpace(cfg.FishLatency) ? "balanced" : cfg.FishLatency.Trim(),
+                v => cfg.FishLatency = v));
+            _rows.Add(Text("Fish 克隆音色 id（留空=官方默认音色）", () => cfg.FishReferenceId ?? "", v => cfg.FishReferenceId = v.Trim()));
+            _rows.Add(Bool("接口不支持时自动退回 Windows 自带语音", () => cfg.TtsFallbackSapi, v => cfg.TtsFallbackSapi = v));
+            _rows.Add(Bool("mp3 自动转 wav 再播（游戏内播放更稳）", () => cfg.TtsConvertToWav, v => cfg.TtsConvertToWav = v));
+            _rows.Add(Text("Windows 语音音色（留空用系统默认）", () => cfg.SapiVoice ?? "", v => cfg.SapiVoice = v.Trim(),
+                () => "（中文女声一般是 Microsoft Huihui Desktop）"));
+            _rows.Add(Text("语音合成地址（留空用主接口）", () => cfg.TtsBaseUrl ?? "", v => cfg.TtsBaseUrl = v.Trim()));
+            _rows.Add(Text("语音合成密钥（留空用主密钥）", () => cfg.TtsApiKey ?? "", v => cfg.TtsApiKey = v.Trim(),
+                () => "（当前 " + (cfg.TtsApiKey ?? "").Trim().Length + " 位）"));
+            _rows.Add(Text("语音模型 TtsModel", () => cfg.TtsModel ?? "", v => cfg.TtsModel = v.Trim()));
+
+            // 音色：常用音色做成下拉直接挑；当前值永远排第一个，
+            // 所以以前手打进去的（自定义）音色名不会被这个下拉弄丢。
+            string[] voiceIds =
+            {
+                "female-tianmei", "female-shaonv", "female-yujie", "female-chengshu",
+                "Chinese (Mandarin)_Warm_Girl", "zh-CN-XiaoxiaoNeural",
+                "nova", "alloy", "male-qn-qingse", "male-qn-jingying"
+            };
+
+            string[] voiceLabels =
+            {
+                "甜美（女）· female-tianmei", "少女（女）· female-shaonv", "御姐（女）· female-yujie", "成熟（女）· female-chengshu",
+                "温暖（女）· Warm_Girl", "晓晓（edge 那个）· zh-CN-XiaoxiaoNeural",
+                "通用 · nova", "通用 · alloy", "青涩（男）· male-qn-qingse", "精英（男）· male-qn-jingying"
+            };
+
+            var voiceChoices = new List<string>();
+            var voiceNames = new List<string>();
+
+            string curVoice = string.IsNullOrWhiteSpace(cfg.TtsVoice) ? "female-tianmei" : cfg.TtsVoice.Trim();
+            voiceChoices.Add(curVoice);
+            voiceNames.Add("当前 · " + curVoice);
+
+            for (int i = 0; i < voiceIds.Length; i++)
+            {
+                if (HasVoice(voiceChoices, voiceIds[i]))
+                    continue;
+
+                voiceChoices.Add(voiceIds[i]);
+                voiceNames.Add(voiceLabels[i]);
+            }
+
+            var voiceRow = EnumRow("音色 TtsVoice（魔芋/openai 后端用）", voiceChoices.ToArray(), voiceNames.ToArray(),
+                () => cfg.TtsVoice, v => cfg.TtsVoice = v);
+            voiceRow.Dropdown = true;
+            _rows.Add(voiceRow);
+            _rows.Add(EnumRow("语音返回格式", new[] { "mp3", "wav" },
+                new[] { "mp3", "wav（个别机器上播放更稳）" },
+                () => string.Equals(cfg.TtsFormat?.Trim(), "wav", StringComparison.OrdinalIgnoreCase) ? "wav" : "mp3",
+                v => cfg.TtsFormat = v));
+            _rows.Add(Num("语速", () => cfg.TtsSpeed, v => cfg.TtsSpeed = v, 0.1f, 0.5f, 2f));
+            _rows.Add(Num("语音音量（和游戏音量无关）", () => cfg.TtsVolume, v => cfg.TtsVolume = (int)v, 5f, 0f, 100f));
+            _rows.Add(Text("edge-tts 命令（装了 pip 包填 edge-tts）", () => cfg.EdgeTtsCommand ?? "", v => cfg.EdgeTtsCommand = v.Trim()));
+            _rows.Add(Bool("用常驻助手合成（快很多，推荐）", () => cfg.EdgeUseWorker, v => cfg.EdgeUseWorker = v));
+            _rows.Add(Text("edge-tts 音色", () => cfg.EdgeTtsVoice ?? "", v => cfg.EdgeTtsVoice = v.Trim()));
+            _rows.Add(Text("edge-tts 语速（如 +15%）", () => cfg.EdgeTtsRate ?? "", v => cfg.EdgeTtsRate = v.Trim()));
+
+            Section("语音 · 听你说");
+
+            _rows.Add(Bool("允许按住说话（语音识别）", () => cfg.SttEnabled, v => cfg.SttEnabled = v));
+            _rows.Add(EnumRow("语音识别后端", new[] { "auto", "sapi", "api", "none" },
+                new[] { "auto（先用接口，没有就退回 Windows 自带）", "sapi（只用 Windows 自带离线识别）", "api（只用云端接口，更准）", "none（关闭）" },
+                () => NormalizeSttBackend(cfg.SttBackend),
+                v => cfg.SttBackend = v));
+            _rows.Add(Text("识别地址（留空用主接口）", () => cfg.SttBaseUrl ?? "", v => cfg.SttBaseUrl = v.Trim()));
+            _rows.Add(Text("识别密钥（留空用主密钥）", () => cfg.SttApiKey ?? "", v => cfg.SttApiKey = v.Trim(),
+                () => "（当前 " + (cfg.SttApiKey ?? "").Trim().Length + " 位）"));
+            _rows.Add(Text("识别模型 SttModel", () => cfg.SttModel ?? "", v => cfg.SttModel = v.Trim()));
+            _rows.Add(Text("识别语言（中文填 zh，留空自动）", () => cfg.SttLanguage ?? "", v => cfg.SttLanguage = v.Trim()));
+            _rows.Add(Num("录音短于几秒就当误按", () => cfg.SttMinSeconds, v => cfg.SttMinSeconds = v, 0.1f, 0.2f, 5f));
+            _rows.Add(Num("录音最长秒数（到点自动发送）", () => cfg.SttMaxSeconds, v => cfg.SttMaxSeconds = (int)v, 5f, 5f, 300f));
+
+            // ---- 你的伴侣 ----
+            Section("伴侣与搭话");
+
+            _rows.Add(Text("伴侣名字", () => cfg.CompanionName ?? "", v => cfg.CompanionName = v.Trim()));
+            _rows.Add(Text("她怎么称呼你（留空 = 用你的游戏名字）", () => cfg.PlayerTitle ?? "", v => cfg.PlayerTitle = v.Trim()));
+            _rows.Add(Bool("进游戏她先开口打招呼（每次现编，不套模板）", () => cfg.CompanionGreet, v => cfg.CompanionGreet = v));
+            _rows.Add(Text("伴侣人设（留空用内置）", () => cfg.CompanionPersona ?? "", v => cfg.CompanionPersona = v));
+            _rows.Add(Bool("她知道你此刻在干什么（工具/矿层/体力）", () => cfg.ActivityInPrompt, v => cfg.ActivityInPrompt = v));
+            _rows.Add(Bool("她会主动看你在干什么并搭话", () => cfg.ProactiveChat, v => cfg.ProactiveChat = v));
+            _rows.Add(Bool("主动搭话也念出来", () => cfg.ProactiveSpeak, v => cfg.ProactiveSpeak = v));
+            _rows.Add(Num("两次主动搭话至少隔多少秒", () => cfg.ProactiveCooldown, v => cfg.ProactiveCooldown = (int)v, 15f, 20f, 1800f));
+            _rows.Add(Num("攒到事情时开口的概率 %", () => cfg.ProactiveChance, v => cfg.ProactiveChance = (int)v, 5f, 0f, 100f));
+            _rows.Add(Num("站着不动多少秒算发呆（0 = 不催）", () => cfg.ProactiveIdleSeconds, v => cfg.ProactiveIdleSeconds = (int)v, 10f, 0f, 600f));
+            _rows.Add(Num("没事也隔多少秒主动聊一句（0 = 关闭）", () => cfg.ProactiveEverySeconds, v => cfg.ProactiveEverySeconds = (int)v, 30f, 0f, 3600f));
+
+            EndSections();
+
+            if (_activeGroup.Length == 0 && _groups.Count > 0)
+                _activeGroup = _groups[0];
+
+            RebuildVisible();
         }
 
-        /// <summary>模型行的候选：当前模型永远排第一位，后面是网关拉到的清单（没拉到就用默认三个）。</summary>
+        // ---------------- 分页 ----------------
+
+        /// <summary>开一个新页签：调用点之前加的那些行归到上一个页签。</summary>
+        private void Section(string name)
+        {
+            CloseSection();
+            _sectionName = name;
+            _sectionStart = _rows.Count;
+        }
+
+        private void EndSections() => CloseSection();
+
+        private void CloseSection()
+        {
+            if (_sectionName.Length == 0)
+                return;
+
+            if (!_groups.Contains(_sectionName))
+                _groups.Add(_sectionName);
+
+            for (int i = _sectionStart; i < _rows.Count; i++)
+                _rows[i].Group = _sectionName;
+
+            _sectionName = "";
+        }
+
+        /// <summary>按当前页签挑出要显示的行。</summary>
+        private void RebuildVisible()
+        {
+            _visible.Clear();
+
+            foreach (var row in _rows)
+            {
+                if (row.Group == _activeGroup)
+                    _visible.Add(row);
+            }
+        }
+
+        private void SwitchGroup(string group)
+        {
+            if (group == _activeGroup)
+                return;
+
+            _activeGroup = group;
+            _openDrop = null;
+            RebuildVisible();
+            _scroll = 0;
+            Relayout();
+        }
+
+        /// <summary>页签的位置：标题下面一行。</summary>
+        private void LayoutTabs()
+        {
+            _tabRects.Clear();
+
+            int x = xPositionOnScreen + 24;
+            int y = yPositionOnScreen + 48;
+
+            foreach (string g in _groups)
+            {
+                int w = (int)Ui.Measure(Ui.Body, g) + 28;
+                _tabRects.Add(new Rectangle(x, y, w, 28));
+                x += w + 8;
+            }
+        }
+
+        private void DrawTabs(SpriteBatch b)
+        {
+            int mx = Game1.getMouseX(), my = Game1.getMouseY();
+            _hoverTab = -1;
+
+            for (int i = 0; i < _groups.Count && i < _tabRects.Count; i++)
+            {
+                var r = _tabRects[i];
+                bool on = _groups[i] == _activeGroup;
+                bool hover = r.Contains(mx, my);
+
+                if (hover)
+                    _hoverTab = i;
+
+                Ui.Box(b, r, on ? Ui.PanelBg : new Color(0x26, 0x21, 0x19), on ? Ui.Gold : Ui.Line);
+
+                float tw = Ui.Measure(Ui.Body, _groups[i]);
+                b.DrawString(Ui.Body, _groups[i],
+                    new Vector2(r.X + (r.Width - tw) / 2, r.Y + (r.Height - Ui.LineHeight(Ui.Body)) / 2),
+                    on ? Ui.Gold : (hover ? Ui.Ink : Ui.Dim));
+            }
+        }
+
+        /// <summary>
+        /// 模型行的候选：当前模型永远排第一位；后面是网关拉到的清单（没拉到就用默认三个），
+        /// 但会剔掉 HiddenModels，并且总是补上 StandbyModels（这样 hy3 / GLM-5.3-Flash 不管网关给不给都能选）。
+        /// </summary>
         private string[] ModelChoices()
         {
             var list = new List<string>();
@@ -145,28 +380,50 @@ namespace StardewAI.Ui
             if (cur.Length > 0)
                 list.Add(cur);
 
-            var src = _gatewayModels ?? new List<string>(DefaultModels);
+            var src = _gatewayModels != null && _gatewayModels.Count > 0
+                ? _gatewayModels
+                : new List<string>(DefaultModels);
+
             foreach (string m in src)
-            {
-                string id = (m ?? "").Trim();
-                if (id.Length == 0)
-                    continue;
+                AddModel(list, m);
 
-                bool dup = false;
-                foreach (string s in list)
-                {
-                    if (string.Equals(s, id, StringComparison.OrdinalIgnoreCase))
-                    {
-                        dup = true;
-                        break;
-                    }
-                }
-
-                if (!dup)
-                    list.Add(id);
-            }
+            // 常备款始终留着（网关清单里没有 hy3 / GLM-5.3-Flash 时也能选）
+            foreach (string m in StandbyModels)
+                AddModel(list, m);
 
             return list.ToArray();
+        }
+
+        /// <summary>加进候选：去重、跳过空名、跳过 HiddenModels（当前正在用的那个仍然保留，否则看不到自己现在用的是哪个）。</summary>
+        private static void AddModel(List<string> list, string id)
+        {
+            id = (id ?? "").Trim();
+            if (id.Length == 0)
+                return;
+
+            bool dup = false;
+            foreach (string s in list)
+            {
+                if (string.Equals(s, id, StringComparison.OrdinalIgnoreCase))
+                {
+                    dup = true;
+                    break;
+                }
+            }
+            if (dup)
+                return;
+
+            bool isCurrent = list.Count > 0 && string.Equals(list[0], id, StringComparison.OrdinalIgnoreCase);
+            if (!isCurrent)
+            {
+                foreach (string hide in HiddenModels)
+                {
+                    if (string.Equals(hide, id, StringComparison.OrdinalIgnoreCase))
+                        return;
+                }
+            }
+
+            list.Add(id);
         }
 
         /// <summary>候选变了以后换掉模型行的选项（当前值不在选项里时也能正常显示）。</summary>
@@ -361,6 +618,45 @@ namespace StardewAI.Ui
         private Row Key(string label, Func<string> get, Action<string> set)
             => new() { Label = label, Type = Kind.Key, Get = get, Set = set };
 
+        /// <summary>音色候选去重（忽略大小写）。</summary>
+        private static bool HasVoice(List<string> list, string id)
+        {
+            foreach (string s in list)
+            {
+                if (string.Equals(s, id, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>语音合成后端取值兜底：空值或写了别的都当 openai。</summary>
+        private static string NormalizeTtsBackend(string raw)
+        {
+            string v = (raw ?? "").Trim().ToLowerInvariant();
+
+            return v switch
+            {
+                "sapi" or "windows" => "sapi",
+                "edge" or "edge-tts" or "edgetts" => "edge",
+                "fish" or "fish-audio" or "fishaudio" => "fish",
+                "none" => "none",
+                _ => "openai"
+            };
+        }
+
+        /// <summary>语音识别后端取值兜底：空值或写了别的都当 auto。</summary>
+        private static string NormalizeSttBackend(string raw)
+        {
+            return (raw ?? "").Trim().ToLowerInvariant() switch
+            {
+                "sapi" or "windows" => "sapi",
+                "api" or "openai" => "api",
+                "none" => "none",
+                _ => "auto"
+            };
+        }
+
         private static string Format(float v)
         {
             string s = v.ToString("0.##", CultureInfo.InvariantCulture);
@@ -379,21 +675,24 @@ namespace StardewAI.Ui
             xPositionOnScreen = (uiW - width) / 2;
             yPositionOnScreen = (uiH - height) / 2;
 
-            _viewRect = new Rectangle(xPositionOnScreen + 20, yPositionOnScreen + 68, width - 40, height - 68 - 148);
+            _viewRect = new Rectangle(xPositionOnScreen + 20, yPositionOnScreen + 82, width - 40, height - 82 - 148);
 
-            _contentHeight = _rows.Count * RowH + 12;
+            LayoutTabs();
+
+            _contentHeight = Math.Max(1, _visible.Count) * RowH + 12;
             _maxScroll = Math.Max(0, _contentHeight - _viewRect.Height);
             _scroll = Math.Clamp(_scroll, 0, _maxScroll);
 
-            int bw = Math.Min(150, (_viewRect.Width - 40) / 4);
+            int bw = Math.Min(140, (_viewRect.Width - 40) / 5);
             int by = yPositionOnScreen + height - 64;
-            int total = bw * 4 + 30;
+            int total = bw * 5 + 40;
             int bx = xPositionOnScreen + (width - total) / 2;
 
             _saveRect = new Rectangle(bx, by, bw, 44);
             _cancelRect = new Rectangle(bx + bw + 10, by, bw, 44);
             _defaultRect = new Rectangle(bx + (bw + 10) * 2, by, bw, 44);
             _testRect = new Rectangle(bx + (bw + 10) * 3, by, bw, 44);
+            _sampleRect = new Rectangle(bx + (bw + 10) * 4, by, bw, 44);
 
             ApplyControlBounds();
         }
@@ -512,16 +811,28 @@ namespace StardewAI.Ui
             if (_cancelRect.Contains(x, y)) { Game1.playSound("bigDeSelect"); Close(); return; }
             if (_defaultRect.Contains(x, y)) { ResetDefault(); return; }
             if (_testRect.Contains(x, y)) { TestConnection(); return; }
+            if (_sampleRect.Contains(x, y)) { SpeakSample(); return; }
+
+            // 页签
+            for (int i = 0; i < _tabRects.Count && i < _groups.Count; i++)
+            {
+                if (_tabRects[i].Contains(x, y))
+                {
+                    Game1.playSound("smallSelect");
+                    SwitchGroup(_groups[i]);
+                    return;
+                }
+            }
 
             if (!_viewRect.Contains(x, y))
                 return;
 
             int rel = y - _viewRect.Y + _scroll - 6;
             int index = rel / RowH;
-            if (index < 0 || index >= _rows.Count)
+            if (index < 0 || index >= _visible.Count)
                 return;
 
-            var row = _rows[index];
+            var row = _visible[index];
             int cx = row.Ctrl.X;
             int cy = _viewRect.Y + 6 + index * RowH - _scroll + 8;
             var ctrl = new Rectangle(cx, cy, row.Ctrl.Width, row.Ctrl.Height);
@@ -1022,7 +1333,7 @@ namespace StardewAI.Ui
             {
                 int rel = y - _viewRect.Y + _scroll - 6;
                 int idx = rel / RowH;
-                if (idx >= 0 && idx < _rows.Count)
+                if (idx >= 0 && idx < _visible.Count)
                     _hoverRow = idx;
             }
 
@@ -1031,6 +1342,25 @@ namespace StardewAI.Ui
             else if (_cancelRect.Contains(x, y)) _hoverBtn = 1;
             else if (_defaultRect.Contains(x, y)) _hoverBtn = 2;
             else if (_testRect.Contains(x, y)) _hoverBtn = 3;
+            else if (_sampleRect.Contains(x, y)) _hoverBtn = 4;
+        }
+
+        /// <summary>按当前设置（哪怕还没点保存）念一句，专门用来挑音色 / 调语速。</summary>
+        private void SpeakSample()
+        {
+            ApplyRows();   // 先把输入框里的内容同步进配置，否则试听的是旧值
+
+            var cfg = ModEntry.Config;
+            _status = "试听中：" + cfg.TtsModel + " / " + cfg.TtsVoice + " / 语速 " + cfg.TtsSpeed;
+            _testResult = null;
+
+            Voice.VoiceAssistant.Interrupt();
+
+            // 试听句用她自己的名字（以前写死了"小星"）
+            string who = string.IsNullOrWhiteSpace(cfg.CompanionName) ? "" : cfg.CompanionName.Trim();
+            Voice.VoiceAssistant.SpeakTest(who.Length > 0
+                ? "我是" + who + "。今天天气不错，要不要一起去农场看看？"
+                : "今天天气不错，要不要一起去农场看看？");
         }
 
         public override void releaseLeftClick(int x, int y)
@@ -1048,10 +1378,9 @@ namespace StardewAI.Ui
             Ui.Fill(b, new Rectangle(xPositionOnScreen + 8, yPositionOnScreen + 8, width - 16, height - 16), Ui.PageBg);
 
             Utility.drawTextWithShadow(b, "StardewAI 设置", Game1.dialogueFont,
-                new Vector2(xPositionOnScreen + 24, yPositionOnScreen + 16), Ui.Green);
+                new Vector2(xPositionOnScreen + 24, yPositionOnScreen + 12), Ui.Green);
 
-            b.DrawString(Ui.Body, "改完立刻生效；点「保存」会写回 config.json   |   " + TutorialStore.Status,
-                new Vector2(xPositionOnScreen + 24, yPositionOnScreen + 44), Ui.Dim);
+            DrawTabs(b);   // 分页：接口与模型 / 回答与教程 / NPC 与按键 / 语音·她说话 / 语音·听你说 / 伴侣与搭话
 
             Ui.Box(b, _viewRect, new Color(0x29, 0x24, 0x1B), new Color(0x44, 0x3C, 0x2E));
 
@@ -1068,7 +1397,12 @@ namespace StardewAI.Ui
                 Ui.Fill(b, new Rectangle(track.X, ty, track.Width, h), Ui.Gold);
             }
 
-            string status = _status + (_saved ? "" : "   [尚未保存]");
+            string status = string.IsNullOrWhiteSpace(_status)
+                ? "改完立刻生效；点「保存」写回 config.json   |   " + TutorialStore.Status
+                : _status;
+
+            if (!_saved)
+                status += "   [尚未保存]";
             var statusLines = Ui.Wrap(status, Ui.Body, width - 48);
             int sy = _viewRect.Bottom + 8;
             for (int i = 0; i < statusLines.Count && i < 2; i++)
@@ -1081,6 +1415,7 @@ namespace StardewAI.Ui
             Button(b, _cancelRect, "取消", _hoverBtn == 1);
             Button(b, _defaultRect, "恢复默认", _hoverBtn == 2);
             Button(b, _testRect, _testing ? "测试中…" : "测试连接", _hoverBtn == 3 && !_testing);
+            Button(b, _sampleRect, "试听音色", _hoverBtn == 4);
 
             if (_openDrop != null)
                 DrawDropdown(b);
@@ -1091,9 +1426,9 @@ namespace StardewAI.Ui
 
         private void DrawRows(SpriteBatch b)
         {
-            for (int i = 0; i < _rows.Count; i++)
+            for (int i = 0; i < _visible.Count; i++)
             {
-                var row = _rows[i];
+                var row = _visible[i];
                 int y = _viewRect.Y + 6 + i * RowH - _scroll;
                 if (y > _viewRect.Bottom || y + RowH < _viewRect.Y)
                     continue;

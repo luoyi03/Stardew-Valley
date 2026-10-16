@@ -53,6 +53,18 @@ namespace StardewAI
         public string AssistantName { get; set; } = "AI";
         public string UserName { get; set; } = "玩家";
 
+        /// <summary>UI 线程回调：新一轮回答开始（语音朗读借它打断上一段）。</summary>
+        public Action OnAnswerStarted;
+
+        /// <summary>UI 线程回调：流式回答又长出了一截。</summary>
+        public Action<ChatLine> OnAnswerDelta;
+
+        /// <summary>UI 线程回调：一条回答彻底结束。</summary>
+        public Action<ChatLine> OnAnswerDone;
+
+        /// <summary>UI 线程回调：回答被中断或出错，不要念了。</summary>
+        public Action OnAnswerCancelled;
+
         public void Say(MsgRole role, string name, string text)
         {
             Lines.Add(new ChatLine(role, name, text));
@@ -121,12 +133,18 @@ namespace StardewAI
         private void Start(string hidden)
         {
             string system = SystemPromptBuilder?.Invoke() ?? "";
+
+            // 开着语音朗读时补一句写作要求：用口语短句，念出来才像人在说话
+            system = Voice.VoiceAssistant.DecorateSystem(system);
+
             _streaming = new ChatLine(MsgRole.Assistant, AssistantName, "");
             Lines.Add(_streaming);
 
             Busy = true;
             Cancelled = false;
             Version++;
+
+            try { OnAnswerStarted?.Invoke(); } catch { /* 回调出错不能影响对话 */ }
 
             var messages = new List<ChatMsg> { new("system", system) };
             messages.AddRange(_history);
@@ -191,15 +209,22 @@ namespace StardewAI
             }
 
             if (got > 0)
+            {
                 Version++;
+                SafeInvoke(OnAnswerDelta, _streaming);
+            }
 
             if (!Busy && _pendingText != null)
             {
                 string p = _pendingText;
                 _pendingText = null;
 
+                bool speakable = true;
+
                 if (p.StartsWith("__ERROR__", StringComparison.Ordinal))
                 {
+                    speakable = false;
+
                     if (_streaming != null)
                     {
                         string msg = p.Substring(9);
@@ -207,6 +232,10 @@ namespace StardewAI
                         _streaming.Text = string.IsNullOrWhiteSpace(_streaming.Text)
                             ? "调用失败：" + msg
                             : _streaming.Text + "\n[中断] " + msg;
+
+                        string hint = HintFor(msg);
+                        if (hint.Length > 0)
+                            _streaming.Text += "\n" + hint;
                     }
                 }
                 else if (p != "__CANCELLED__")
@@ -214,16 +243,65 @@ namespace StardewAI
                     if (_streaming != null && _streaming.Text.Length == 0)
                         _streaming.Text = p;
                 }
-
-                if (_streaming != null)
+                else
                 {
-                    if (_streaming.Role == MsgRole.Assistant)
-                        ExtractAction(_streaming);
+                    speakable = false;
+                }
+
+                ChatLine finished = _streaming;
+
+                if (finished != null && finished.Role == MsgRole.Assistant)
+                {
+                    ExtractAction(finished);
+
+                    if (speakable)
+                        SafeInvoke(OnAnswerDone, finished);
+                    else
+                        SafeInvoke(OnAnswerCancelled);
+                }
+                else if (!speakable)
+                {
+                    SafeInvoke(OnAnswerCancelled);
                 }
 
                 _streaming = null;
                 Version++;
             }
+        }
+
+        /// <summary>把常见的接口报错翻译成一句能照着做的提示。</summary>
+        private static string HintFor(string message)
+        {
+            if (string.IsNullOrEmpty(message))
+                return "";
+
+            if (message.Contains("未知模型", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("模型不存在", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("no available channel", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("model not found", StringComparison.OrdinalIgnoreCase))
+                return "（模型名已经失效了：按 Esc 关掉面板，敲 aisettings 打开设置，把「模型」换成列表里现在有的那个）";
+
+            if (message.Contains("未登录", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("accessToken", StringComparison.OrdinalIgnoreCase))
+                return "（这是本机网关上游没登录：先登录对应的桌面端，或者把接口地址/密钥换成你自己的服务商）";
+
+            if (message.Contains("401", StringComparison.Ordinal) ||
+                message.Contains("无效的令牌", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("未提供令牌", StringComparison.OrdinalIgnoreCase))
+                return "（密钥不对：敲 aisettings 重新填一遍 ApiKey）";
+
+            return "";
+        }
+
+        /// <summary>回调里出错不能把对话流程带崩。</summary>
+        private static void SafeInvoke(Action action)
+        {
+            try { action?.Invoke(); } catch { /* ignore */ }
+        }
+
+        private static void SafeInvoke(Action<ChatLine> action, ChatLine line)
+        {
+            try { action?.Invoke(line); } catch { /* ignore */ }
         }
 
         /// <summary>把回答里的 [[GIVE:物品名]] 标记抽出来，正文里不显示它。</summary>

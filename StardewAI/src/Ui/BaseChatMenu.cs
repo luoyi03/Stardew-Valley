@@ -42,6 +42,7 @@ namespace StardewAI.Ui
         private Rectangle _sendRect;
         private Rectangle _clearRect;
         private Rectangle _extraRect;
+        private Rectangle _voiceRect;
         private Rectangle _settingsRect;
         private Rectangle _scrollTrack;
         private Rectangle _scrollThumb;
@@ -74,6 +75,9 @@ namespace StardewAI.Ui
                 Game1.mouseCursors, new Rectangle(337, 494, 12, 12), 3f);
         }
 
+        /// <summary>本面板正在用的会话（「按住说话」要把识别结果送进这里）。</summary>
+        public ChatSession Chat => Session;
+
         protected virtual string BuildSystemPrompt(string question) => "";
 
         protected virtual List<string> GetQuickPrompts() => new();
@@ -103,6 +107,14 @@ namespace StardewAI.Ui
         protected virtual string ExtraButtonLabel() => null;
 
         protected virtual void OnExtraButton() { }
+
+        /// <summary>
+        /// 「说话」按钮的文字（返回 null 则不显示）。
+        /// 伴侣面板用它做录音开关：聊天框占着键盘，按 V 打不出字，所以给个能点的入口。
+        /// </summary>
+        protected virtual string VoiceButtonLabel() => null;
+
+        protected virtual void OnVoiceButton() { }
 
         // ---------------- 布局 ----------------
 
@@ -141,7 +153,10 @@ namespace StardewAI.Ui
 
             int inputH = 48;
             int inputY = yPositionOnScreen + height - 24 - inputH;
-            int buttons = ExtraButtonLabel() != null ? 3 : 2;
+
+            bool hasExtra = ExtraButtonLabel() != null;
+            bool hasVoice = VoiceButtonLabel() != null;
+            int buttons = 2 + (hasExtra ? 1 : 0) + (hasVoice ? 1 : 0);
 
             ContentRect = new Rectangle(
                 xPositionOnScreen + pad,
@@ -158,7 +173,14 @@ namespace StardewAI.Ui
             _settingsRect = new Rectangle(xPositionOnScreen + width - 44 - 96, yPositionOnScreen + 14, 88, 34);
             _sendRect = new Rectangle(InputRect.Right + 10, inputY, 100, inputH);
             _clearRect = new Rectangle(_sendRect.Right + 10, inputY, 100, inputH);
-            _extraRect = new Rectangle(_clearRect.Right + 10, inputY, 100, inputH);
+
+            int nextX = _clearRect.Right + 10;
+            _voiceRect = new Rectangle(nextX, inputY, hasVoice ? 132 : 0, inputH);
+
+            if (hasVoice)
+                nextX = _voiceRect.Right + 10;
+
+            _extraRect = new Rectangle(nextX, inputY, hasExtra ? 100 : 0, inputH);
 
             int trackX = ContentRect.Right + 6;
             _scrollTrack = new Rectangle(trackX, ContentRect.Y, 8, ContentRect.Height);
@@ -274,6 +296,14 @@ namespace StardewAI.Ui
                 Session.Clear();
                 OnCleared();
                 Game1.playSound("trashcan");
+                RestoreFocus();
+                return;
+            }
+
+            if (VoiceButtonLabel() != null && _voiceRect.Contains(x, y))
+            {
+                Game1.playSound("bigSelect");
+                OnVoiceButton();
                 RestoreFocus();
                 return;
             }
@@ -678,6 +708,10 @@ namespace StardewAI.Ui
 
             DrawButton(b, _sendRect, Session.Busy ? "停止" : "发送", !Session.Busy);
             DrawButton(b, _clearRect, "清空", true);
+
+            string voice = VoiceButtonLabel();
+            if (voice != null)
+                DrawButton(b, _voiceRect, voice, true);
 
             string extra = ExtraButtonLabel();
             if (extra != null)
