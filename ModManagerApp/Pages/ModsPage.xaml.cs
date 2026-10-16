@@ -476,6 +476,7 @@ namespace SMM
 
             await RunBusyAsync("正在安装压缩包…", async () =>
             {
+                var before = NewModNamePrompt.Snapshot(Env);      // 装完拿它对比出「新装的」
                 var msgs = new List<string>();
                 foreach (string f in list)
                 {
@@ -496,6 +497,7 @@ namespace SMM
                 }
                 await _shell.ReloadModsAsync();
                 _shell.Toast(string.Join("\n", msgs.Take(6)));
+                await NewModNamePrompt.AskAsync(Env, before, Window.GetWindow(this));
             });
         }
 
@@ -640,6 +642,7 @@ namespace SMM
             if (folders.Count > 0)
                 await RunBusyAsync("正在安装…", async () =>
                 {
+                    var before = NewModNamePrompt.Snapshot(Env);
                     var msgs = new List<string>();
                     foreach (string f in folders)
                     {
@@ -654,6 +657,7 @@ namespace SMM
                     }
                     await _shell.ReloadModsAsync();
                     _shell.Toast(string.Join("\n", msgs.Take(6)));
+                    await NewModNamePrompt.AskAsync(Env, before, Window.GetWindow(this));
                 });
 
             if (zips.Count > 0)

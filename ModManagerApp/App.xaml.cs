@@ -147,6 +147,29 @@ namespace SMM
                 sb.AppendLine("  真实清单副本：" + RealManifestProbe(mods));
                 sb.AppendLine();
 
+                sb.AppendLine("=== 新装 Mod 会弹窗问中文名吗 ===");
+                var empty = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                int askCount = 0;
+                foreach (var m in mods)
+                {
+                    if (!NewModNamePrompt.ShouldAsk(env, m, empty))
+                        continue;
+                    askCount++;
+                    sb.AppendLine($"  会问：{m.Id}（{m.Name}）");
+                }
+                sb.AppendLine($"  按「全是新装的」算会问 {askCount} 个 / 共 {mods.Count} 个"
+                              + "（已有内置中文名或配过中文名的不会问）");
+                var fakeNew = new LocalMod { Id = "someone.brand.new.mod", Name = "Brand New Mod" };
+                sb.AppendLine($"  陌生英文名新 Mod：{(NewModNamePrompt.ShouldAsk(env, fakeNew, null) ? "会问 ✔" : "不问 ✘")}");
+                var fakeCn = new LocalMod { Id = "someone.brand.new.mod", Name = "全新模组" };
+                sb.AppendLine($"  manifest 已是中文的新 Mod：{(NewModNamePrompt.ShouldAsk(env, fakeCn, null) ? "会问 ✘" : "不问 ✔")}");
+                var fakeKnown = new LocalMod { Id = "Pathoschild.LookupAnything", Name = "Lookup Anything" };
+                sb.AppendLine($"  内置表里有中文名的新 Mod：{(NewModNamePrompt.ShouldAsk(env, fakeKnown, null) ? "会问" : "不问 ✔（界面本来就显示中文）")}");
+                var fakeOld = new LocalMod { Id = "someone.brand.new.mod", Name = "Brand New Mod" };
+                var snap = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { fakeOld.Id };
+                sb.AppendLine($"  更新已有的 Mod：{(NewModNamePrompt.ShouldAsk(env, fakeOld, snap) ? "会问 ✘" : "不问 ✔")}");
+                sb.AppendLine();
+
                 var issues = Analyzer.Analyze(env, mods);
                 sb.AppendLine($"=== 问题检查：{issues.Count} 个 ===");
                 foreach (var i in issues)

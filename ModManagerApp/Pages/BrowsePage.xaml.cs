@@ -236,10 +236,12 @@ namespace SMM
                     _shell.SetStatus(p.Phase);
                     _shell.SetProgress(p.Percent);
                 });
+                var before = NewModNamePrompt.Snapshot(Env);
                 string msg = await ModInstaller.InstallBrowseAsync(Env, item, prog, CancellationToken.None);
                 await _shell.ReloadModsAsync();
                 MarkInstalled(_items.ToList());
                 _shell.Toast(msg);
+                await NewModNamePrompt.AskAsync(Env, before, Window.GetWindow(this));
             }
             catch (Exception ex)
             {
@@ -290,6 +292,7 @@ namespace SMM
             {
                 await RunBusyAsync("正在安装…", async () =>
                 {
+                    var before = NewModNamePrompt.Snapshot(Env);
                     bool isFolder = Directory.Exists(input);
                     var prog = new Progress<InstallProgress>(p =>
                     {
@@ -300,6 +303,7 @@ namespace SMM
                     await _shell.ReloadModsAsync();
                     TxtLink.Text = "";
                     _shell.Toast(msg);
+                    await NewModNamePrompt.AskAsync(Env, before, Window.GetWindow(this));
                 });
                 return;
             }

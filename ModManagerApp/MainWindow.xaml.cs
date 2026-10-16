@@ -347,10 +347,12 @@ namespace SMM
                     SetStatus(p.Phase);
                     SetProgress(p.Percent);
                 });
+                var before = NewModNamePrompt.Snapshot(Env);
                 string msg = await ModInstaller.ImportAsync(Env, path, false, prog, default);
                 Env.Log("下载文件夹监控安装成功：" + msg);
                 await ReloadModsAsync();
                 Toast(msg);
+                await NewModNamePrompt.AskAsync(Env, before, this);   // 新装的 Mod 问一句中文名
             }
             catch (Exception ex)
             {
