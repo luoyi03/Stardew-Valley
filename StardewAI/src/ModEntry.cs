@@ -170,8 +170,12 @@ namespace StardewAI
 
         private void PrintUsage()
         {
+            string ask = Config.TryAskKey(out _)
+                ? "  " + Config.AskKey + "  打开 AI 问答面板\n"
+                : "  （AI 问答快捷键已禁用：问答面板统一用 InGameCodex 的 F5；想启用本 Mod 的就把 AskKey 改成 F5）\n";
+
             Monitor.Log("StardewAI 用法：\n" +
-                        "  " + Config.AskKey + "  打开 AI 问答面板\n" +
+                        ask +
                         "  " + Config.NpcChatKey + "  与最近的 NPC 自由对话\n" +
                         "  aiask <问题>   在控制台提问\n" +
                         "  aitalk [名字]  在控制台发起 NPC 对话\n" +

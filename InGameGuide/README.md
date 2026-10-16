@@ -90,14 +90,15 @@ python tools\extract_items.py
 
 ## 编译
 
-需要 .NET SDK（已装 8.0.425，可编译 net6.0）：
+需要 .NET SDK（可编译 net6.0）：
 
 ```powershell
-cd 游戏空间\星露谷\InGameGuide
+cd e:\星露谷\InGameGuide
 dotnet build -c Release
 ```
 
-构建成功后会自动复制到 `E:\Steam\steamapps\common\Stardew Valley\Mods\InGameGuide`，并生成一份可分享的 zip。
+构建成功后会自动复制到 `F:\steam\steamapps\common\Stardew Valley\Mods\InGameGuide`，并生成一份可分享的 zip
+（路径取自 csproj 里的 `GamePath`，游戏换位置时改那一项即可）。
 
 ## 已知取舍
 

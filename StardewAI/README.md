@@ -2,15 +2,15 @@
 
 在《星露谷物语》里直接和大模型对话：
 
-- **AI 问答面板**（默认 `F5`）：问教程、攻略、物品用途、赚钱路线，模型会自动带上你当前存档状态作答。
 - **NPC 自由对话**（默认 `F4`）：对着附近的 NPC 按键，就能用他的口吻和你聊天；每个 NPC 有独立的对话记忆。
+- **AI 问答面板**：默认**已禁用**（`AskKey = "None"`）。问答面板统一由 **InGameCodex 的 `F5`** 提供（它那个 AI 页就是从本 Mod 搬过去的），两边都占 `F5` 会一次弹出两个面板。想启用本 Mod 的面板，把 `AskKey` 改成 `F5` 或别的键即可；接口地址 / 密钥 / 模型两边仍然共用（InGameCodex 首次启动会读这份配置）。
 - 回答**流式显示**（一个字一个字蹦出来），回答中可以点「停止」打断。
 
 ## 一、配置 API（必做）
 
 ### 推荐：在游戏里改（不用碰文件）
 
-按 `F5` 打开问答面板 → 点右上角 **「设置」** 按钮，就能在可视化界面里改所有选项：
+在 SMAPI 控制台输入 `aisettings`（或用 `F5` 打开 InGameCodex 的问答面板）→ 点右上角 **「设置」** 按钮，就能在可视化界面里改所有选项：
 接口地址 / 密钥 / 模型直接打字，开关一键切换，数值用 − + 调，按键点一下再按新键即可。
 底部四个按钮：**保存**（写回 config.json）、**取消**、**恢复默认**、**测试连接**（真发一条请求验证 Key 能不能用，结果直接显示在面板上）。
 也可以直接在 SMAPI 控制台输入 `aisettings` 打开它。
@@ -38,7 +38,7 @@
 
 ### 也可以手改文件
 
-编辑 `E:\Steam\steamapps\common\Stardew Valley\Mods\StardewAI\config.json`：
+编辑 `F:\steam\steamapps\common\Stardew Valley\Mods\StardewAI\config.json`：
 
 ```json
 {
@@ -70,7 +70,7 @@
 
 | 按键 | 作用 |
 | --- | --- |
-| `F5` | 打开/关闭 AI 问答面板（可在 config.json 改 `AskKey`） |
+| `F5` | 打开/关闭 AI 问答面板——**默认禁用**（`AskKey = "None"`），问答统一用 InGameCodex 的 `F5`；改 `AskKey` 可启用本 Mod 的面板 |
 | `F4` | 身边有 NPC 就直接开聊；**身边没人则打开 NPC 选择面板**（改 `NpcChatKey`） |
 | 回车 | 发送；发送中按同键或点「停止」可中断 |
 | `Esc` | 关闭面板 |
@@ -190,8 +190,9 @@ AI 会拿到这些信息来扮演角色：性格设定、好感度、你们的�
 需要 .NET SDK 8：
 
 ```powershell
-cd f:\游戏空间\星露谷\StardewAI
+cd e:\星露谷\StardewAI
 dotnet build -c Release
 ```
 
-ModBuildConfig 会自动把产物部署到 `E:\Steam\steamapps\common\Stardew Valley\Mods\StardewAI`。
+ModBuildConfig 会自动把产物部署到 `F:\steam\steamapps\common\Stardew Valley\Mods\StardewAI`
+（目标路径取自 csproj 里的 `GamePath`，游戏换位置时改那一项即可）。

@@ -104,11 +104,12 @@ InGameCodex/
 需要 .NET SDK（可编译 `net6.0`）与 SMAPI 4.0+：
 
 ```powershell
-cd 游戏空间\星露谷\InGameCodex
+cd e:\星露谷\InGameCodex
 dotnet build -c Release
 ```
 
-`InGameCodex.csproj` 里的 `GamePath` 指向游戏安装目录，构建成功后会自动复制到
+`InGameCodex.csproj` 里的 `GamePath` 指向游戏安装目录（当前为
+`F:\steam\steamapps\common\Stardew Valley`），构建成功后会自动复制到
 `Mods\InGameCodex`；若你的游戏不在该路径，改这一项即可。
 
 ## 已知取舍

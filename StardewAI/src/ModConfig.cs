@@ -8,8 +8,13 @@ namespace StardewAI
     {
         // ---------------- 按键 ----------------
 
-        /// <summary>打开「AI 问答」面板的按键。</summary>
-        public string AskKey { get; set; } = "F5";
+        /// <summary>
+        /// 打开「AI 问答」面板的按键。默认 "None" = 禁用：
+        /// 游戏里的问答面板统一由 InGameCodex 的 F5 提供（它那个 AI 页就是从本 Mod 搬过去的），
+        /// 两边都占 F5 会一次弹出两个面板。想让本 Mod 的问答面板也能用，改成 "F5" 或其它键即可
+        /// （游戏内设置面板里点一下再按新键也能改，配置里的接口/Key 仍然共用）。
+        /// </summary>
+        public string AskKey { get; set; } = "None";
 
         /// <summary>与最近的 NPC 开启自由对话的按键。</summary>
         public string NpcChatKey { get; set; } = "F4";

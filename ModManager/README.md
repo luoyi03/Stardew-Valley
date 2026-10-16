@@ -3,7 +3,7 @@
 游戏内的 Mod 管理器：**检测已装 Mod 的新版本，并一键下载安装更新**。
 
 - 项目源码：`src/`
-- 已自动部署到：`E:\Steam\steamapps\common\Stardew Valley\Mods\ModManager`
+- 构建后自动部署到：`F:\steam\steamapps\common\Stardew Valley\Mods\ModManager`（路径取自 csproj 里的 `GamePath`）
 
 ---
 
@@ -116,7 +116,7 @@ Nexus 对**免费账号**不开放下载接口（详情见下），所以主力�
 ## 重新编译
 
 ```
-cd f:\游戏空间\星露谷\ModManager
+cd e:\星露谷\ModManager
 dotnet build -c Release
 ```
 

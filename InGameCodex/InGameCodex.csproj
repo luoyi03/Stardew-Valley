@@ -8,7 +8,7 @@
     <RootNamespace>InGameCodex</RootNamespace>
     <Version>1.0.0</Version>
     <EnableHarmony>true</EnableHarmony>
-    <GamePath>E:\Steam\steamapps\common\Stardew Valley</GamePath>
+    <GamePath>F:\steam\steamapps\common\Stardew Valley</GamePath>
     <IgnoreModFilePaths>^\.;^bin;^obj;^tools</IgnoreModFilePaths>
     <NoWarn>NETSDK1138;CS1591;NU1701</NoWarn>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
