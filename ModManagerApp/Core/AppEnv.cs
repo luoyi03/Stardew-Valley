@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace SMM
@@ -32,8 +33,6 @@ namespace SMM
             Directory.CreateDirectory(roaming);
 
             env.Config = AppConfig.Load(Path.Combine(roaming, "config.json"));
-            if (string.IsNullOrWhiteSpace(env.Config.WatchFolder))
-                env.Config.WatchFolder = DefaultDownloadFolder();
 
             string game = env.Config.GamePath;
             if (!GameLocator.IsValid(game))
@@ -112,6 +111,52 @@ namespace SMM
                 if (fi.Exists && fi.Length > 512 * 1024)
                     File.Delete(LogFile);
                 File.AppendAllText(LogFile, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}{Environment.NewLine}");
+            }
+            catch { }
+        }
+
+        /// <summary>
+        /// 实际要监控的下载目录（可能有多个）。
+        /// 设置里填了就用它；没填就自动：浏览器（Edge / Chrome / Firefox）自己的下载目录 + 系统「下载」目录。
+        /// 之所以要读浏览器设置，是因为很多人在浏览器里把下载位置改成了别处（例如 D:\下载），
+        /// 系统「下载」目录就空了，只盯系统目录的话新包永远识别不到。
+        /// </summary>
+        public List<string> WatchFolders()
+        {
+            if (!Config.WatchFolderEnabled)
+                return new List<string>();
+
+            string manual = Config.WatchFolder;
+            if (!string.IsNullOrWhiteSpace(manual))
+            {
+                manual = manual.Trim().TrimEnd('\\', '/');
+                return Directory.Exists(manual) ? new List<string> { manual } : new List<string>();
+            }
+
+            return AutoWatchFolders();
+        }
+
+        /// <summary>自动推断的下载目录：浏览器实际下载目录 + 系统「下载」目录。</summary>
+        public static List<string> AutoWatchFolders()
+        {
+            var list = new List<string>();
+
+            foreach (string d in Browser.DownloadFolders())
+                AddFolder(list, d);
+            AddFolder(list, DefaultDownloadFolder());
+
+            return list;
+        }
+
+        private static void AddFolder(List<string> list, string folder)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder))
+                    return;
+                folder = folder.Trim().TrimEnd('\\', '/');
+                if (!list.Exists(x => string.Equals(x, folder, StringComparison.OrdinalIgnoreCase)))
+                    list.Add(folder);
             }
             catch { }
         }

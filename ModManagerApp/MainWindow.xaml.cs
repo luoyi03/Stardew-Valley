@@ -29,6 +29,7 @@ namespace SMM
         private DownloadWatcher _watcher;
         private readonly Queue<string> _zipQueue = new();
         private bool _zipBusy;
+        private bool _quietSkip;      // 启动补扫时不弹「不是 Mod 包」的提示
 
         /// <summary>每 3 秒看一眼游戏在不在跑，用来更新顶栏提示。</summary>
         private readonly DispatcherTimer _gameTimer = new() { Interval = TimeSpan.FromSeconds(3) };
@@ -82,6 +83,7 @@ namespace SMM
                 OpenPage("mods");
 
             RestartDownloadWatcher();
+            await CatchUpDownloadsAsync();
         }
 
         protected override void OnClosed(EventArgs e)
@@ -106,18 +108,57 @@ namespace SMM
                 return;
             }
 
-            string folder = cfg.WatchFolder;
-            if (string.IsNullOrWhiteSpace(folder))
-                return;
-            if (!Directory.Exists(folder))
+            var folders = Env.WatchFolders();
+            if (folders.Count == 0)
             {
-                Env.Log("下载文件夹监控：目录不存在，已停用 → " + folder);
+                Env.Log("下载文件夹监控：没找到可用的下载目录，已停用 → " + (cfg.WatchFolder ?? "(自动)"));
                 return;
             }
 
-            _watcher = new DownloadWatcher(folder, OnZipReady);
+            _watcher = new DownloadWatcher(folders, OnZipReady);
             _watcher.Start();
-            Env.Log($"下载文件夹监控已启动：{folder}（模式：{cfg.WatchInstallMode}）");
+            Env.Log($"下载文件夹监控已启动：{string.Join("；", folders)}（模式：{cfg.WatchInstallMode}）");
+        }
+
+        /// <summary>
+        /// 补扫「上次关掉程序之后」新下载的 zip。
+        /// 以前只有开着程序时才会识别新下载的包，关着的时候下的包得手动点「立即检查」；
+        /// 现在启动时拿上次运行时间比一下，自动补一遍（还是按「弹窗问我 / 自动安装」的设置来）。
+        /// </summary>
+        private async Task CatchUpDownloadsAsync()
+        {
+            DateTime? last = Env.Config.LastRunUtc;
+
+            // 先记下这次运行的时间，下次启动才能知道哪些是「之后」新下的
+            Env.Config.LastRunUtc = DateTime.UtcNow;
+            Env.Config.Save();
+
+            if (!Env.Config.WatchFolderEnabled)
+                return;
+
+            var folders = Env.WatchFolders();
+            if (folders.Count == 0)
+                return;
+
+            // 第一次运行没有参考时间：只看最近 2 小时下载的，免得把整个下载文件夹的旧包全翻出来
+            DateTime since = last ?? DateTime.UtcNow.AddHours(-2);
+
+            var zips = await Task.Run(() => DownloadWatcher.FindNewZips(folders, since));
+            if (zips.Count == 0)
+                return;
+
+            Env.Log($"补扫上次运行后新下载的压缩包：{zips.Count} 个");
+            Toast($"发现上次关闭后新下载的 {zips.Count} 个压缩包，正在处理…");
+
+            foreach (string z in zips)
+            {
+                if (!_zipQueue.Contains(z))
+                    _zipQueue.Enqueue(z);
+            }
+
+            _quietSkip = true;      // 补扫可能扫到用户下载的非 Mod 文件，不逐个弹提示
+            try { await DrainZipQueueAsync(); }
+            finally { _quietSkip = false; }
         }
 
         /// <summary>FileSystemWatcher 的回调在后台线程，切回界面线程再处理。</summary>
@@ -132,28 +173,44 @@ namespace SMM
 
         public async Task<int> CheckWatchFolderNowAsync()
         {
-            string folder = Env.Config.WatchFolder;
-            if (string.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder))
+            var folders = Env.WatchFolders();
+            if (folders.Count == 0)
             {
-                Toast("监控目录不存在：" + (folder ?? "(未设置)"));
+                Toast("没有可用的下载目录，请到「设置」里指定一个：" + (Env.Config.WatchFolder ?? "(自动)"));
                 return 0;
             }
 
-            var found = await Task.Run(() => DownloadWatcher.ScanFolder(folder));
-            if (found.Count == 0)
+            var found = await Task.Run(() => DownloadWatcher.ScanFolder(folders));
+            var ok = found.Where(r => r.Ok).ToList();
+            if (ok.Count == 0)
             {
-                Toast($"「{folder}」里没找到能识别的 SMAPI Mod 压缩包");
+                Toast(ExplainNoMods(folders, found));
                 return 0;
             }
 
-            foreach (var (path, _) in found)
+            foreach (var r in ok)
             {
-                if (!_zipQueue.Contains(path))
-                    _zipQueue.Enqueue(path);
+                if (!_zipQueue.Contains(r.Path))
+                    _zipQueue.Enqueue(r.Path);
             }
 
             await DrainZipQueueAsync();
-            return found.Count;
+            return ok.Count;
+        }
+
+        /// <summary>一个能识别都没扫到时，说清楚是「没包」还是「包有问题」。</summary>
+        private static string ExplainNoMods(List<string> folders, List<ZipPeekResult> found)
+        {
+            string where = string.Join("、", folders);
+            if (found.Count == 0)
+                return $"「{where}」里一个 zip 都没有";
+
+            var bad = found.Where(r => r.HasManifest).ToList();
+            if (bad.Count > 0)
+                return $"「{where}」里的压缩包都没识别出来：" + string.Join("；",
+                    bad.Take(3).Select(r => Path.GetFileName(r.Path) + " → " + r.Error));
+
+            return $"「{where}」里的 {found.Count} 个 zip 都不是 SMAPI Mod 包（没有 manifest.json），已跳过";
         }
 
         private async Task DrainZipQueueAsync()
@@ -186,11 +243,16 @@ namespace SMM
                 return;
             }
 
-            if (info == null)
+            if (info == null || !info.Ok)
             {
-                // 不是 SMAPI Mod 包（用户下载的其他东西），安静跳过
-                Env.Log("跳过（不是 SMAPI Mod 包）：" + path);
-                Toast($"「{Path.GetFileName(path)}」不是 SMAPI Mod 包，已跳过");
+                // 没识别出来。有 manifest 却读不出来的（manifest 写坏了、带注释解不开等）必须明确告诉用户，
+                // 否则看起来就是「没反应」；压根不是 Mod 包的只安静跳过，免得启动补扫时弹一堆提示。
+                string reason = info?.Error ?? "读不出来";
+                Env.Log($"识别失败（{reason}）：{path}");
+                if (info != null && info.HasManifest)
+                    Toast($"「{Path.GetFileName(path)}」识别失败：{reason}");
+                else if (!_quietSkip)
+                    Toast($"「{Path.GetFileName(path)}」不是 SMAPI Mod 包，已跳过");
                 return;
             }
 

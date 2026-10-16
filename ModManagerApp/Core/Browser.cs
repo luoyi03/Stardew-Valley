@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using Microsoft.Win32;
 
 namespace SMM
@@ -85,6 +88,95 @@ namespace SMM
             if (mode == Custom)
                 return "自定义路径无效或不存在，会退回系统默认浏览器";
             return "系统默认浏览器";
+        }
+
+        // ==================== 下载目录 ====================
+
+        /// <summary>
+        /// 浏览器「实际」的下载目录。Chrome / Edge 读 User Data 里的 Preferences（download.default_directory），
+        /// Firefox 读 prefs.js。用户在浏览器设置里改过下载位置（例如改成 D:\下载）后，
+        /// 系统「下载」目录仍然是老的，只有这里能拿到真实目录。
+        /// </summary>
+        public static List<string> DownloadFolders()
+        {
+            var list = new List<string>();
+            string local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+            foreach (string ud in new[]
+            {
+                Path.Combine(local, @"Microsoft\Edge\User Data"),
+                Path.Combine(local, @"Google\Chrome\User Data")
+            })
+                AddFolder(list, ReadChromeDownloadDir(Path.Combine(ud, "Default", "Preferences")));
+
+            // Firefox：每个 profile 一个 prefs.js
+            try
+            {
+                string root = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    @"Mozilla\Firefox\Profiles");
+                if (Directory.Exists(root))
+                    foreach (string dir in Directory.GetDirectories(root))
+                        AddFolder(list, ReadFirefoxDownloadDir(Path.Combine(dir, "prefs.js")));
+            }
+            catch { }
+
+            return list;
+        }
+
+        private static void AddFolder(List<string> list, string folder)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder))
+                    return;
+                folder = folder.Trim().TrimEnd('\\', '/');
+                if (!list.Exists(x => string.Equals(x, folder, StringComparison.OrdinalIgnoreCase)))
+                    list.Add(folder);
+            }
+            catch { }
+        }
+
+        /// <summary>Chrome / Edge：Preferences 是 JSON，取 download.default_directory。</summary>
+        private static string ReadChromeDownloadDir(string prefsPath)
+        {
+            try
+            {
+                if (!File.Exists(prefsPath))
+                    return null;
+                using var doc = JsonDocument.Parse(File.ReadAllText(prefsPath));
+                if (!doc.RootElement.TryGetProperty("download", out var dl) || dl.ValueKind != JsonValueKind.Object)
+                    return null;
+                if (!dl.TryGetProperty("default_directory", out var dd) || dd.ValueKind != JsonValueKind.String)
+                    return null;
+                return dd.GetString();
+            }
+            catch
+            {
+                return null;   // 读不了就当没设置
+            }
+        }
+
+        private static readonly Regex FfDir = new(
+            "\"browser\\.download\\.dir\"\\s*,\\s*\"(?<p>(?:[^\"\\\\]|\\\\.)*)\"",
+            RegexOptions.Compiled);
+
+        /// <summary>Firefox：prefs.js 里 user_pref("browser.download.dir", "D:\\下载");</summary>
+        private static string ReadFirefoxDownloadDir(string prefsPath)
+        {
+            try
+            {
+                if (!File.Exists(prefsPath))
+                    return null;
+                foreach (string line in File.ReadLines(prefsPath))
+                {
+                    var m = FfDir.Match(line);
+                    if (m.Success)
+                        return m.Groups["p"].Value.Replace("\\\\", "\\");
+                }
+            }
+            catch { }
+            return null;
         }
 
         // ==================== 打开 ====================

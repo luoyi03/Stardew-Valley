@@ -146,25 +146,34 @@ namespace SMM
 
             bool on = ChkWatch.IsChecked == true;
             string folder = (TxtWatchFolder.Text ?? "").Trim();
+            string tail = WatchAutoMode() ? "　发现新 zip 会直接被安装。" : "　发现新 zip 会先弹窗问你。";
 
             if (!on)
             {
                 TxtWatchState.Text = "监控已关闭：新下载的 zip 不会自动处理，需要手动拖进「Mod 管理」页。";
                 return;
             }
+
             if (folder.Length == 0)
             {
-                TxtWatchState.Text = "还没设置文件夹。填上浏览器保存下载文件的目录（或者点「浏览…」）。";
+                // 留空 = 自动识别（浏览器自己的下载目录 + 系统「下载」目录）
+                var auto = AppEnv.AutoWatchFolders();
+                if (auto.Count == 0)
+                    TxtWatchState.Text = "留空 = 自动识别，但现在没找到任何下载目录。请点「浏览…」手动指定"
+                                         + @"（例如 D:\下载）。";
+                else
+                    TxtWatchState.Text = "留空 = 自动识别，正在监控：" + string.Join("、", auto) + tail
+                        + "　程序关闭期间下载的包，下次打开程序时也会补识别一次。";
                 return;
             }
+
             if (!Directory.Exists(folder))
             {
                 TxtWatchState.Text = "这个文件夹不存在：" + folder;
                 return;
             }
 
-            TxtWatchState.Text = $"正在监控：{folder}"
-                + (WatchAutoMode() ? "　发现新 zip 会直接被安装。" : "　发现新 zip 会先弹窗问你。")
+            TxtWatchState.Text = $"正在监控：{folder}" + tail
                 + "　只处理程序运行期间新出现的文件；已经躺在里面的旧包可以用「立即检查」手动扫。";
         }
 

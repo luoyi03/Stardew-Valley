@@ -1,24 +1,26 @@
 using System.Collections.Generic;
 using System.Text.Json;
-using System.Text.RegularExpressions;
+using System.Text.Json.Nodes;
 
 namespace SMM
 {
-    /// <summary>SMAPI 的清单解析允许尾逗号 / 注释，System.Text.Json 不允许，这里做兼容。</summary>
+    /// <summary>
+    /// SMAPI 的清单解析允许注释（// 行注释 和 /* */ 块注释）以及尾逗号，System.Text.Json 默认不允许。
+    /// 这里统一用一套宽松规则：Generic Mod Config Menu 这类用 ModManifestBuilder 生成的 manifest
+    /// 开头就带一块 /* ... */，不放开的话连读都读不了。
+    /// </summary>
     internal static class JsonUtil
     {
-        private static readonly Regex TrailingComma = new(@",\s*([}\]])", RegexOptions.Compiled);
-        private static readonly Regex LineComment = new(@"^\s*//.*$", RegexOptions.Compiled | RegexOptions.Multiline);
-
-        public static string Clean(string text)
+        public static readonly JsonDocumentOptions Options = new()
         {
-            if (string.IsNullOrEmpty(text))
-                return text;
-            text = LineComment.Replace(text, "");
-            return TrailingComma.Replace(text, "$1");
-        }
+            CommentHandling = JsonCommentHandling.Skip,   // 支持 // 和 /* */
+            AllowTrailingCommas = true
+        };
 
-        public static JsonDocument Parse(string text) => JsonDocument.Parse(Clean(text));
+        public static JsonDocument Parse(string text) => JsonDocument.Parse(text, Options);
+
+        /// <summary>需要改字段（例如改中文名）时用这个，规则与 Parse 一致。</summary>
+        public static JsonNode ParseNode(string text) => JsonNode.Parse(text, null, Options);
     }
 
     internal static class JsonEx

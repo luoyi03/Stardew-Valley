@@ -198,12 +198,17 @@ namespace SMM
                 sb.AppendLine("状态  : " + (env.Config.WatchFolderEnabled ? "已开启" : "已关闭")
                               + "，模式：" + (string.Equals(env.Config.WatchInstallMode, "auto", StringComparison.OrdinalIgnoreCase)
                                   ? "直接自动安装" : "弹窗询问"));
-                sb.AppendLine("目录  : " + (env.Config.WatchFolder ?? "(未设置)")
-                              + (Directory.Exists(env.Config.WatchFolder) ? "" : "（目录不存在）"));
-                var zips = DownloadWatcher.ScanFolder(env.Config.WatchFolder);
-                sb.AppendLine($"能识别出 {zips.Count} 个 Mod 压缩包：");
-                foreach (var (zp, zi) in zips)
-                    sb.AppendLine($"  - {zi.DisplayName} {zi.VersionText}  [{zi.Id}]  包内 {zi.ModCount} 个 Mod  ← {Path.GetFileName(zp)}");
+                var watchFolders = env.WatchFolders();
+                sb.AppendLine("目录  : " + (watchFolders.Count > 0
+                    ? string.Join("、", watchFolders)
+                    : (env.Config.WatchFolder ?? "(自动)") + "（没找到可用的下载目录）"));
+                var zips = DownloadWatcher.ScanFolder(watchFolders);
+                var okZips = zips.Where(z => z.Ok).ToList();
+                sb.AppendLine($"看到 {zips.Count} 个 zip，其中能识别出 {okZips.Count} 个 Mod 压缩包：");
+                foreach (var zi in okZips)
+                    sb.AppendLine($"  - {zi.DisplayName} {zi.VersionText}  [{zi.Id}]  包内 {zi.ModCount} 个 Mod  ← {Path.GetFileName(zi.Path)}");
+                foreach (var zi in zips.Where(z => !z.Ok))
+                    sb.AppendLine($"  - 识别失败：{Path.GetFileName(zi.Path)} → {zi.Error}");
                 sb.AppendLine();
 
                 if (network && !string.IsNullOrWhiteSpace(env.Config.NexusApiKey))

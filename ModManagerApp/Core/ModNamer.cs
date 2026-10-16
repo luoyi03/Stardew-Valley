@@ -34,7 +34,7 @@ namespace SMM
                 string path = ManifestPath(modDir);
                 if (!File.Exists(path))
                     return null;
-                var root = JsonNode.Parse(JsonUtil.Clean(File.ReadAllText(path))) as JsonObject;
+                var root = JsonUtil.ParseNode(File.ReadAllText(path)) as JsonObject;
                 return root?["Name"]?.GetValue<string>();
             }
             catch
@@ -54,7 +54,7 @@ namespace SMM
             JsonObject root;
             try
             {
-                root = JsonNode.Parse(JsonUtil.Clean(File.ReadAllText(path))) as JsonObject;
+                root = JsonUtil.ParseNode(File.ReadAllText(path)) as JsonObject;
             }
             catch (Exception ex)
             {

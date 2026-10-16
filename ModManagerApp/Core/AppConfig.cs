@@ -61,8 +61,16 @@ namespace SMM
         /// <summary>是否监控下载文件夹（程序运行期间发现新 zip 就处理）。</summary>
         public bool WatchFolderEnabled { get; set; } = true;
 
-        /// <summary>监控的下载文件夹。留空则用系统「下载」目录。</summary>
+        /// <summary>
+        /// 监控的下载文件夹。留空 = 自动（浏览器自己的下载目录 + 系统「下载」目录）。
+        /// </summary>
         public string WatchFolder { get; set; } = "";
+
+        /// <summary>
+        /// 上次运行本程序的时间（UTC）。启动时用它补扫「上次关闭之后」新下载的 zip，
+        /// 不用非得开着程序才能识别。null 表示还没记录过（第一次运行不补扫，避免把旧包全弹一遍）。
+        /// </summary>
+        public DateTime? LastRunUtc { get; set; }
 
         /// <summary>发现新压缩包时怎么处理：ask = 弹窗问（默认），auto = 直接装。</summary>
         public string WatchInstallMode { get; set; } = "ask";

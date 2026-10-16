@@ -1,16 +1,21 @@
 using System.Text.Json;
-using System.Text.RegularExpressions;
+using System.Text.Json.Nodes;
 
 namespace ModManager
 {
-    /// <summary>SMAPI 的清单解析器允许尾逗号，System.Text.Json 不允许，这里做兼容。</summary>
+    /// <summary>
+    /// SMAPI 的清单解析器允许注释（// 和 /* */）和尾逗号，System.Text.Json 默认不允许，这里统一放开。
+    /// </summary>
     internal static class JsonUtil
     {
-        private static readonly Regex TrailingComma = new(",\\s*([}\\]])", RegexOptions.Compiled);
+        public static readonly JsonDocumentOptions Options = new()
+        {
+            CommentHandling = JsonCommentHandling.Skip,
+            AllowTrailingCommas = true
+        };
 
-        public static string Clean(string text)
-            => string.IsNullOrEmpty(text) ? text : TrailingComma.Replace(text, "$1");
+        public static JsonDocument Parse(string text) => JsonDocument.Parse(text, Options);
 
-        public static JsonDocument Parse(string text) => JsonDocument.Parse(Clean(text));
+        public static JsonNode ParseNode(string text) => JsonNode.Parse(text, null, Options);
     }
 }
