@@ -36,7 +36,7 @@ namespace SMM
                 progress?.Report(new InstallProgress { Phase = "正在解压…", Percent = 100 });
                 Installer.ResetDir(stage);
 
-                if (Installer.IsZip(pkg))
+                if (Installer.IsArchive(pkg))
                 {
                     Installer.Extract(pkg, stage);
                     string root = PickRoot(stage, mod.Id);
@@ -77,12 +77,8 @@ namespace SMM
                     }, ct).ConfigureAwait(false);
                 }
 
-                if (path.EndsWith(".7z", StringComparison.OrdinalIgnoreCase)
-                    || path.EndsWith(".rar", StringComparison.OrdinalIgnoreCase))
-                    throw new Exception("只支持 zip 压缩包，7z/rar 请先解压成文件夹");
-
-                if (!Installer.IsZip(path))
-                    throw new Exception("这不是一个 zip 压缩包");
+                if (!Installer.IsArchive(path))
+                    throw new Exception("只支持 zip / rar / 7z 压缩包（也可以直接拖已解压的 Mod 文件夹）");
 
                 stage = Path.Combine(env.TempDir, "import-" + Guid.NewGuid().ToString("N").Substring(0, 8));
                 Installer.ResetDir(stage);
@@ -140,7 +136,7 @@ namespace SMM
                 progress?.Report(new InstallProgress { Phase = "正在解压…", Percent = 100 });
                 Installer.ResetDir(stage);
 
-                if (!Installer.IsZip(pkg))
+                if (!Installer.IsArchive(pkg))
                 {
                     // 裸文件包：只能按 UniqueID 未知的方式落一个目录
                     string dll = Path.GetFileName(plan.FileName ?? "mod.dll");
@@ -185,7 +181,7 @@ namespace SMM
                 progress?.Report(new InstallProgress { Phase = "正在解压…", Percent = 100 });
 
                 Installer.ResetDir(stage);
-                if (Installer.IsZip(pkg))
+                if (Installer.IsArchive(pkg))
                     Installer.Extract(pkg, stage);
                 else
                     File.Copy(pkg, Path.Combine(stage, Path.GetFileName(url)), true);

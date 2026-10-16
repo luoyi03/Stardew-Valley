@@ -21,7 +21,7 @@
                         Margin="8,0,0,0" Click="BtnToggle_Click" />
                 <Button x:Name="BtnDelete" Content="删除" Style="{StaticResource BtnDanger}"
                         Margin="8,0,0,0" Click="BtnDelete_Click" />
-                <Button x:Name="BtnImport" Content="从 zip 安装…" Style="{StaticResource Btn}"
+                <Button x:Name="BtnImport" Content="从压缩包安装…" Style="{StaticResource Btn}"
                         Margin="8,0,0,0" Click="BtnImport_Click" />
                 <Button x:Name="BtnOpenMods" Content="打开 Mods 目录" Style="{StaticResource Btn}"
                         Margin="8,0,0,0" Click="BtnOpenMods_Click" />

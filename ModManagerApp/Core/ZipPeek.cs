@@ -45,16 +45,22 @@ namespace SMM
     internal static class ZipPeek
     {
         /// <summary>
-        /// 从 zip 里读出 manifest.json（只读不落地）。规则和 Installer.FindRoots 保持一致：
+        /// 看一眼压缩包里是什么 Mod。规则和 Installer.FindRoots 保持一致：
         /// 深度不超过 3 层，跳过点开头和 __MACOSX 的目录，找到 manifest.json 的目录算一个 Mod 根。
+        /// zip 直接读条目（不解压）；rar / 7z / tar 靠系统 tar.exe 解到临时目录再看。
         /// 永远返回结果对象、不返回 null：识别不了的原因放在 Error 里，界面才能告诉用户为什么。
         /// </summary>
-        public static ZipPeekResult Read(string zipPath)
+        public static ZipPeekResult Read(string archivePath)
         {
-            var result = new ZipPeekResult { Path = zipPath };
+            var result = new ZipPeekResult { Path = archivePath };
             try
             {
-                using var zip = ZipFile.OpenRead(zipPath);
+                if (!Installer.IsZip(archivePath)
+                    && (Installer.IsRar(archivePath) || Installer.Is7z(archivePath)
+                        || Installer.IsGzip(archivePath) || Installer.IsTar(archivePath)))
+                    return ReadViaTar(result);
+
+                using var zip = ZipFile.OpenRead(archivePath);
 
                 // 1. 找出所有「含 manifest.json 的目录」
                 bool tooDeep = false;
@@ -127,27 +133,86 @@ namespace SMM
                     return result;
                 }
 
-                var main = details.FirstOrDefault(d => string.IsNullOrWhiteSpace(d.mod.ContentPackForId));
-                if (main.mod == null)
-                    main = details[0];
-
-                result.Id = main.mod.Id;
-                result.Name = main.mod.Name;
-                result.Version = main.mod.Version;
-                result.Author = main.mod.Author;
-                result.RootFolder = main.dir;
-                result.ModCount = details.Count;
-                foreach (var (m, _) in details)
-                    result.All.Add((m.Id, m.Name, m.Version));
-
                 // 包里个别 Mod 读不出来不影响整体识别（errors 只在全部失败时才用得上）
-                return result;
+                return Finish(result, details);
             }
             catch (Exception ex)
             {
                 result.Error = "打不开这个压缩包：" + ex.Message;
                 return result;
             }
+        }
+
+        /// <summary>rar / 7z / tar：系统 tar.exe 解到临时目录，再按与 zip 相同的规则找 manifest.json。</summary>
+        private static ZipPeekResult ReadViaTar(ZipPeekResult result)
+        {
+            string tmp = Path.Combine(Path.GetTempPath(), "smm-peek-" + Guid.NewGuid().ToString("N").Substring(0, 8));
+            try
+            {
+                Installer.Extract(result.Path, tmp);      // 内部就是 tar -xf，认不出格式会抛出来
+                var roots = Installer.FindRoots(tmp);
+                if (roots.Count == 0)
+                {
+                    result.Error = "包里没有 manifest.json，不是能直接安装的 SMAPI Mod 包"
+                                   + "（翻译包 / 补丁包这类要手动放进对应 Mod 目录）";
+                    return result;
+                }
+
+                result.HasManifest = true;
+                var details = new List<(LocalMod mod, string dir)>();
+                var errors = new List<string>();
+                foreach (string root in roots.Take(50))
+                {
+                    string rel = root.Substring(tmp.Length).TrimStart('\\', '/').Replace('\\', '/');
+                    try
+                    {
+                        var mod = ModScanner.ParseManifestSafe(
+                            File.ReadAllText(Path.Combine(root, "manifest.json")), out string err);
+                        if (mod != null)
+                            details.Add((mod, rel));
+                        else
+                            errors.Add(Label(rel) + "：" + (err ?? "读不出来"));
+                    }
+                    catch (Exception ex)
+                    {
+                        errors.Add(Label(rel) + "：" + ex.Message);
+                    }
+                }
+
+                if (details.Count == 0)
+                {
+                    result.Error = errors.Count > 0 ? string.Join("；", errors) : "manifest.json 读不出来";
+                    return result;
+                }
+                return Finish(result, details);
+            }
+            catch (Exception ex)
+            {
+                result.Error = "打不开这个压缩包：" + ex.Message;
+                return result;
+            }
+            finally
+            {
+                try { if (Directory.Exists(tmp)) Directory.Delete(tmp, true); } catch { }
+            }
+        }
+
+        /// <summary>把读到的 manifest 汇总成结果（zip 与 rar/7z 两条路共用）。</summary>
+        private static ZipPeekResult Finish(ZipPeekResult result, List<(LocalMod mod, string dir)> details)
+        {
+            var main = details.FirstOrDefault(d => string.IsNullOrWhiteSpace(d.mod.ContentPackForId));
+            if (main.mod == null)
+                main = details[0];
+
+            result.Id = main.mod.Id;
+            result.Name = main.mod.Name;
+            result.Version = main.mod.Version;
+            result.Author = main.mod.Author;
+            result.RootFolder = main.dir;
+            result.ModCount = details.Count;
+            foreach (var (m, _) in details)
+                result.All.Add((m.Id, m.Name, m.Version));
+            return result;
         }
 
         private static string Label(string dir)

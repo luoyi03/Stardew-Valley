@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -30,6 +31,18 @@ namespace SMM
             Directory.CreateDirectory(dir);
         }
 
+        /// <summary>支持的压缩包扩展名。zip 用内置解压；rar / 7z / tar 交给系统自带的 tar.exe。</summary>
+        public static readonly string[] ArchiveExtensions = { ".zip", ".rar", ".7z", ".tar", ".gz", ".tgz" };
+
+        /// <summary>按扩展名判断像不像压缩包（拖进来 / 监控下载文件夹时用）。</summary>
+        public static bool IsArchiveName(string file)
+        {
+            if (string.IsNullOrWhiteSpace(file))
+                return false;
+            string lower = file.ToLowerInvariant();
+            return ArchiveExtensions.Any(e => lower.EndsWith(e));
+        }
+
         public static bool IsZip(string file)
         {
             try
@@ -43,8 +56,156 @@ namespace SMM
             }
         }
 
+        /// <summary>RAR 4 / RAR 5 的文件头都是 "Rar!\x1a\x07"。</summary>
+        public static bool IsRar(string file) => HasMagic(file, new byte[] { 0x52, 0x61, 0x72, 0x21, 0x1A, 0x07 });
+
+        /// <summary>7z 的文件头是 "7z\xBC\xAF\x27\x1C"。</summary>
+        public static bool Is7z(string file) => HasMagic(file, new byte[] { 0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C });
+
+        /// <summary>gzip（.tar.gz 之类）。</summary>
+        public static bool IsGzip(string file) => HasMagic(file, new byte[] { 0x1F, 0x8B });
+
+        /// <summary>tar：偏移 257 处是 "ustar"。</summary>
+        public static bool IsTar(string file)
+        {
+            try
+            {
+                using var fs = File.OpenRead(file);
+                if (fs.Length < 262)
+                    return false;
+                fs.Seek(257, SeekOrigin.Begin);
+                var buf = new byte[5];
+                if (fs.Read(buf, 0, 5) != 5)
+                    return false;
+                return buf[0] == (byte)'u' && buf[1] == (byte)'s' && buf[2] == (byte)'t'
+                       && buf[3] == (byte)'a' && buf[4] == (byte)'r';
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool HasMagic(string file, byte[] magic)
+        {
+            try
+            {
+                using var fs = File.OpenRead(file);
+                var buf = new byte[magic.Length];
+                if (fs.Read(buf, 0, buf.Length) != buf.Length)
+                    return false;
+                for (int i = 0; i < buf.Length; i++)
+                    if (buf[i] != magic[i])
+                        return false;
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>能不能直接当安装包解压（zip / rar / 7z / tar）。</summary>
+        public static bool IsArchive(string file)
+        {
+            if (IsZip(file) || IsRar(file) || Is7z(file) || IsGzip(file) || IsTar(file))
+                return true;
+            // 认不出文件头（例如分卷包）就退回看扩展名，真解不开会给出明确报错
+            return File.Exists(file) && IsArchiveName(file);
+        }
+
+        /// <summary>系统自带的 tar.exe（Windows 10 1803+ 都有，基于 libarchive，能解 rar / 7z / tar）。</summary>
+        public static string TarExe()
+        {
+            try
+            {
+                string sys = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "tar.exe");
+                if (File.Exists(sys))
+                    return sys;
+
+                foreach (string dir in (Environment.GetEnvironmentVariable("PATH") ?? "").Split(';'))
+                {
+                    if (string.IsNullOrWhiteSpace(dir))
+                        continue;
+                    string p = Path.Combine(dir.Trim(), "tar.exe");
+                    if (File.Exists(p))
+                        return p;
+                }
+            }
+            catch { }
+            return null;
+        }
+
+        /// <summary>解压压缩包：zip 走内置，rar / 7z / tar 走 tar.exe。</summary>
+        public static void Extract(string archivePath, string dest)
+        {
+            if (IsZip(archivePath))
+            {
+                ExtractZip(archivePath, dest);
+                return;
+            }
+            ExtractWithTar(archivePath, dest);
+        }
+
+        /// <summary>用系统自带 tar.exe 解压 rar / 7z / tar。</summary>
+        public static void ExtractWithTar(string archivePath, string dest)
+        {
+            string tar = TarExe();
+            if (tar == null)
+                throw new Exception("这个包是 rar / 7z，需要靠系统自带的 tar.exe 解压，但没找到它"
+                                    + "（Windows 10 1803 以下没有）。请手动解压成文件夹再拖进来。");
+
+            Directory.CreateDirectory(dest);
+            var (code, outp, err) = RunTar(tar, new[] { "-xf", archivePath, "-C", dest });
+            if (code != 0)
+            {
+                string msg = (err ?? "").Trim();
+                if (msg.Length == 0)
+                    msg = (outp ?? "").Trim();
+                throw new Exception("解压失败：" + (msg.Length > 0 ? msg : "exit code " + code));
+            }
+
+            CleanMacJunk(dest);
+        }
+
+        private static (int Code, string Out, string Err) RunTar(string tar, IEnumerable<string> args)
+        {
+            var psi = new ProcessStartInfo(tar)
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+            foreach (string a in args)
+                psi.ArgumentList.Add(a);
+
+            using var p = Process.Start(psi);
+            string outp = p.StandardOutput.ReadToEnd();
+            string err = p.StandardError.ReadToEnd();
+            p.WaitForExit();
+            return (p.ExitCode, outp, err);
+        }
+
+        /// <summary>tar 解压会把 macOS 的 __MACOSX / ._ 文件也带出来，顺手清掉。</summary>
+        private static void CleanMacJunk(string dest)
+        {
+            try
+            {
+                foreach (string dir in Directory.GetDirectories(dest, "__MACOSX", SearchOption.AllDirectories))
+                {
+                    try { Directory.Delete(dir, true); } catch { }
+                }
+                foreach (string f in Directory.GetFiles(dest, "._*", SearchOption.AllDirectories))
+                {
+                    try { File.Delete(f); } catch { }
+                }
+            }
+            catch { }
+        }
+
         /// <summary>解压 zip（带 Zip Slip 防护，跳过 __MACOSX）。</summary>
-        public static void Extract(string zipPath, string dest)
+        private static void ExtractZip(string zipPath, string dest)
         {
             string root = Path.GetFullPath(dest);
             using var fs = File.OpenRead(zipPath);

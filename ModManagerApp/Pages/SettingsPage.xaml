@@ -137,7 +137,7 @@
                         <TextBlock x:Name="TxtWatchState" Style="{StaticResource T.Dim}" Margin="0,8,0,0"
                                    TextWrapping="Wrap" />
                         <TextBlock Style="{StaticResource T.Dim}" Margin="0,6,0,0" TextWrapping="Wrap"
-                                   Text="用法：需要手动下载的 Mod（比如 Nexus 上的），点「打开网页」在浏览器里点下载，zip 落到下载目录后程序会自动认出来并安装。上面留空就自动读浏览器（Edge / Chrome / 火狐）自己的下载目录，再兜上系统「下载」目录 —— 你在浏览器里改过下载位置也能认。" />
+                                   Text="用法：需要手动下载的 Mod（比如 Nexus 上的），点「打开网页」在浏览器里点下载，压缩包（zip / rar / 7z）落到下载目录后程序会自动认出来并安装。上面留空就自动读浏览器（Edge / Chrome / 火狐）自己的下载目录，再兜上系统「下载」目录 —— 你在浏览器里改过下载位置也能认。" />
                     </StackPanel>
                 </Border>
 

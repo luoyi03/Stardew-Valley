@@ -455,7 +455,7 @@ namespace SMM
             var dlg = new Microsoft.Win32.OpenFileDialog
             {
                 Title = "选择下载好的 Mod 压缩包（可多选）",
-                Filter = "Mod 压缩包 (*.zip)|*.zip|所有文件 (*.*)|*.*",
+                Filter = "Mod 压缩包 (*.zip;*.rar;*.7z)|*.zip;*.rar;*.7z|所有文件 (*.*)|*.*",
                 Multiselect = true
             };
             if (dlg.ShowDialog(Dlg.Owner(this)) != true)
@@ -608,7 +608,7 @@ namespace SMM
                 App.OpenFolder(s.Mod.Dir);
         }
 
-        // ==================== 拖入 zip ====================
+        // ==================== 拖入压缩包 ====================
 
         private void OnDragOver(object sender, DragEventArgs e)
         {
@@ -624,12 +624,12 @@ namespace SMM
                 return;
             e.Handled = true;
 
-            var zips = paths.Where(p => p.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)).ToList();
+            var zips = paths.Where(Installer.IsArchiveName).ToList();
             var folders = paths.Where(p => Directory.Exists(p)).ToList();
 
             if (zips.Count == 0 && folders.Count == 0)
             {
-                _shell.Toast("只支持拖入 zip 压缩包或已解压的 Mod 文件夹");
+                _shell.Toast("只支持拖入 zip / rar / 7z 压缩包，或已解压的 Mod 文件夹");
                 return;
             }
 

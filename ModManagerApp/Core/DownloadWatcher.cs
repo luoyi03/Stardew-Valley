@@ -68,7 +68,7 @@ namespace SMM
                     if (!Directory.Exists(folder))
                         continue;
 
-                    var fsw = new FileSystemWatcher(folder, "*.zip")
+                    var fsw = new FileSystemWatcher(folder, "*.*")
                     {
                         NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.Size,
                         IncludeSubdirectories = false
@@ -89,7 +89,7 @@ namespace SMM
 
         private void Add(string path)
         {
-            if (string.IsNullOrWhiteSpace(path) || !path.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(path) || !Installer.IsArchiveName(path))
                 return;
             lock (_lock)
             {
@@ -108,8 +108,10 @@ namespace SMM
             {
                 try
                 {
-                    foreach (string f in Directory.EnumerateFiles(folder, "*.zip", SearchOption.TopDirectoryOnly))
+                    foreach (string f in Directory.EnumerateFiles(folder, "*", SearchOption.TopDirectoryOnly))
                     {
+                        if (!Installer.IsArchiveName(f))
+                            continue;
                         DateTime t;
                         try { t = File.GetLastWriteTime(f); }
                         catch { continue; }
@@ -237,8 +239,10 @@ namespace SMM
                     continue;
                 try
                 {
-                    foreach (string f in Directory.EnumerateFiles(folder, "*.zip", SearchOption.TopDirectoryOnly))
+                    foreach (string f in Directory.EnumerateFiles(folder, "*", SearchOption.TopDirectoryOnly))
                     {
+                        if (!Installer.IsArchiveName(f))
+                            continue;
                         try
                         {
                             var fi = new FileInfo(f);

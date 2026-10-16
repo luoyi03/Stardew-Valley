@@ -285,7 +285,7 @@ namespace SMM
             if (string.IsNullOrWhiteSpace(input))
                 return;
 
-            // 1) 本地 zip / 文件夹
+            // 1) 本地压缩包 / 文件夹
             if (File.Exists(input) || Directory.Exists(input))
             {
                 await RunBusyAsync("正在安装…", async () =>

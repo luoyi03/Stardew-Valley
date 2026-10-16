@@ -203,14 +203,14 @@ namespace SMM
         {
             string where = string.Join("、", folders);
             if (found.Count == 0)
-                return $"「{where}」里一个 zip 都没有";
+                return $"「{where}」里一个压缩包都没有";
 
             var bad = found.Where(r => r.HasManifest).ToList();
             if (bad.Count > 0)
                 return $"「{where}」里的压缩包都没识别出来：" + string.Join("；",
                     bad.Take(3).Select(r => Path.GetFileName(r.Path) + " → " + r.Error));
 
-            return $"「{where}」里的 {found.Count} 个 zip 都不是 SMAPI Mod 包（没有 manifest.json），已跳过";
+            return $"「{where}」里的 {found.Count} 个压缩包都不是 SMAPI Mod 包（没有 manifest.json），已跳过";
         }
 
         private async Task DrainZipQueueAsync()

@@ -48,8 +48,8 @@
                 <TextBlock Grid.Column="0" Text="按链接 / 编号安装：" VerticalAlignment="Center"
                            Foreground="{StaticResource B.TextDim}" FontSize="12" />
                 <TextBox x:Name="TxtLink" Grid.Column="1" Margin="10,0,10,0"
-                         Tag="Nexus 链接或编号 / GitHub 仓库链接 / zip 直链 / 本地 zip 路径"
-                         ToolTip="支持：Nexus Mod 链接或编号、GitHub 仓库链接、任意 zip 直链、本地 zip 路径" />
+                         Tag="Nexus 链接或编号 / GitHub 仓库链接 / 压缩包直链 / 本地压缩包路径"
+                         ToolTip="支持：Nexus Mod 链接或编号、GitHub 仓库链接、任意压缩包直链、本地 zip / rar / 7z 路径" />
                 <Button x:Name="BtnLinkInstall" Grid.Column="2" Content="安装" Style="{StaticResource Btn}"
                         Click="BtnLinkInstall_Click" />
             </Grid>

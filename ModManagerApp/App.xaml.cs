@@ -204,7 +204,7 @@ namespace SMM
                     : (env.Config.WatchFolder ?? "(自动)") + "（没找到可用的下载目录）"));
                 var zips = DownloadWatcher.ScanFolder(watchFolders);
                 var okZips = zips.Where(z => z.Ok).ToList();
-                sb.AppendLine($"看到 {zips.Count} 个 zip，其中能识别出 {okZips.Count} 个 Mod 压缩包：");
+                sb.AppendLine($"看到 {zips.Count} 个压缩包，其中能识别出 {okZips.Count} 个 Mod 包：");
                 foreach (var zi in okZips)
                     sb.AppendLine($"  - {zi.DisplayName} {zi.VersionText}  [{zi.Id}]  包内 {zi.ModCount} 个 Mod  ← {Path.GetFileName(zi.Path)}");
                 foreach (var zi in zips.Where(z => !z.Ok))
