@@ -538,7 +538,7 @@ namespace SMM
                 await _shell.ReloadModsAsync();
                 _shell.Toast(string.Join("\n", msgs.Take(6)));
                 RevealMods(_shell.Mods.Where(m => !before.Contains(m.Id)).Select(m => m.Id));
-                await NewModNamePrompt.AskAsync(Env, before, Window.GetWindow(this));
+                await NewModNamePrompt.AskAsync(Env, before, _shell);
             });
         }
 
@@ -564,6 +564,7 @@ namespace SMM
                 return;
 
             await _shell.ReloadModsAsync();
+            RevealMods(new[] { mod.Id });          // 名字变了就选中它露出来（顺便清搜索/筛选，免得被挡住）
             _shell.Toast(dlg.ResultMessage ?? "名字已更新");
         }
 
@@ -699,7 +700,7 @@ namespace SMM
                     await _shell.ReloadModsAsync();
                     _shell.Toast(string.Join("\n", msgs.Take(6)));
                     RevealMods(_shell.Mods.Where(m => !before.Contains(m.Id)).Select(m => m.Id));
-                    await NewModNamePrompt.AskAsync(Env, before, Window.GetWindow(this));
+                    await NewModNamePrompt.AskAsync(Env, before, _shell);
                 });
 
             if (zips.Count > 0)

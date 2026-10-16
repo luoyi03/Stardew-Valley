@@ -242,7 +242,7 @@ namespace SMM
                 MarkInstalled(_items.ToList());
                 _shell.Toast(msg);
                 _shell.RevealMods(_shell.Mods.Where(m => !before.Contains(m.Id)).Select(m => m.Id));
-                await NewModNamePrompt.AskAsync(Env, before, Window.GetWindow(this));
+                await NewModNamePrompt.AskAsync(Env, before, _shell);
             }
             catch (Exception ex)
             {
@@ -305,7 +305,7 @@ namespace SMM
                     TxtLink.Text = "";
                     _shell.Toast(msg);
                     _shell.RevealMods(_shell.Mods.Where(m => !before.Contains(m.Id)).Select(m => m.Id));
-                    await NewModNamePrompt.AskAsync(Env, before, Window.GetWindow(this));
+                    await NewModNamePrompt.AskAsync(Env, before, _shell);
                 });
                 return;
             }

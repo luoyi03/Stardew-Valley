@@ -45,11 +45,14 @@ namespace SMM
         /// <summary>
         /// 和快照对比，把「这次新装进来、且还没中文名」的 Mod 逐个弹窗问名字。
         /// 返回填了几个（用户取消的不算）。
+        /// 填完会立刻重扫列表——不然行上显示的、以及中文搜索用的，都还是改名前那个值。
         /// </summary>
-        public static async Task<int> AskAsync(AppEnv env, HashSet<string> before, Window owner)
+        public static async Task<int> AskAsync(AppEnv env, HashSet<string> before, IShell shell)
         {
-            if (env == null || before == null)
+            if (env == null || before == null || shell == null)
                 return 0;
+
+            var owner = shell as Window;
 
             List<LocalMod> mods;
             try { mods = await Task.Run(() => ModScanner.Scan(env.ModsPath, env.DisabledDir)); }
@@ -76,6 +79,17 @@ namespace SMM
                     {
                         named++;
                         env.Log("新装 Mod 填中文名：" + dlg.ResultMessage + "（" + m.Id + "）");
+
+                        // 名字改了要重扫列表才生效：DisplayName（中文（English））与中文搜索都靠它
+                        try
+                        {
+                            await shell.ReloadModsAsync();
+                            shell.RevealMods(new[] { m.Id });
+                        }
+                        catch (Exception ex)
+                        {
+                            env.Log("改名后刷新列表失败：" + ex.Message);
+                        }
                     }
                 }
                 catch (Exception ex)
