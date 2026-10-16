@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
@@ -28,5 +29,8 @@ namespace SMM
 
         /// <summary>立刻扫一遍监控目录里已有的 zip（设置页「立即检查」用）。</summary>
         Task<int> CheckWatchFolderNowAsync();
+
+        /// <summary>把刚装好的 Mod 在「Mod 管理」页里露出来（清搜索/筛选、选中并滚过去）。</summary>
+        void RevealMods(IEnumerable<string> ids);
     }
 }

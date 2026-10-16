@@ -43,8 +43,48 @@ namespace SMM
 
         public void OnActivated()
         {
+            _view?.Refresh();
             UpdateSummary();
             UpdateSelectionPanel();
+        }
+
+        /// <summary>
+        /// 装完 Mod 之后把它「露出来」：清掉搜索框、筛选切回「全部」、刷新视图，
+        /// 再选中并滚动到它。否则用户搜索框里还留着字、或者筛选停在「可更新」这类条件上，
+        /// 新装的 Mod（状态是"未检查"）就被挡在列表外，看起来像没装上。
+        /// </summary>
+        public void RevealMods(IEnumerable<string> ids)
+        {
+            var wanted = new HashSet<string>(ids ?? Enumerable.Empty<string>(), StringComparer.OrdinalIgnoreCase);
+            if (wanted.Count == 0)
+                return;
+
+            bool cleared = false;
+            if (!string.IsNullOrEmpty(TxtSearch.Text))
+            {
+                TxtSearch.Text = "";         // 会触发 TxtSearch_TextChanged → _view.Refresh()
+                cleared = true;
+            }
+            if (CmbFilter.SelectedIndex != 0)
+            {
+                CmbFilter.SelectedIndex = 0;
+                cleared = true;
+            }
+            _view.Refresh();
+
+            var targets = _shell.Mods.Where(m => wanted.Contains(m.Id)).ToList();
+            if (targets.Count == 0)
+                return;
+
+            List.SelectedItems.Clear();
+            foreach (var t in targets)
+                List.SelectedItems.Add(t);
+
+            try { List.ScrollIntoView(targets[0]); } catch { }
+
+            if (cleared)
+                Env.Log("新装的 Mod 之前被搜索/筛选挡着，已切回「全部」并选中："
+                        + string.Join("、", targets.Select(t => t.DisplayName)));
         }
 
         // ==================== 筛选 / 排序 ====================
@@ -497,6 +537,7 @@ namespace SMM
                 }
                 await _shell.ReloadModsAsync();
                 _shell.Toast(string.Join("\n", msgs.Take(6)));
+                RevealMods(_shell.Mods.Where(m => !before.Contains(m.Id)).Select(m => m.Id));
                 await NewModNamePrompt.AskAsync(Env, before, Window.GetWindow(this));
             });
         }
@@ -657,6 +698,7 @@ namespace SMM
                     }
                     await _shell.ReloadModsAsync();
                     _shell.Toast(string.Join("\n", msgs.Take(6)));
+                    RevealMods(_shell.Mods.Where(m => !before.Contains(m.Id)).Select(m => m.Id));
                     await NewModNamePrompt.AskAsync(Env, before, Window.GetWindow(this));
                 });
 

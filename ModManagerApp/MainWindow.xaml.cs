@@ -352,6 +352,7 @@ namespace SMM
                 Env.Log("下载文件夹监控安装成功：" + msg);
                 await ReloadModsAsync();
                 Toast(msg);
+                RevealNewMods(before);                                // 让新装的在「Mod 管理」页里露出来
                 await NewModNamePrompt.AskAsync(Env, before, this);   // 新装的 Mod 问一句中文名
             }
             catch (Exception ex)
@@ -404,6 +405,35 @@ namespace SMM
             int disabledCount = Mods.Count(m => m.Mod.Disabled);
             SetStatus($"{Mods.Count} 个 Mod（{disabledCount} 个已禁用）"
                       + (updates > 0 ? $" · {updates} 个可更新" : ""));
+            Env.Log($"重新扫描 Mods：{Mods.Count} 个（{disabledCount} 个已禁用）");
+        }
+
+        /// <summary>
+        /// 新装的 Mod 在「Mod 管理」页里露出来（清搜索/筛选、选中并滚动过去）。
+        /// 页面还没创建过就不用管——等切过去时列表本来就是最新的。
+        /// </summary>
+        private void RevealNewMods(HashSet<string> before)
+        {
+            if (before == null)
+                return;
+
+            var fresh = Mods.Where(m => !before.Contains(m.Id)).Select(m => m.Id).ToList();
+            if (fresh.Count == 0)
+                return;
+
+            Env.Log($"本次新装 {fresh.Count} 个：{string.Join("、", fresh)}（列表现在共 {Mods.Count} 个）");
+
+            RevealMods(fresh);
+        }
+
+        public void RevealMods(IEnumerable<string> ids)
+        {
+            var list = (ids ?? Enumerable.Empty<string>()).ToList();
+            if (list.Count == 0)
+                return;
+
+            if (_pages.TryGetValue("mods", out var page) && page is ModsPage mp)
+                mp.RevealMods(list);
         }
 
         public void SetStatus(string text)
