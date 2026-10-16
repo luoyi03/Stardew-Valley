@@ -120,9 +120,13 @@ namespace SMM
 
                 var mods = ModScanner.Scan(env.ModsPath, env.DisabledDir);
                 sb.AppendLine($"=== 扫描到 {mods.Count} 个 Mod ===");
+                sb.AppendLine($"（界面显示名格式：中文名（English Name））");
                 foreach (var m in mods)
                 {
-                    sb.AppendLine($"  [{m.Id}] {m.Name} v{m.Version}"
+                    sb.AppendLine($"  [{m.Id}] {ModNames.Display(m)}"
+                                  + (string.Equals(ModNames.Display(m), m.Name, StringComparison.Ordinal)
+                                      ? "" : $"(原名 {m.Name})")
+                                  + $" v{m.Version}"
                                   + (m.Disabled ? " (已禁用)" : "")
                                   + (m.IsDuplicate ? " (重复)" : "")
                                   + "  目录=" + m.DisplayPath

@@ -30,7 +30,7 @@ namespace SMM
                     Level = IssueLevel.Error,
                     Kind = "重复安装",
                     ModId = g.Key,
-                    ModName = list[0].Name,
+                    ModName = ModNames.Display(list[0]),
                     Detail = $"同一个 Mod 装了 {list.Count} 份：{paths}。SMAPI 只会加载其中一份，建议删掉多余的。"
                 };
 
@@ -61,7 +61,7 @@ namespace SMM
                     Level = IssueLevel.Warning,
                     Kind = "入口文件冲突",
                     ModId = string.Join(" / ", list.Select(x => x.Id)),
-                    ModName = string.Join(" / ", list.Select(x => x.Name)),
+                    ModName = string.Join(" / ", list.Select(ModNames.Display)),
                     Detail = $"这些 Mod 都用同一个 {g.Key} 作为入口文件，通常意味着同一个 Mod 装了两份，建议只保留一个。"
                 });
             }
@@ -87,7 +87,7 @@ namespace SMM
                             Level = IssueLevel.Error,
                             Kind = "依赖被禁用",
                             ModId = m.Id,
-                            ModName = m.Name,
+                            ModName = ModNames.Display(m),
                             Detail = $"「{m.Name}」需要前置「{t.Name}」，但它现在是禁用状态，进游戏会报错。",
                             FixLabel = $"重新启用 {t.RootFolderName}",
                             Fix = () => ModControl.Enable(env, t)
@@ -103,7 +103,7 @@ namespace SMM
                             Level = IssueLevel.Warning,
                             Kind = "依赖版本过低",
                             ModId = m.Id,
-                            ModName = m.Name,
+                            ModName = ModNames.Display(m),
                             Detail = $"「{m.Name}」要求前置「{target.Name}」至少 {dep.MinVersion}，当前是 {target.Version}，请先更新前置。"
                         });
                     }
@@ -122,7 +122,7 @@ namespace SMM
                         Level = IssueLevel.Error,
                         Kind = "缺少前置 Mod",
                         ModId = m.Id,
-                        ModName = m.Name,
+                        ModName = ModNames.Display(m),
                         Detail = $"「{m.Name}」需要前置「{dep.UniqueId}」{VersionText(dep.MinVersion)}，但它没有安装。"
                     });
                 }
@@ -137,7 +137,7 @@ namespace SMM
                             Level = IssueLevel.Error,
                             Kind = "缺少内容框架",
                             ModId = m.Id,
-                            ModName = m.Name,
+                            ModName = ModNames.Display(m),
                             Detail = $"内容包「{m.Name}」需要框架「{m.ContentPackForId}」{VersionText(m.ContentPackForVersion)}，但它没有安装。"
                         });
                     }
@@ -149,7 +149,7 @@ namespace SMM
                             Level = IssueLevel.Error,
                             Kind = "依赖被禁用",
                             ModId = m.Id,
-                            ModName = m.Name,
+                            ModName = ModNames.Display(m),
                             Detail = $"内容包「{m.Name}」需要的框架「{fw.Name}」被禁用了。",
                             FixLabel = $"重新启用 {fw.RootFolderName}",
                             Fix = () => ModControl.Enable(env, fw)
@@ -168,7 +168,7 @@ namespace SMM
                         Level = IssueLevel.Error,
                         Kind = "SMAPI 版本过低",
                         ModId = m.Id,
-                        ModName = m.Name,
+                        ModName = ModNames.Display(m),
                         Detail = $"「{m.Name}」要求 SMAPI ≥ {m.MinimumApiVersion}，当前是 {env.SmapiVersion}，请去 smapi.io 下载新版安装器更新。"
                     });
                 }
@@ -181,7 +181,7 @@ namespace SMM
                         Level = IssueLevel.Info,
                         Kind = "无更新源",
                         ModId = m.Id,
-                        ModName = m.Name,
+                        ModName = ModNames.Display(m),
                         Detail = $"「{m.Name}」的 manifest 里没写 UpdateKeys，没法自动检查更新。在 Mod 管理页选中它，点「补写更新源」，填上它的 Nexus 编号或 GitHub 仓库就行。"
                     });
                 }
@@ -204,7 +204,7 @@ namespace SMM
                     Level = IssueLevel.Warning,
                     Kind = "被依赖的禁用项",
                     ModId = m.Id,
-                    ModName = m.Name,
+                    ModName = ModNames.Display(m),
                     Detail = $"「{m.Name}」目前是禁用状态，但有别的 Mod 需要它。"
                 });
             }

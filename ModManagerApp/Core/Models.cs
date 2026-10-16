@@ -74,6 +74,9 @@ namespace SMM
 
         public string SortName => Name ?? Id ?? "";
 
+        /// <summary>显示用名字：「中文名（English Name）」。</summary>
+        public string DisplayName => ModNames.Display(this);
+
         public IEnumerable<UpdateKey> SupportedKeys()
         {
             foreach (var k in Keys)
@@ -101,7 +104,7 @@ namespace SMM
 
         public string TimeText => Time.ToString("yyyy-MM-dd HH:mm");
         public string SizeText => FormatSize(SizeBytes);
-        public string Title => string.IsNullOrEmpty(Name) ? UniqueId : Name;
+        public string Title => ModNames.Display(UniqueId, Name, null);
 
         public static string FormatSize(long bytes)
         {

@@ -63,7 +63,7 @@
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel>
-                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold"
+                                        <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"
                                                    TextTrimming="CharacterEllipsis" />
                                         <TextBlock Text="{Binding Id}" FontSize="11"
                                                    Foreground="{StaticResource B.TextDim}"

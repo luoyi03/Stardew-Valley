@@ -57,7 +57,7 @@ namespace SMM
             string q = TxtSearch.Text?.Trim();
             if (!string.IsNullOrEmpty(q))
             {
-                string hay = (s.Name + " " + s.Id + " " + s.AuthorText).ToLowerInvariant();
+                string hay = (s.DisplayName + " " + s.Name + " " + s.Id + " " + s.AuthorText).ToLowerInvariant();
                 if (!hay.Contains(q.ToLowerInvariant()))
                     return false;
             }
@@ -202,15 +202,19 @@ namespace SMM
 
             var s = sel[0];
             var m = s.Mod;
-            TxtSelTitle.Text = m.Name;
+            string selTitle = ModNames.Display(m);
+            TxtSelTitle.Text = selTitle;
+
+            // 显示名里已经带上英文原名时就不用再单列一行「原名」
+            bool showOriginal = !string.IsNullOrWhiteSpace(m.OriginalName)
+                                 && !string.Equals(m.OriginalName, m.Name, StringComparison.Ordinal)
+                                 && !selTitle.Contains(m.OriginalName, StringComparison.Ordinal);
+
             TxtSelMeta.Text = $"v{m.Version}　·　作者：{(string.IsNullOrEmpty(m.Author) ? "—" : m.Author)}　·　"
                               + (m.ContentPackForId != null ? $"内容包（{m.ContentPackForId}）　·　" : "")
                               + $"状态：{s.StatusText}"
                               + (s.LatestVersion != null ? $"（最新 {s.LatestVersion}）" : "")
-                              + (string.IsNullOrWhiteSpace(m.OriginalName)
-                                 || string.Equals(m.OriginalName, m.Name, StringComparison.Ordinal)
-                                  ? ""
-                                  : $"　·　原名：{m.OriginalName}");
+                              + (showOriginal ? $"　·　原名：{m.OriginalName}" : "");
             TxtSelDesc.Text = string.IsNullOrWhiteSpace(m.Description)
                 ? $"路径：{m.Dir}"
                 : m.Description + "\n路径：" + m.Dir;

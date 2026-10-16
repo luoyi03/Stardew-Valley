@@ -23,7 +23,7 @@ namespace SMM
             InitializeComponent();
 
             string cur = string.IsNullOrWhiteSpace(mod.Name) ? mod.Id : mod.Name;
-            TxtTitle.Text = "给「" + cur + "」改中文名";
+            TxtTitle.Text = "给「" + ModNames.Display(mod) + "」改中文名";
 
             string orig = string.IsNullOrWhiteSpace(mod.OriginalName) ? cur : mod.OriginalName;
             string sub = $"UniqueID：{mod.Id}　当前版本：{mod.Version ?? "?"}";
@@ -31,7 +31,8 @@ namespace SMM
                 sub += "\n目录：" + mod.Dir;
             TxtSub.Text = sub;
 
-            TxtName.Text = cur;
+            // 内置对照表里有中文名就预填上，省得手打（点保存才会真正写进 manifest）
+            TxtName.Text = ModNames.Chinese(mod) ?? cur;
             TxtOld.Text = string.Equals(orig, cur, StringComparison.Ordinal)
                 ? "原名（英文）：" + orig
                 : "原名（英文）：" + orig + "　·　现在显示的是上面这个名字";

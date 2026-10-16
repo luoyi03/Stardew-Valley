@@ -35,10 +35,11 @@ namespace ModManager
         private static readonly Dictionary<string, string> BuiltIn = new(StringComparer.OrdinalIgnoreCase)
         {
             // 框架类
-            ["Pathoschild.ContentPatcher"] = "内容补丁（CP 框架）",
-            ["Pathoschild.SpaceCore"] = "太空核心（SpaceCore）",
-            ["Pathoschild.DynamicGameAssets"] = "动态游戏资源（DGA）",
-            ["spacechase0.GenericModConfigMenu"] = "通用 Mod 配置菜单（GMCM）",
+            ["Pathoschild.ContentPatcher"] = "内容补丁",
+            ["Pathoschild.SpaceCore"] = "太空核心",
+            ["Pathoschild.DynamicGameAssets"] = "动态游戏资源",
+            ["spacechase0.GenericModConfigMenu"] = "通用 Mod 配置菜单",
+            ["focustense.StardewUI"] = "StardewUI 界面框架",
             ["SMAPI.ConsoleCommands"] = "控制台命令",
             ["SMAPI.SaveBackup"] = "存档备份",
             ["SMAPI"] = "SMAPI 本体",
@@ -49,8 +50,9 @@ namespace ModManager
             ["Pathoschild.Automate"] = "自动化",
             ["Pathoschild.TractorMod"] = "拖拉机",
             ["Pathoschild.TrainStation"] = "传送站",
-            ["Pathoschild.FarmTypeManager"] = "农场类型管理器",
             ["Pathoschild.Predictor"] = "预测器",
+            ["Esca.FarmTypeManager"] = "农场类型管理器",
+            ["Pathoschild.FarmTypeManager"] = "农场类型管理器",
             ["Bouhm.NPCMapLocations"] = "NPC 地图位置",
             ["Omegasis.SaveAnywhere"] = "随处存档",
             ["ZeroXPatch.CraftAnywhere"] = "随处制作",
@@ -58,13 +60,17 @@ namespace ModManager
             ["Annosz.UiInfoSuite2"] = "界面信息套件 2",
             ["chiccen.MapTeleport"] = "地图传送",
             ["ccr.TeleportNPCLocation"] = "NPC 位置传送",
+            ["ChibiKyu.FishingAssistant2"] = "钓鱼助手",
+            ["Borealis.MatrixFishingUI"] = "钓鱼界面",
+            ["shekurika.WaterFish"] = "可见鱼类",
             ["Digus.AnimalHusbandryMod"] = "畜牧扩展",
             ["Digus.PFMAutomate"] = "PFM 自动化",
 
             // 大型内容包
-            ["FlashShifter.StardewValleyExpandedCP"] = "星露谷扩展（SVE）",
-            ["FlashShifter.SVECode"] = "星露谷扩展 · 核心（SVE）",
-            ["FlashShifter.SVE"] = "星露谷扩展（SVE）",
+            ["FlashShifter.StardewValleyExpandedCP"] = "星露谷扩展",
+            ["FlashShifter.SVECode"] = "星露谷扩展 · 核心",
+            ["FlashShifter.SVE-FTM"] = "星露谷扩展 · 农场管理器",
+            ["FlashShifter.SVE"] = "星露谷扩展",
 
             // 本仓库自己的 Mod
             ["ly.InGameGuide"] = "游戏内教程",

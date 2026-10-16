@@ -81,6 +81,10 @@ namespace SMM
         public bool IsBusy => _status == "checking" || _phase != null;
 
         public string Name => _mod?.Name ?? "";
+
+        /// <summary>界面上显示的名字：「中文名（English Name）」。</summary>
+        public string DisplayName => ModNames.Display(_mod);
+
         public string Id => _mod?.Id ?? "";
         public string VersionText => _mod?.Version ?? "";
         public string AuthorText => string.IsNullOrEmpty(_mod?.Author) ? "—" : _mod.Author;
@@ -134,6 +138,7 @@ namespace SMM
         public void NotifyAll()
         {
             Raise(nameof(Name));
+            Raise(nameof(DisplayName));
             Raise(nameof(Id));
             Raise(nameof(VersionText));
             Raise(nameof(AuthorText));
