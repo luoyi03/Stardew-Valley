@@ -239,6 +239,19 @@ namespace SMM
                     sb.AppendLine($"  - 翻译包：{Path.GetFileName(zi.Path)} → 装给「{zi.TranslationTarget}」：{string.Join("、", zi.TranslationFiles)}");
                 foreach (var zi in zips.Where(z => !z.Ok && !z.IsTranslation))
                     sb.AppendLine($"  - 识别失败：{Path.GetFileName(zi.Path)} → {zi.Error}");
+
+                // 路由检查：监控路径到底会把每个包送去哪（防止再出现"翻译包被当成不是 Mod 跳过"）
+                int nMod = 0, nTr = 0, nSkip = 0;
+                foreach (var zi in zips)
+                {
+                    switch (SMM.MainWindow.RouteZip(zi))
+                    {
+                        case "translation": nTr++; break;
+                        case "mod": nMod++; break;
+                        default: nSkip++; break;
+                    }
+                }
+                sb.AppendLine($"  路由检查：走 Mod 安装 {nMod} 个 · 走翻译安装 {nTr} 个 · 跳过 {nSkip} 个");
                 sb.AppendLine();
 
                 if (network && !string.IsNullOrWhiteSpace(env.Config.NexusApiKey))

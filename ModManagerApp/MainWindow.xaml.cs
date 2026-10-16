@@ -244,41 +244,27 @@ namespace SMM
                 return;
             }
 
-            if (info == null || !info.Ok)
+            // 走哪条路由 RouteZip 统一决定（翻译包没有 manifest、Ok 是 false，但它是能装的，
+            // 必须抢在「识别失败」分支前面处理，否则就会被当成"不是 Mod"跳过）。
+            switch (RouteZip(info))
             {
-                // 没识别出来。有 manifest 却读不出来的（manifest 写坏了、带注释解不开等）必须明确告诉用户，
-                // 否则看起来就是「没反应」；压根不是 Mod 包的只安静跳过，免得启动补扫时弹一堆提示。
-                string reason = info?.Error ?? "读不出来";
-                Env.Log($"识别失败（{reason}）：{path}");
-                if (info != null && info.HasManifest)
-                    Toast($"「{Path.GetFileName(path)}」识别失败：{reason}");
-                else if (!_quietSkip)
-                    Toast($"「{Path.GetFileName(path)}」不是 SMAPI Mod 包，已跳过");
-                return;
-            }
-
-            // 翻译包（汉化包这类）：没有 manifest，但能对上某个已装 Mod —— 合进去就行
-            if (info.IsTranslation)
-            {
-                bool autoTr = string.Equals(Env.Config.WatchInstallMode, "auto", StringComparison.OrdinalIgnoreCase);
-                if (!autoTr)
-                {
-                    var r2 = Dlg.Show(this,
-                        $"发现翻译包：{Path.GetFileName(path)}\n\n"
-                        + $"会装给：「{info.TranslationTarget}」\n"
-                        + "写入文件：" + string.Join("、", info.TranslationFiles.Take(6)) + "\n\n"
-                        + @"（同名旧文件会先备份到 数据目录\i18n-backup，随时能找回）"
-                        + "\n\n要现在安装吗？",
-                        "下载文件夹监控", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if (r2 != MessageBoxResult.Yes)
+                case "translation":
+                    await HandleTranslationAsync(path, info);
+                    return;
+                case "mod":
+                    break;
+                default:
                     {
-                        Env.Log("用户跳过了翻译包：" + path);
+                        // 没识别出来。有 manifest 却读不出来的（manifest 写坏了、带注释解不开等）必须告诉用户，
+                        // 否则看起来就是「没反应」；压根不是 Mod 包的只安静跳过，免得启动补扫时弹一堆提示。
+                        string reason = info?.Error ?? "读不出来";
+                        Env.Log($"识别失败（{reason}）：{path}");
+                        if (info != null && info.HasManifest)
+                            Toast($"「{Path.GetFileName(path)}」识别失败：{reason}");
+                        else if (!_quietSkip)
+                            Toast($"「{Path.GetFileName(path)}」不是 SMAPI Mod 包，已跳过");
                         return;
                     }
-                }
-
-                await InstallZipAsync(path);
-                return;
             }
 
             var existing = Mods
@@ -323,6 +309,45 @@ namespace SMM
                 if (r != MessageBoxResult.Yes)
                 {
                     Env.Log("用户跳过了：" + path);
+                    return;
+                }
+            }
+
+            await InstallZipAsync(path);
+        }
+
+        /// <summary>
+        /// 一个压缩包该怎么处理：
+        /// translation = 翻译包（没有 manifest，但能对上已装 Mod，合进它的 i18n）；
+        /// mod = 能直接安装的 Mod 包；skip = 跳过（含"不是 Mod 包"与"读不出来"）。
+        /// 翻译包必须单独判：Ok 只表示「能当 Mod 直接装」，而翻译包的 Ok 是 false
+        /// （早期就是因为先判 Ok，翻译包被当成"不是 Mod"跳过了）。
+        /// </summary>
+        internal static string RouteZip(ZipPeekResult info)
+        {
+            if (info == null)
+                return "skip";
+            if (info.IsTranslation)
+                return "translation";
+            return info.Ok ? "mod" : "skip";
+        }
+
+        /// <summary>翻译包：问一句，然后合进对应 Mod 的 i18n（同名旧文件先备份）。</summary>
+        private async Task HandleTranslationAsync(string path, ZipPeekResult info)
+        {
+            bool auto = string.Equals(Env.Config.WatchInstallMode, "auto", StringComparison.OrdinalIgnoreCase);
+            if (!auto)
+            {
+                var r = Dlg.Show(this,
+                    $"发现翻译包：{Path.GetFileName(path)}\n\n"
+                    + $"会装给：「{info.TranslationTarget}」\n"
+                    + "写入文件：" + string.Join("、", info.TranslationFiles.Take(6)) + "\n\n"
+                    + @"（同名旧文件会先备份到 数据目录\i18n-backup，随时能找回）"
+                    + "\n\n要现在安装吗？",
+                    "下载文件夹监控", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (r != MessageBoxResult.Yes)
+                {
+                    Env.Log("用户跳过了翻译包：" + path);
                     return;
                 }
             }
