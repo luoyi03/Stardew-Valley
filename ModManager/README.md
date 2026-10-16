@@ -25,6 +25,7 @@ modmgr             打开管理界面
 modmgr check       后台检查一次，把可更新的 Mod 打到日志
 modmgr update all  检查并更新全部可自动更新的 Mod
 modmgr update <ID> 只更新某个 Mod，ID 用 manifest 里的 UniqueID，如 Pathoschild.TractorMod
+modmgr names       重新载入中英文名对照（改过 names.json 后执行，不用重启游戏）
 ```
 
 ## 第一次用：填 Nexus API Key
@@ -42,7 +43,7 @@ modmgr update <ID> 只更新某个 Mod，ID 用 manifest 里的 UniqueID，如 P
 
 - 顶部：**检查更新**、**设置**、右上角 × 关闭
 - 第二排筛选：**全部 / 可更新 / 已最新 / 需手动**，右侧 **全部更新 (N)**
-- 每一行：Mod 名 + `当前版本 → 最新版本 · 来源`，右侧两个按钮
+- 每一行：**中文名（English Name）** + `当前版本 → 最新版本 · 来源`，右侧两个按钮
   - **网页**：用浏览器打开 Mod 页面
   - **更新**：下载并替换（GitHub / Nexus 来源可用）；灰色表示需要手动更新
 - 左键点行的空白处 = 打开该 Mod 所在文件夹

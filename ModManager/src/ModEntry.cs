@@ -35,6 +35,9 @@ namespace ModManager
             Service = new UpdateService(helper, Monitor);
             _lastCheckFile = Path.Combine(Service.DataDir, "lastcheck.txt");
 
+            // 中英文名对照（面板里显示「中文名（英文名）」）
+            try { ModNames.Load(); } catch (Exception ex) { Monitor.Log("载入中英文名对照失败：" + ex.Message, LogLevel.Warn); }
+
             // 上次没替换成功的更新，趁现在补上
             try { Updater.ApplyPending(); } catch (Exception ex) { Monitor.Log("应用待处理更新失败：" + ex.Message, LogLevel.Warn); }
 
@@ -227,8 +230,14 @@ namespace ModManager
                     OpenManager();
                     break;
 
+                case "names":
+                case "名字":
+                    ModNames.Load(reload: true);
+                    Monitor.Log($"已重新载入中英文名对照（{ModNames.Summary()}）。文件：{ModNames.FilePath}", LogLevel.Info);
+                    break;
+
                 default:
-                    Monitor.Log("用法：modmgr / modmgr check / modmgr update <ModID|all>", LogLevel.Info);
+                    Monitor.Log("用法：modmgr / modmgr check / modmgr update <ModID|all> / modmgr names", LogLevel.Info);
                     break;
             }
         }

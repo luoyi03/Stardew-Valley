@@ -625,7 +625,7 @@ namespace ModManager
             RowButtons(i, out var web, out var act);
             float textW = Math.Max(120, act.X - r.X - 28);
 
-            Ui.Text(b, Ui.Clip(s.Mod.Name, Game1.smallFont, textW), new Vector2(r.X + 14, r.Y + 8),
+            Ui.Text(b, Ui.Clip(ModNames.Display(s.Mod), Game1.smallFont, textW), new Vector2(r.X + 14, r.Y + 8),
                 s.HasUpdate ? Ui.Gold : Ui.Ink);
             Ui.Text(b, Ui.Clip(SubText(s), Game1.smallFont, textW), new Vector2(r.X + 14, r.Y + 32), Ui.Dim);
 
