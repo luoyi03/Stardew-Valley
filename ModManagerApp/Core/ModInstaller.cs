@@ -61,7 +61,6 @@ namespace SMM
         public static async Task<string> ImportAsync(AppEnv env, string path, bool isFolder,
             IProgress<InstallProgress> progress, CancellationToken ct)
         {
-            RequireGameClosed();
             progress?.Report(new InstallProgress { Phase = "正在读取安装包…", Percent = 0 });
 
             string stage = null;
@@ -237,7 +236,18 @@ namespace SMM
         {
             var roots = Installer.FindRoots(stage);
             if (roots.Count == 0)
-                throw new Exception("压缩包里没有找到 manifest.json，看起来不是 SMAPI Mod 包");
+            {
+                // 没有 manifest.json：试一下「翻译包」（i18n/zh.json 这类），能对上已装 Mod 就合进去
+                var hit = TranslationPack.DetectFromDir(stage, fallbackName, env, out string why);
+                if (hit != null)
+                {
+                    progress?.Report(new InstallProgress { Phase = "正在安装翻译…", Percent = 100 });
+                    return TranslationPack.Apply(env, stage, hit);
+                }
+                throw new Exception("压缩包里没有找到 manifest.json，也不是能识别的翻译包。" + (why ?? ""));
+            }
+
+            RequireGameClosed();      // 真要往 Mods 里写文件了才要求关游戏（翻译包不受这个限制）
 
             var done = new List<string>();
             var failed = new List<string>();

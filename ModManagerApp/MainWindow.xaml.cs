@@ -181,21 +181,21 @@ namespace SMM
             }
 
             var found = await Task.Run(() => DownloadWatcher.ScanFolder(folders));
-            var ok = found.Where(r => r.Ok).ToList();
-            if (ok.Count == 0)
+            var usable = found.Where(r => r.Ok || r.IsTranslation).ToList();   // Mod 包 + 翻译包都处理
+            if (usable.Count == 0)
             {
                 Toast(ExplainNoMods(folders, found));
                 return 0;
             }
 
-            foreach (var r in ok)
+            foreach (var r in usable)
             {
                 if (!_zipQueue.Contains(r.Path))
                     _zipQueue.Enqueue(r.Path);
             }
 
             await DrainZipQueueAsync();
-            return ok.Count;
+            return usable.Count;
         }
 
         /// <summary>一个能识别都没扫到时，说清楚是「没包」还是「包有问题」。</summary>
@@ -205,7 +205,8 @@ namespace SMM
             if (found.Count == 0)
                 return $"「{where}」里一个压缩包都没有";
 
-            var bad = found.Where(r => r.HasManifest).ToList();
+            var bad = found.Where(r => !r.IsTranslation
+                                       && (r.HasManifest || (r.Error ?? "").Contains("翻译包"))).ToList();
             if (bad.Count > 0)
                 return $"「{where}」里的压缩包都没识别出来：" + string.Join("；",
                     bad.Take(3).Select(r => Path.GetFileName(r.Path) + " → " + r.Error));
@@ -253,6 +254,30 @@ namespace SMM
                     Toast($"「{Path.GetFileName(path)}」识别失败：{reason}");
                 else if (!_quietSkip)
                     Toast($"「{Path.GetFileName(path)}」不是 SMAPI Mod 包，已跳过");
+                return;
+            }
+
+            // 翻译包（汉化包这类）：没有 manifest，但能对上某个已装 Mod —— 合进去就行
+            if (info.IsTranslation)
+            {
+                bool autoTr = string.Equals(Env.Config.WatchInstallMode, "auto", StringComparison.OrdinalIgnoreCase);
+                if (!autoTr)
+                {
+                    var r2 = Dlg.Show(this,
+                        $"发现翻译包：{Path.GetFileName(path)}\n\n"
+                        + $"会装给：「{info.TranslationTarget}」\n"
+                        + "写入文件：" + string.Join("、", info.TranslationFiles.Take(6)) + "\n\n"
+                        + @"（同名旧文件会先备份到 数据目录\i18n-backup，随时能找回）"
+                        + "\n\n要现在安装吗？",
+                        "下载文件夹监控", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (r2 != MessageBoxResult.Yes)
+                    {
+                        Env.Log("用户跳过了翻译包：" + path);
+                        return;
+                    }
+                }
+
+                await InstallZipAsync(path);
                 return;
             }
 

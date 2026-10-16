@@ -19,8 +19,17 @@ namespace SMM
         /// <summary>识别失败的原因；识别成功时为 null。</summary>
         public string Error { get; set; }
 
-        /// <summary>是否识别成功。</summary>
-        public bool Ok => Error == null;
+        /// <summary>是不是能直接安装的 Mod 包（翻译包不算，它有独立的安装方式）。</summary>
+        public bool Ok => Error == null && !IsTranslation;
+
+        /// <summary>是个翻译包（没有 manifest.json，但能对上某个已装 Mod），可以合进去。</summary>
+        public bool IsTranslation { get; set; }
+
+        /// <summary>翻译包要装给哪个 Mod（显示名）。</summary>
+        public string TranslationTarget { get; set; }
+
+        /// <summary>翻译包会写进目标 Mod 的文件（如 i18n/zh.json）。</summary>
+        public List<string> TranslationFiles { get; set; } = new();
 
         /// <summary>包里第一个「正经 Mod」的 UniqueID（优先非内容包）。</summary>
         public string Id { get; set; }
@@ -64,12 +73,14 @@ namespace SMM
 
                 // 1. 找出所有「含 manifest.json 的目录」
                 bool tooDeep = false;
+                var allPaths = new List<string>();
                 var dirs = new Dictionary<string, ZipArchiveEntry>(StringComparer.OrdinalIgnoreCase);
                 foreach (var e in zip.Entries)
                 {
                     string full = e.FullName.Replace('\\', '/').TrimStart('/');
                     if (full.Length == 0 || full.EndsWith("/"))
                         continue;
+                    allPaths.Add(full);
                     if (!e.Name.Equals("manifest.json", StringComparison.OrdinalIgnoreCase))
                         continue;
 
@@ -92,8 +103,11 @@ namespace SMM
                     }
                     else
                     {
-                        result.Error = "包里没有 manifest.json，不是能直接安装的 SMAPI Mod 包"
-                                       + "（翻译包 / 补丁包这类要手动放进对应 Mod 目录）";
+                        // 没有 manifest：再看是不是「翻译包」，能对上已装 Mod 就标记出来
+                        TryTranslation(result, allPaths);
+                        if (!result.IsTranslation)
+                            result.Error = "包里没有 manifest.json，也不是能识别的翻译包"
+                                           + "（翻译包要能在 Mods 里对上目标 Mod，形如 某Mod/i18n/zh.json 或裸的 zh.json）";
                     }
                     return result;
                 }
@@ -153,8 +167,23 @@ namespace SMM
                 var roots = Installer.FindRoots(tmp);
                 if (roots.Count == 0)
                 {
-                    result.Error = "包里没有 manifest.json，不是能直接安装的 SMAPI Mod 包"
-                                   + "（翻译包 / 补丁包这类要手动放进对应 Mod 目录）";
+                    var env = AppEnv.Current;
+                    string trNote = null;
+                    var hit = env == null
+                        ? null
+                        : TranslationPack.DetectFromDir(tmp, Path.GetFileName(result.Path), env, out trNote);
+                    if (hit == null)
+                    {
+                        result.Error = trNote != null && trNote.StartsWith("看起来是翻译包", StringComparison.Ordinal)
+                            ? trNote
+                            : "包里没有 manifest.json，也不是能识别的翻译包"
+                              + "（翻译包要能在 Mods 里对上目标 Mod，形如 某Mod/i18n/zh.json 或裸的 zh.json）";
+                        return result;
+                    }
+
+                    result.IsTranslation = true;
+                    result.TranslationTarget = hit.TargetNames;
+                    result.TranslationFiles = hit.DestinationFiles;
                     return result;
                 }
 
@@ -213,6 +242,27 @@ namespace SMM
             foreach (var (m, _) in details)
                 result.All.Add((m.Id, m.Name, m.Version));
             return result;
+        }
+
+        /// <summary>zip 路径下判断是不是翻译包（直接用条目清单，不用解压）。</summary>
+        private static void TryTranslation(ZipPeekResult result, List<string> relPaths)
+        {
+            var env = AppEnv.Current;
+            if (env == null)
+                return;
+
+            var hit = TranslationPack.Detect(relPaths, Path.GetFileName(result.Path), env, out string note);
+            if (hit == null)
+            {
+                // 一眼就是翻译包、只是没对上目标 Mod 时，把具体原因说给用户听
+                if (!string.IsNullOrEmpty(note) && note.StartsWith("看起来是翻译包", StringComparison.Ordinal))
+                    result.Error = note;
+                return;
+            }
+
+            result.IsTranslation = true;
+            result.TranslationTarget = hit.TargetNames;
+            result.TranslationFiles = hit.DestinationFiles;
         }
 
         private static string Label(string dir)

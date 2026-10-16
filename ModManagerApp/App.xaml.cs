@@ -204,10 +204,13 @@ namespace SMM
                     : (env.Config.WatchFolder ?? "(自动)") + "（没找到可用的下载目录）"));
                 var zips = DownloadWatcher.ScanFolder(watchFolders);
                 var okZips = zips.Where(z => z.Ok).ToList();
-                sb.AppendLine($"看到 {zips.Count} 个压缩包，其中能识别出 {okZips.Count} 个 Mod 包：");
+                var trZips = zips.Where(z => z.IsTranslation).ToList();
+                sb.AppendLine($"看到 {zips.Count} 个压缩包：能直接装的 {okZips.Count} 个 · 翻译包 {trZips.Count} 个");
                 foreach (var zi in okZips)
                     sb.AppendLine($"  - {zi.DisplayName} {zi.VersionText}  [{zi.Id}]  包内 {zi.ModCount} 个 Mod  ← {Path.GetFileName(zi.Path)}");
-                foreach (var zi in zips.Where(z => !z.Ok))
+                foreach (var zi in trZips)
+                    sb.AppendLine($"  - 翻译包：{Path.GetFileName(zi.Path)} → 装给「{zi.TranslationTarget}」：{string.Join("、", zi.TranslationFiles)}");
+                foreach (var zi in zips.Where(z => !z.Ok && !z.IsTranslation))
                     sb.AppendLine($"  - 识别失败：{Path.GetFileName(zi.Path)} → {zi.Error}");
                 sb.AppendLine();
 
