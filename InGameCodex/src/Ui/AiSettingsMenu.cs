@@ -75,6 +75,12 @@ namespace InGameCodex.Ui
         /// <summary>还没连上网关时，模型行的默认候选。</summary>
         private static readonly string[] DefaultModels = { "hy3", "deepseek-v4.1-flash", "glm-5.3-flash" };
 
+        /// <summary>不管网关返回什么，都不出现在候选里的模型（不想看到的写这儿）。</summary>
+        private static readonly string[] HiddenModels = { "hy4-preview-f" };
+
+        /// <summary>不管网关返回什么，这几款始终留在候选里（想固定可选哪些就改这里）。</summary>
+        private static readonly string[] StandbyModels = { "hy3", "deepseek-v4.1-flash", "glm-5.3-flash" };
+
         // ---------------- 下拉清单（点一下展开，点选项即选中） ----------------
         private const int DropItemH = 32;
         private const int DropMaxRows = 10;
@@ -156,7 +162,10 @@ namespace InGameCodex.Ui
             return res;
         }
 
-        /// <summary>模型行的候选：当前模型永远排第一位，后面是网关拉到的清单（没拉到就用默认三个）。</summary>
+        /// <summary>
+        /// 模型行的候选：当前模型永远排第一位；后面是网关拉到的清单（没拉到就用默认三个），
+        /// 但会剔掉 HiddenModels，并且总是补上 StandbyModels（这样 hy3 / GLM-5.3-Flash 不管网关给不给都能选）。
+        /// </summary>
         private string[] ModelChoices()
         {
             var list = new List<string>();
@@ -164,28 +173,50 @@ namespace InGameCodex.Ui
             if (cur.Length > 0)
                 list.Add(cur);
 
-            var src = _gatewayModels ?? new List<string>(DefaultModels);
+            var src = _gatewayModels != null && _gatewayModels.Count > 0
+                ? _gatewayModels
+                : new List<string>(DefaultModels);
+
             foreach (string m in src)
-            {
-                string id = (m ?? "").Trim();
-                if (id.Length == 0)
-                    continue;
+                AddModel(list, m);
 
-                bool dup = false;
-                foreach (string s in list)
-                {
-                    if (string.Equals(s, id, StringComparison.OrdinalIgnoreCase))
-                    {
-                        dup = true;
-                        break;
-                    }
-                }
-
-                if (!dup)
-                    list.Add(id);
-            }
+            // 常备款始终留着（网关清单里没有 hy3 / GLM-5.3-Flash 时也能选）
+            foreach (string m in StandbyModels)
+                AddModel(list, m);
 
             return list.ToArray();
+        }
+
+        /// <summary>加进候选：去重、跳过空名、跳过 HiddenModels（当前正在用的那个仍然保留，否则看不到自己现在用的是哪个）。</summary>
+        private static void AddModel(List<string> list, string id)
+        {
+            id = (id ?? "").Trim();
+            if (id.Length == 0)
+                return;
+
+            bool dup = false;
+            foreach (string s in list)
+            {
+                if (string.Equals(s, id, StringComparison.OrdinalIgnoreCase))
+                {
+                    dup = true;
+                    break;
+                }
+            }
+            if (dup)
+                return;
+
+            bool isCurrent = list.Count > 0 && string.Equals(list[0], id, StringComparison.OrdinalIgnoreCase);
+            if (!isCurrent)
+            {
+                foreach (string hide in HiddenModels)
+                {
+                    if (string.Equals(hide, id, StringComparison.OrdinalIgnoreCase))
+                        return;
+                }
+            }
+
+            list.Add(id);
         }
 
         /// <summary>候选变了以后换掉模型行的选项。</summary>
