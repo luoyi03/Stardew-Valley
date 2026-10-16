@@ -1,0 +1,72 @@
+<Window x:Class="SMM.TextInputDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="输入"
+        Width="720" MinHeight="320" MaxHeight="780"
+        SizeToContent="Height"
+        ResizeMode="CanResize"
+        WindowStartupLocation="CenterOwner"
+        Icon="/Assets/app.ico"
+        Background="{StaticResource B.Window}"
+        TextOptions.TextFormattingMode="Display"
+        PreviewKeyDown="Window_PreviewKeyDown"
+        FontFamily="Microsoft YaHei UI, Segoe UI">
+    <Grid Margin="20,18,20,16">
+        <Grid.RowDefinitions>
+            <!-- 上面可滚动（内容多了也不会把按钮挤出去），下面按钮固定 -->
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" Padding="0,0,6,0">
+            <StackPanel>
+                <TextBlock x:Name="TxtTitle" Text="输入" Style="{StaticResource T.Title}" />
+                <TextBlock x:Name="TxtSub" Style="{StaticResource T.Dim}" Margin="0,6,0,0"
+                           TextWrapping="Wrap" />
+
+                <Border Style="{StaticResource Card}" Margin="0,14,0,0">
+                    <StackPanel>
+                        <TextBlock x:Name="TxtLabel" Text="值" Style="{StaticResource T.Section}"
+                                   Margin="0,0,0,6" />
+                        <TextBox x:Name="TxtValue" MinHeight="32" MaxLength="80"
+                                 KeyDown="TxtValue_KeyDown" GotFocus="TxtValue_GotFocus" />
+
+                        <Border x:Name="BoxCapture" Visibility="Collapsed" Margin="0,10,0,0" Padding="12,10"
+                                CornerRadius="6" Background="{StaticResource B.Panel}"
+                                BorderBrush="{StaticResource B.Border}" BorderThickness="1"
+                                Focusable="True" Cursor="Hand" FocusVisualStyle="{x:Null}"
+                                MouseDown="BoxCapture_MouseDown"
+                                GotKeyboardFocus="BoxCapture_GotKeyboardFocus"
+                                LostKeyboardFocus="BoxCapture_LostKeyboardFocus">
+                            <StackPanel>
+                                <TextBlock x:Name="TxtCapture" Text="点这里，然后按下你要用的键" TextWrapping="Wrap" />
+                                <TextBlock x:Name="TxtCaptureHint" Style="{StaticResource T.Dim}" Margin="0,6,0,0"
+                                           TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock x:Name="TxtHint" Style="{StaticResource T.Dim}" Margin="0,8,0,0"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                </Border>
+
+                <Border x:Name="BoxExtra" Style="{StaticResource Card}" Margin="0,12,0,0"
+                        Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock x:Name="TxtExtraTitle" Text="说明" Style="{StaticResource T.Section}"
+                                   Margin="0,0,0,6" />
+                        <TextBlock x:Name="TxtExtra" Style="{StaticResource T.Dim}" TextWrapping="Wrap" />
+                    </StackPanel>
+                </Border>
+
+                <TextBlock x:Name="TxtError" Margin="0,12,0,0" TextWrapping="Wrap"
+                           Foreground="{StaticResource B.Danger}" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+            <Button x:Name="BtnOk" Content="保存" Style="{StaticResource BtnAccent}" Click="BtnOk_Click" />
+            <Button Content="取消" Style="{StaticResource Btn}" Margin="8,0,0,0" Click="BtnCancel_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

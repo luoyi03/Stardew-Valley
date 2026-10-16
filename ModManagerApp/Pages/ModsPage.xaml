@@ -112,6 +112,17 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
+                        <GridViewColumn Header="互斥组" Width="96">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding GroupText}" VerticalAlignment="Center"
+                                               Foreground="{StaticResource B.Accent}"
+                                               TextTrimming="CharacterEllipsis"
+                                               ToolTip="同一互斥组里只会启用一个：启用其中一个时，同组其它会被自动停用" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
                         <GridViewColumn Header="说明" Width="380">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -150,6 +161,9 @@
                     <Button x:Name="BtnSelName" Content="改中文名" Style="{StaticResource Btn}"
                             Margin="8,0,0,0" Click="BtnSelName_Click"
                             ToolTip="改成中文名后，游戏里（SMAPI 控制台、游戏内 Mod 管理器）也会显示中文" />
+                    <Button x:Name="BtnSelGroup" Content="互斥组…" Style="{StaticResource Btn}"
+                            Margin="8,0,0,0" Click="BtnSelGroup_Click"
+                            ToolTip="把选中的 Mod 归到同一互斥组（例如「马皮肤」）：同组里只会启用一个，换皮肤时启用新的会自动停用旧的" />
                     <Button x:Name="BtnSelCopy" Content="复制名称" Style="{StaticResource Btn}"
                             Margin="8,0,0,0" Click="BtnSelCopy_Click" />
                     <Button x:Name="BtnSelToggle" Content="禁用" Style="{StaticResource Btn}"

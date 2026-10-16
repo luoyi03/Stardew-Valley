@@ -209,6 +209,35 @@ namespace SMM
                 });
             }
 
+            // ---------- 8. 互斥组里有多个还启用着 ----------
+            // 互斥组（例如「马皮肤」）里同一时间只该有一个启用，否则它们会互改同一批文件。
+            foreach (var g in mods.Where(m => !m.Disabled)
+                                  .GroupBy(m => ModGroups.GroupOf(env, m), StringComparer.CurrentCultureIgnoreCase)
+                                  .Where(x => !string.IsNullOrWhiteSpace(x.Key) && x.Count() > 1))
+            {
+                var list = g.OrderBy(m => m.Name ?? m.Id, StringComparer.CurrentCultureIgnoreCase).ToList();
+                var keep = list[0];
+                var drop = list.Skip(1).ToList();
+
+                var issue = new ModIssue
+                {
+                    Level = IssueLevel.Warning,
+                    Kind = "互斥组冲突",
+                    ModId = string.Join(" / ", list.Select(x => x.Id)),
+                    ModName = $"互斥组「{g.Key}」",
+                    Detail = $"互斥组「{g.Key}」里有 {list.Count} 个同时启用着："
+                             + string.Join("、", list.Select(x => x.Name))
+                             + "。它们通常改同一批游戏文件，同时启用会互相冲突，建议只留一个。",
+                    FixLabel = $"只留「{keep.Name}」"
+                };
+                issue.Fix = () =>
+                {
+                    foreach (var d in drop)
+                        ModControl.Disable(env, d, mods);
+                };
+                issues.Add(issue);
+            }
+
             return issues
                 .OrderBy(i => i.Level)
                 .ThenBy(i => i.Kind)

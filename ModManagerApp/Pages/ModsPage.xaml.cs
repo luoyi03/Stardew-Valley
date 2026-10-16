@@ -220,13 +220,15 @@ namespace SMM
                 TxtSelDesc.Text = "";
                 BtnSelUpdate.IsEnabled = BtnSelToggle.IsEnabled = BtnSelPage.IsEnabled =
                     BtnSelFolder.IsEnabled = BtnSelDelete.IsEnabled =
-                    BtnSelSource.IsEnabled = BtnSelCopy.IsEnabled = BtnSelName.IsEnabled = false;
+                    BtnSelSource.IsEnabled = BtnSelCopy.IsEnabled = BtnSelName.IsEnabled =
+                    BtnSelGroup.IsEnabled = false;
                 return;
             }
 
             BtnSelUpdate.IsEnabled = BtnSelToggle.IsEnabled = BtnSelPage.IsEnabled =
                 BtnSelFolder.IsEnabled = BtnSelDelete.IsEnabled =
-                BtnSelSource.IsEnabled = BtnSelCopy.IsEnabled = BtnSelName.IsEnabled = true;
+                BtnSelSource.IsEnabled = BtnSelCopy.IsEnabled = BtnSelName.IsEnabled =
+                BtnSelGroup.IsEnabled = true;
 
             if (sel.Count > 1)
             {
@@ -420,11 +422,25 @@ namespace SMM
                 {
                     try
                     {
-                        string msg = s.Mod.Disabled
-                            ? ModControl.Enable(Env, s.Mod)
-                            : ModControl.Disable(Env, s.Mod, all);
-                        if (msg != null)
-                            msgs.Add(msg);
+                        if (!s.Mod.Disabled)
+                        {
+                            string msg = ModControl.Disable(Env, s.Mod, all);
+                            if (msg != null)
+                                msgs.Add(msg);
+                            continue;
+                        }
+
+                        // 启用前先把同一个互斥组里还开着的其它 Mod 停用（同组只留一个，例如换马皮肤）
+                        foreach (var t in ModGroups.ToDisable(Env, s.Mod, all))
+                        {
+                            string m2 = ModControl.Disable(Env, t, all);
+                            if (m2 != null)
+                                msgs.Add(m2 + "（同互斥组，自动停用）");
+                        }
+
+                        string enabled = ModControl.Enable(Env, s.Mod);
+                        if (enabled != null)
+                            msgs.Add(enabled);
                     }
                     catch (Exception ex)
                     {
@@ -600,6 +616,46 @@ namespace SMM
             }
 
             _shell.Toast($"已给「{mod.Name}」补上更新源：{saved}");
+        }
+
+        /// <summary>给选中的 Mod 设置互斥组（支持多选：一次把几套皮肤都归到「马皮肤」）。</summary>
+        private async void BtnSelGroup_Click(object sender, RoutedEventArgs e)
+        {
+            if (_busy)
+                return;
+
+            var sel = Selected();
+            if (sel.Count == 0)
+                return;
+
+            var all = _shell.Mods.Select(x => x.Mod).ToList();
+            var dlg = new ExclusiveGroupDialog(Env, sel.Select(x => x.Mod).ToList(), all)
+            {
+                Owner = Window.GetWindow(this)
+            };
+            if (dlg.ShowDialog() != true)
+                return;
+
+            await RunBusyAsync("正在应用互斥组…", async () =>
+            {
+                var msgs = new List<string> { dlg.ResultMessage ?? "互斥组已更新" };
+
+                // 刚分好组时，如果组里还有多个启用着，只留选中的第一个，其余自动停用
+                var first = sel[0].Mod;
+                if (!first.Disabled && ModGroups.GroupOf(Env, first) != null)
+                {
+                    var stop = ModGroups.ToDisable(Env, first, all);
+                    foreach (var t in stop)
+                    {
+                        string msg = ModControl.Disable(Env, t, all);
+                        if (msg != null)
+                            msgs.Add(msg + "（同互斥组，只留一个启用）");
+                    }
+                }
+
+                await _shell.ReloadModsAsync();
+                _shell.Toast(string.Join("\n", msgs.Take(6)));
+            });
         }
 
         private void BtnSelCopy_Click(object sender, RoutedEventArgs e)

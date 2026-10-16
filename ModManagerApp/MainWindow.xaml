@@ -73,6 +73,8 @@
                              SelectionChanged="NavList_SelectionChanged">
                         <ListBoxItem Content="Mod 管理" Tag="mods" />
                         <ListBoxItem Content="浏览下载" Tag="browse" />
+                        <ListBoxItem Content="AI 设置" Tag="ai" />
+                        <ListBoxItem Content="快捷键" Tag="hotkeys" />
                         <ListBoxItem Content="备份回滚" Tag="backup" />
                         <ListBoxItem Content="问题检查" Tag="issues" />
                         <ListBoxItem Content="联机" Tag="mp" />

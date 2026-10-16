@@ -50,6 +50,19 @@ namespace SMM
         public Dictionary<string, string> OriginalNames { get; set; } = new();
 
         /// <summary>
+        /// 互斥组：ModID → 组名（例如「马皮肤」）。
+        /// 同组里同一时间只允许一个处于启用状态：启用其中一个时，管理器会自动把同组其它停用。
+        /// 典型用途是装了好几套马皮肤 / 狗皮肤 / 家具这类互相改同一批文件的内容包，避免冲突。
+        /// </summary>
+        public Dictionary<string, string> ExclusiveGroups { get; set; } = new();
+
+        /// <summary>
+        /// 被「禁用」的快捷键原来是什么：&lt;ModID&gt;|&lt;配置路径&gt; → 原按键。
+        /// 禁用快捷键时把配置里的值写成 None，原值记在这里；点「启用」时再写回去。
+        /// </summary>
+        public Dictionary<string, string> HotkeyOriginal { get; set; } = new();
+
+        /// <summary>
         /// 「打开网页」用哪个浏览器：auto（有 Edge 用 Edge）/ default（系统默认）/
         /// edge / chrome / custom（用 BrowserPath）。
         /// </summary>
@@ -97,6 +110,8 @@ namespace SMM
                     cfg.IgnoredModIds ??= new List<string>();
                     cfg.ChineseNames ??= new Dictionary<string, string>();
                     cfg.OriginalNames ??= new Dictionary<string, string>();
+                    cfg.ExclusiveGroups ??= new Dictionary<string, string>();
+                    cfg.HotkeyOriginal ??= new Dictionary<string, string>();
                     return cfg;
                 }
             }
@@ -129,6 +144,8 @@ namespace SMM
             IgnoredModIds = new List<string>();
             ChineseNames = new Dictionary<string, string>();
             OriginalNames = new Dictionary<string, string>();
+            ExclusiveGroups = new Dictionary<string, string>();
+            HotkeyOriginal = new Dictionary<string, string>();
             BrowserMode = Browser.Auto;
             BrowserPath = "";
             WatchFolderEnabled = true;

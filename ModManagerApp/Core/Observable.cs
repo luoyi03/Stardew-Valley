@@ -86,6 +86,9 @@ namespace SMM
         public string DisplayName => ModNames.Display(_mod);
 
         public string Id => _mod?.Id ?? "";
+
+        /// <summary>所属互斥组（没分组就是空字符串），列表里单独一列显示。</summary>
+        public string GroupText => ModGroups.GroupOf(AppEnv.Current, _mod) ?? "";
         public string VersionText => _mod?.Version ?? "";
         public string AuthorText => string.IsNullOrEmpty(_mod?.Author) ? "—" : _mod.Author;
         public string EnabledText => _mod == null ? "" : (_mod.Disabled ? "已禁用" : "启用中");
@@ -140,6 +143,7 @@ namespace SMM
             Raise(nameof(Name));
             Raise(nameof(DisplayName));
             Raise(nameof(Id));
+            Raise(nameof(GroupText));
             Raise(nameof(VersionText));
             Raise(nameof(AuthorText));
             Raise(nameof(EnabledText));

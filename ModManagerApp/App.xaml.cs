@@ -147,6 +147,123 @@ namespace SMM
                 sb.AppendLine("  真实清单副本：" + RealManifestProbe(mods));
                 sb.AppendLine();
 
+                sb.AppendLine("=== 快捷键（读各 Mod 的 config.json）===");
+                var hotkeys = Hotkeys.Scan(env);
+                sb.AppendLine($"  读到 {hotkeys.Count} 条按键绑定"
+                              + $"（能读到的前提是该 Mod 已经生成 config.json）");
+                foreach (var h in hotkeys.Take(40))
+                    sb.AppendLine($"  - {h.ModName}  {h.JsonPath} = {h.ValueText}{(h.IsDisabled ? "" : "")}");
+                var hotConflicts = Hotkeys.Conflicts(hotkeys);
+                if (hotConflicts.Count == 0)
+                    sb.AppendLine("  重复检查：没发现重复");
+                else
+                    foreach (var c in hotConflicts)
+                        sb.AppendLine($"  重复：{c.Text}");
+                sb.AppendLine("  键名校验自测："
+                              + $"F5={(Hotkeys.ValidateInput("F5") == null ? "OK" : "✗")} "
+                              + $"LeftShift + F5={(Hotkeys.ValidateInput("LeftShift + F5") == null ? "OK" : "✗")} "
+                              + $"F5, F6={(Hotkeys.ValidateInput("F5, F6") == null ? "OK" : "✗")} "
+                              + $"None={(Hotkeys.ValidateInput("None") == null ? "OK" : "✗")} "
+                              + $"乱填被拦={(Hotkeys.ValidateInput("随便写") != null ? "OK" : "✗")} "
+                              + $"归一化 F5+LeftShift=LeftShift+F5={(Hotkeys.Normalize("F5 + LeftShift") == Hotkeys.Normalize("LeftShift + F5") ? "OK" : "✗")}");
+                sb.AppendLine("  写入自测：" + HotkeyWriteProbe(hotkeys));
+
+                // 改键拦重 + 多键写法查重（假数据，不碰真实配置）
+                var ka = new HotkeyBinding { ModId = "a", ModName = "甲", JsonPath = ".A", Value = "F5" };
+                var kb = new HotkeyBinding { ModId = "b", ModName = "乙", JsonPath = ".B", Value = "F5, F6" };
+                var kc = new HotkeyBinding { ModId = "c", ModName = "丙", JsonPath = ".C", Value = "None" };
+                var klist = new List<HotkeyBinding> { ka, kb, kc };
+
+                var conf = Hotkeys.Conflicts(klist);
+                sb.AppendLine($"  多键写法查重：「F5」与「F5, F6」→ {conf.Count} 处（应为 1）{(conf.Count == 1 && conf[0].Items.Count == 2 ? " OK" : " ✗")}"
+                              + $"；禁用的不算 {(conf.Any(c => c.Items.Any(i => i.ModId == "c")) ? "✗" : "OK")}");
+
+                var h1 = Hotkeys.ConflictsFor(klist, ka, "F5");
+                var h2 = Hotkeys.ConflictsFor(klist, ka, "LeftShift + F5");
+                var h3 = Hotkeys.ConflictsFor(klist, ka, "F6");
+                var h4 = Hotkeys.ConflictsFor(klist, ka, "None");
+                sb.AppendLine($"  改键拦重：改成 F5 → 撞 {h1.Count} 处（应 1）{(h1.Count == 1 ? " OK" : " ✗")}"
+                              + $"；改成 LeftShift + F5 → 撞 {h2.Count} 处（应 0）{(h2.Count == 0 ? " OK" : " ✗")}"
+                              + $"；改成 F6 → 撞 {h3.Count} 处（应 1）{(h3.Count == 1 ? " OK" : " ✗")}"
+                              + $"；改成 None → 撞 {h4.Count} 处（应 0）{(h4.Count == 0 ? " OK" : " ✗")}");
+
+                // 按键捕获的键名映射自测（按一下键 → 认得出是什么键）
+                sb.AppendLine("  捕获键名映射自测："
+                              + string.Join("　", new[]
+                              {
+                                  System.Windows.Input.Key.F5,
+                                  System.Windows.Input.Key.A,
+                                  System.Windows.Input.Key.D5,
+                                  System.Windows.Input.Key.NumPad3,
+                                  System.Windows.Input.Key.LeftCtrl,
+                                  System.Windows.Input.Key.OemComma,
+                                  System.Windows.Input.Key.PageUp,
+                                  System.Windows.Input.Key.Space
+                              }.Select(k => k + "→" + (TextInputDialog.KeyName(k) ?? "（不支持）"))));
+                sb.AppendLine();
+
+                sb.AppendLine("=== AI 设置（InGameCodex / StardewAI）===");
+                foreach (var (folder, prefix, name) in new[]
+                {
+                    ("InGameCodex", ".Ai.", "游戏内图鉴（InGameCodex）"),
+                    ("StardewAI", ".", "游戏内 AI 助手（StardewAI）")
+                })
+                {
+                    string cfg = JsonEdit.ConfigPathOf(env, folder);
+                    if (cfg == null || !File.Exists(cfg))
+                    {
+                        sb.AppendLine($"  {name}：还没有 config.json（先进一次游戏）");
+                        continue;
+                    }
+
+                    string key = JsonEdit.Read(cfg, prefix + "ApiKey") ?? "";
+                    sb.AppendLine($"  {name}：{JsonEdit.Read(cfg, prefix + "BaseUrl")}"
+                                  + $"　·　模型 {JsonEdit.Read(cfg, prefix + "Model")}"
+                                  + $"　·　方案 {JsonEdit.Read(cfg, prefix + "Preset")}"
+                                  + $"　·　密钥 {key.Length} 位");
+                }
+
+                var merged1 = AiModels.Merge(new[] { "hy4-preview-f", "deepseek-v4.1-flash" }, "hy3");
+                var merged2 = AiModels.Merge(null, "hy4-preview-f");
+                sb.AppendLine("  候选合并自测：hy4 只来自接口 → "
+                              + (merged1.Contains("hy4-preview-f") ? "✗ 没屏蔽掉" : "已屏蔽 OK")
+                              + "；常备款齐全 → "
+                              + (AiModels.Standby.All(m => merged1.Contains(m)) ? "OK" : "✗")
+                              + $"；当前值不会被删 → {(merged2.Contains("hy4-preview-f") ? "OK" : "✗")}"
+                              + $"（候选：{string.Join("、", merged1)}）");
+                sb.AppendLine();
+
+                sb.AppendLine("=== 互斥组 ===");
+                var groupNames = ModGroups.GroupNames(env);
+                if (groupNames.Count == 0)
+                    sb.AppendLine("  还没分组（在「Mod 管理」里选中几个 Mod → 点「互斥组…」）");
+                foreach (string g in groupNames)
+                {
+                    var members = mods.Where(m => string.Equals(ModGroups.GroupOf(env, m), g,
+                        StringComparison.CurrentCultureIgnoreCase)).ToList();
+                    int on = members.Count(m => !m.Disabled);
+                    sb.AppendLine($"  「{g}」共 {members.Count} 个，启用中 {on} 个"
+                                  + (on > 1 ? "  ← 同组多个启用，会冲突" : "")
+                                  + "：" + string.Join("、", members.Select(m => m.Name + (m.Disabled ? "(禁用)" : ""))));
+                }
+
+                // 互斥组逻辑自测（用假数据，不碰真实配置）
+                var fakeEnv = new AppEnv { Config = new AppConfig() };
+                fakeEnv.Config.ExclusiveGroups["fake.horse.a"] = "马皮肤";
+                fakeEnv.Config.ExclusiveGroups["fake.horse.b"] = "马皮肤";
+                fakeEnv.Config.ExclusiveGroups["fake.dog.a"] = "狗皮肤";
+                var fa = new LocalMod { Id = "fake.horse.a", Name = "马皮肤A", Dir = "A" };
+                var fb = new LocalMod { Id = "fake.horse.b", Name = "马皮肤B", Dir = "B" };
+                var fc = new LocalMod { Id = "fake.dog.a", Name = "狗皮肤A", Dir = "C" };
+                var fakeList = new List<LocalMod> { fa, fb, fc };
+                var wouldStop = ModGroups.ToDisable(fakeEnv, fa, fakeList);
+                sb.AppendLine("  逻辑自测：启用「马皮肤A」会自动停用 "
+                              + string.Join("、", wouldStop.Select(x => x.Name)) + "（应为 马皮肤B）"
+                              + (wouldStop.Count == 1 && wouldStop[0].Id == "fake.horse.b" ? " ✔" : " ✘"));
+                bool leak = ModGroups.Siblings(fakeEnv, fa, fakeList).Any(x => x.Id == "fake.dog.a");
+                sb.AppendLine("  逻辑自测：别组（狗皮肤）不会被误停用 " + (leak ? "✘" : "✔"));
+                sb.AppendLine();
+
                 sb.AppendLine("=== 新装 Mod 会弹窗问中文名吗 ===");
                 var empty = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 int askCount = 0;
@@ -557,6 +674,8 @@ namespace SMM
 
                     var pages = new (string name, System.Windows.Controls.UserControl page)[]
                     {
+                        ("AI 设置页", new AiPage(win)),
+                        ("快捷键页", new HotkeysPage(win)),
                         ("浏览下载页", new BrowsePage(win)),
                         ("备份回滚页", new BackupPage(win)),
                         ("问题检查页", new IssuesPage(win)),
@@ -594,6 +713,47 @@ namespace SMM
                     sb.AppendLine("  改中文名对话框：OK");
                     nameDlg.Close();
 
+                    // 互斥组对话框
+                    var groupDlg = new ExclusiveGroupDialog(win.Env,
+                        new List<LocalMod> { fakeMod },
+                        new List<LocalMod> { fakeMod });
+                    groupDlg.Measure(new System.Windows.Size(760, 560));
+                    groupDlg.Arrange(new System.Windows.Rect(0, 0, 760, 560));
+                    groupDlg.UpdateLayout();
+                    sb.AppendLine("  互斥组对话框：OK");
+                    groupDlg.Close();
+
+                    // 通用输入框（带按键捕获）
+                    var inputDlg = new TextInputDialog("改快捷键", "自检用", "新的按键", "B",
+                        _ => null, null, null, null, captureKeys: true);
+                    inputDlg.Measure(new System.Windows.Size(720, 460));
+                    inputDlg.Arrange(new System.Windows.Rect(0, 0, 720, 460));
+                    inputDlg.UpdateLayout();
+                    sb.AppendLine("  改键输入框（含按键捕获）：OK");
+
+                    // 真模拟一次"按键"：走一遍「按键 → 键名 → 填进输入框」
+                    var capBox = inputDlg.FindName("TxtValue") as System.Windows.Controls.TextBox;
+                    bool capOk = inputDlg.SimulateKeyPress(System.Windows.Input.Key.F5);
+                    string capText = capBox?.Text ?? "?";
+                    bool capCombo = inputDlg.SimulateKeyPress(System.Windows.Input.Key.F5, leftShift: true);
+                    string capComboText = capBox?.Text ?? "?";
+
+                    sb.AppendLine("  按键捕获：按 F5 → " + capText + (capOk && capText == "F5" ? " OK" : " ✗")
+                                  + "；按住 LeftShift 再按 F5 → " + capComboText
+                                  + (capCombo && capComboText == "LeftShift + F5" ? " OK" : " ✗")
+                                  + "；键名映射 "
+                                  + string.Join("　", new[]
+                                  {
+                                      System.Windows.Input.Key.A,
+                                      System.Windows.Input.Key.D5,
+                                      System.Windows.Input.Key.NumPad3,
+                                      System.Windows.Input.Key.LeftCtrl,
+                                      System.Windows.Input.Key.OemComma,
+                                      System.Windows.Input.Key.PageUp,
+                                      System.Windows.Input.Key.Space
+                                  }.Select(k => k + "→" + (TextInputDialog.KeyName(k) ?? "（不支持）"))));
+                    inputDlg.Close();
+
                     win.Close();
                 }
                 catch (Exception ex)
@@ -608,8 +768,150 @@ namespace SMM
                 sb.AppendLine("  界面测试超时（可能有模态框卡住）");
         }
 
-        // ==================== 通用 ====================
+        /// <summary>
+        /// 拿一个真实的 config.json 复制到临时目录，真跑一遍「改键 → 禁用 → 启用」，
+        /// 确认只动那一个字段、其它设置没被写坏。只碰临时副本，原文件不动。
+        /// </summary>
+        private static string HotkeyWriteProbe(List<HotkeyBinding> hotkeys)
+        {
+            var src = hotkeys?.FirstOrDefault(h => h != null && File.Exists(h.ConfigPath));
+            if (src == null)
+                return "跳过（没有可用的 config.json 可以测：进游戏跑一次再来看）";
 
+            string tmp = Path.Combine(Path.GetTempPath(), "smm-keycopy-" + Guid.NewGuid().ToString("N").Substring(0, 8));
+            try
+            {
+                Directory.CreateDirectory(tmp);
+                string copy = Path.Combine(tmp, "config.json");
+                File.Copy(src.ConfigPath, copy, true);
+
+                string beforeLeaves = DumpLeaves(File.ReadAllText(src.ConfigPath));
+                string original = src.Value;
+
+                // ModId 用假的，避免动到真实绑定在配置里记的「原按键」
+                var probe = new HotkeyBinding
+                {
+                    ModId = "smm.selftest.probe",
+                    ModName = src.ModName,
+                    ConfigPath = copy,
+                    JsonPath = src.JsonPath,
+                    Value = original,
+                    Normalized = Hotkeys.Normalize(original)
+                };
+
+                var env = AppEnv.Current;
+                bool wrote, disabled, enabled;
+                try
+                {
+                    Hotkeys.Write(env, probe, "F9");
+                    wrote = probe.Value == "F9";
+
+                    Hotkeys.Disable(env, probe);
+                    disabled = probe.Value == "None";
+
+                    Hotkeys.Enable(env, probe);
+                    enabled = probe.Value == "F9";
+                }
+                catch (Exception ex)
+                {
+                    return "失败：" + ex.Message;
+                }
+                finally
+                {
+                    env?.Config?.HotkeyOriginal?.Remove("smm.selftest.probe|" + src.JsonPath);
+                    env?.Config?.Save();
+                }
+
+                string afterAll = DumpLeaves(File.ReadAllText(copy));
+                string othersOkCompare = StripLine(beforeLeaves, src.JsonPath);
+                bool othersOk = othersOkCompare == StripLine(afterAll, src.JsonPath);
+                string diffDetail = othersOk ? "" : "　差异：" + FirstDiff(othersOkCompare, StripLine(afterAll, src.JsonPath));
+
+                // 最后把值写回原值，确认能改回来
+                bool restored;
+                try
+                {
+                    Hotkeys.Write(env, probe, original);
+                    restored = DumpLeaves(File.ReadAllText(copy)) == beforeLeaves;
+                }
+                catch { restored = false; }
+
+                return $"改键={(wrote ? "OK" : "✗")}　禁用={(disabled ? "OK" : "✗")}"
+                       + $"　启用={(enabled ? "OK" : "✗")}　其它字段保留={(othersOk ? "OK" : "✗")}"
+                       + $"　改回原值={(restored ? "OK" : "✗")}"
+                       + $"（样本：{src.ModName} {src.JsonPath} = {original}）"
+                       + diffDetail;
+            }
+            catch (Exception ex)
+            {
+                return "失败：" + ex.Message;
+            }
+            finally
+            {
+                try { if (Directory.Exists(tmp)) Directory.Delete(tmp, true); } catch { }
+            }
+        }
+
+        /// <summary>把 JSON 里所有叶子节点拍平成「路径=值」的文本，用于比对"别的字段有没有被改"。</summary>
+        private static string DumpLeaves(string json)
+        {
+            try
+            {
+                using var doc = JsonUtil.Parse(json);
+                var list = new List<string>();
+
+                void Walk(System.Text.Json.JsonElement el, string path)
+                {
+                    switch (el.ValueKind)
+                    {
+                        case System.Text.Json.JsonValueKind.Object:
+                            foreach (var p in el.EnumerateObject())
+                                Walk(p.Value, path + "." + p.Name);
+                            break;
+                        case System.Text.Json.JsonValueKind.Array:
+                            int i = 0;
+                            foreach (var x in el.EnumerateArray())
+                                Walk(x, path + "[" + i++ + "]");
+                            break;
+                        default:
+                            list.Add(path + "=" + el.ToString());
+                            break;
+                    }
+                }
+
+                Walk(doc.RootElement, "");
+                list.Sort(StringComparer.Ordinal);
+                return string.Join("\n", list);
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        /// <summary>找出两份「叶子快照」的头几处不同（诊断用）。</summary>
+        private static string FirstDiff(string a, string b)
+        {
+            var la = (a ?? "").Split('\n');
+            var lb = (b ?? "").Split('\n');
+            var setB = new HashSet<string>(lb, StringComparer.Ordinal);
+            var setA = new HashSet<string>(la, StringComparer.Ordinal);
+
+            var onlyA = la.Where(x => !setB.Contains(x)).Take(3).ToList();
+            var onlyB = lb.Where(x => !setA.Contains(x)).Take(3).ToList();
+
+            string s = "";
+            if (onlyA.Count > 0) s += "仅原文件有 → " + string.Join(" ｜ ", onlyA);
+            if (onlyB.Count > 0) s += (s.Length > 0 ? "；" : "") + "仅改写后有 → " + string.Join(" ｜ ", onlyB);
+            return s.Length == 0 ? "（行集合相同，可能是顺序/空白差异）" : s;
+        }
+
+        /// <summary>去掉指定路径那一行（比对时排除被测的那个字段）。</summary>
+        private static string StripLine(string leaves, string path)
+            => string.Join("\n", (leaves ?? "").Split('\n')
+                .Where(l => !l.StartsWith(path + "=", StringComparison.Ordinal)));
+
+        // ==================== 通用 ====================
         /// <summary>打开网页。用哪个浏览器由设置决定（默认 Edge），失败了会退回系统默认。</summary>
         public static void OpenUrl(string url)
         {

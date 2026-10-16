@@ -1,0 +1,79 @@
+<Window x:Class="SMM.ExclusiveGroupDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="互斥组"
+        Width="760" Height="560" MinHeight="420" MinWidth="640" MaxHeight="800"
+        ResizeMode="CanResize"
+        WindowStartupLocation="CenterOwner"
+        Icon="/Assets/app.ico"
+        Background="{StaticResource B.Window}"
+        TextOptions.TextFormattingMode="Display"
+        FontFamily="Microsoft YaHei UI, Segoe UI">
+    <Grid Margin="20,18,20,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="TxtTitle" Grid.Row="0" Text="互斥组" Style="{StaticResource T.Title}" />
+        <TextBlock x:Name="TxtSub" Grid.Row="1" Style="{StaticResource T.Dim}" Margin="0,6,0,0"
+                   TextWrapping="Wrap" />
+
+        <Border Grid.Row="2" Style="{StaticResource Card}" Margin="0,14,0,0">
+            <StackPanel>
+                <TextBlock Text="组名" Style="{StaticResource T.Section}" Margin="0,0,0,6" />
+                <TextBox x:Name="TxtGroup" MinHeight="32" MaxLength="20"
+                         Tag="在这里输入组名，例如：马皮肤" TextChanged="TxtGroup_TextChanged" />
+                <StackPanel x:Name="PanelExisting" Margin="0,10,0,0">
+                    <TextBlock Text="已经有的组（点一下直接填进上面的框）" Style="{StaticResource T.Dim}" />
+                    <WrapPanel x:Name="WrapExisting" Margin="0,6,0,0" />
+                </StackPanel>
+                <TextBlock Style="{StaticResource T.Dim}" Margin="0,8,0,0" TextWrapping="Wrap"
+                           Text="自己起个名字就行：同名即同一组。多套马皮肤都填「马皮肤」，它们就归成一组。" />
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="3" Style="{StaticResource Card}" Margin="0,12,0,0">
+            <StackPanel>
+                <TextBlock Text="同组规则" Style="{StaticResource T.Section}" Margin="0,0,0,6" />
+                <TextBlock Style="{StaticResource T.Dim}" TextWrapping="Wrap"
+                           Text="同一个组里，同一时间只会有一个处于启用状态。你在「Mod 管理」里启用其中一个时，管理器会自动把同组其它停用 —— 换皮肤只要点一下「启用」，不会两个同时加载导致冲突。" />
+                <TextBlock Style="{StaticResource T.Dim}" TextWrapping="Wrap" Margin="0,4,0,0"
+                           Text="禁用操作本身不挪动别的组；分组信息只存在管理器自己的配置里，不改 Mod 文件。改动重启游戏后生效。" />
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="4" Style="{StaticResource Card}" Margin="0,12,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <StackPanel Orientation="Horizontal" Grid.Row="0">
+                    <TextBlock Text="组内成员" Style="{StaticResource T.Section}" />
+                    <TextBlock x:Name="TxtCount" Style="{StaticResource T.Dim}" Margin="10,0,0,0"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+                <ListBox x:Name="ListMembers" Grid.Row="1" Margin="0,8,0,0" MinHeight="90"
+                         Background="Transparent" BorderThickness="0"
+                         Foreground="{StaticResource B.Text}" />
+            </Grid>
+        </Border>
+
+        <TextBlock Grid.Row="5" x:Name="TxtError" Margin="0,12,0,0" TextWrapping="Wrap"
+                   VerticalAlignment="Top" Foreground="{StaticResource B.Danger}" />
+
+        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+            <Button x:Name="BtnRemove" Content="移出此组" Style="{StaticResource Btn}"
+                    Click="BtnRemove_Click" />
+            <Button x:Name="BtnSave" Content="保存" Style="{StaticResource BtnAccent}"
+                    Margin="8,0,0,0" Click="BtnSave_Click" />
+            <Button Content="取消" Style="{StaticResource Btn}" Margin="8,0,0,0" Click="BtnCancel_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

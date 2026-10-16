@@ -521,6 +521,8 @@ namespace SMM
                 page = key switch
                 {
                     "mods" => new ModsPage(this),
+                    "hotkeys" => new HotkeysPage(this),
+                    "ai" => new AiPage(this),
                     "browse" => new BrowsePage(this),
                     "backup" => new BackupPage(this),
                     "issues" => new IssuesPage(this),
